@@ -30,6 +30,7 @@ import AfipOperaciones from './views/Tablas/AfipOperaciones.vue';
 import ImportarArticulos from './views/ImportarArticulos.vue';
 import StocksInventarios from './views/Stocks/StocksInventarios.vue';
 import Ventas from './views/Ventas.vue';
+import Compras from './views/Compras.vue';
 import StocksAjustes from './views/Stocks/StocksAjustes.vue';
 import StocksTransferencias from './views/Stocks/StocksTransferencias.vue';
 import TesoreriaCaja from './views/Tesoreria/TesoreriaCaja.vue';
@@ -190,8 +191,12 @@ export default new Router({
     {
       path: '/ventas',
       name: 'ventas',
-      refs: 'ventas',
       component: Ventas,
+    },
+    {
+      path: '/compras',
+      name: 'compras',
+      component: Compras,
     },
     {
       path: '/stocksinventarios',

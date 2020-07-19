@@ -10,6 +10,24 @@ class ArticuloController {
 
   async index ({ auth }) {
     const user = await auth.getUser()
+
+    let id = 16
+    const articulo = await Articulo.find(id)
+    //const aborrar = await Precio.query().where('articulo_id', 16).with('lista').fetch()
+    const aborrar = await Precio.query()
+      .with('lista')
+      .where('articulo_id', 16)
+      .where('lista_id', 1)
+      .fetch()
+
+
+//    const aborrar = await Articulo.query()
+//    .with('precios.lista')
+//    .where('lista.user_id', '=',user.id)
+//    .fetch()
+    return aborrar
+
+    /*
     const articulos = await Articulo.query()
       .with('marca')
       .with('grupo')
@@ -25,7 +43,8 @@ class ArticuloController {
       .with('moneda')
       .fetch()
     return articulos
-//  return await Articulo.all()
+    */
+
   }
 
   async exists ({ auth, request, params }) {
@@ -209,6 +228,7 @@ class ArticuloController {
     const pr2 = pr[0];
     if(pr2.length>0) {
       let arr = []
+      let arrId = []
       for (let i=0; i<pr2.length; i++) {
         arr.push({articulo_id: Number(id),
                   lista_id: pr2[i].lista_id,
@@ -216,9 +236,28 @@ class ArticuloController {
                   porrem: pr2[i].porrem,
                   precio: pr2[i].precio
                 })
+        arrId.push(pr2[i].lista_id)
       }
-      await articulo.precios().delete()
-      await articulo.precios().createMany(arr)
+
+      let act = null
+      let estaba = false
+      for (let i=0; i<=arrId.length-1; i++) {
+        act = await Precio.query()
+        .where('articulo_id', id)
+        .where('lista_id', arrId[i])
+        .fetch()
+
+        if (act.rows.length > 0) {
+          estaba = true
+          act = await Precio.query()
+          .where('articulo_id', id)
+          .where('lista_id', arrId[i])
+          .update({costo: arr[i].costo, porrem: arr[i].porrem, precio: arr[i].precio})
+        }
+      }
+      if (!estaba) {
+        await articulo.precios().createMany(arr)
+      }
     }
     
     articulo.merge(request.only([
@@ -258,14 +297,11 @@ class ArticuloController {
       }      
     });
     */
-
-
     //console.log('el articulo es:' , articulo)
     //const tgs = articulo.merge(request.only(['tags']))
     //console.log('el tgs es', tgs)
     //const tg = JSON.stringify(tgs)
     //console.log('pasado a obj es',tg)
-
 
 //  tags.merge(request.only(['tags']))
 //  await tags.save()

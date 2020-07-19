@@ -16,170 +16,51 @@
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn
                     fab color="cyan accent-3" :class="tl"
-                    @click="nuevo('fac')" v-on="on">Fac
+                    @click="nuevo('com')" v-on="on">Com
                   </v-btn>
                 </template>
-                <span>Nueva Factura</span>
+                <span>Nueva Compra</span>
               </v-tooltip>
               <v-tooltip bottom>
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn
                     fab color="cyan accent-3" :class="tl"
-                    @click="nuevo('ndc')" v-on="on">Ndc
+                    @click="nuevo('gas')" v-on="on">Gas
                   </v-btn>
                 </template>
-                <span>Nueva Nota de Crédito</span>
+                <span>Nuevo Gasto</span>
               </v-tooltip>
               <v-tooltip bottom>
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn
                     fab color="cyan accent-3" :class="tl"
-                    @click="nuevo('ndd')" v-on="on">Ndd
-                  </v-btn>
-                </template>
-                <span>Nueva Nota de Débito</span>
-              </v-tooltip>
-              <!--
-              <v-tooltip bottom>
-                <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    fab color="lime accent-1" :class="tl"
                     @click="nuevo('rem')" v-on="on">Rem
                   </v-btn>
                 </template>
-                <span>Remito</span>
+                <span>Nuevo Remito</span>
               </v-tooltip>
               <v-tooltip bottom>
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn
-                    fab color="lime accent-1" :class="tl"
-                    @click="nuevo('remfac')" v-on="on">Rem/F
-                  </v-btn>
-                </template>
-                <span>Generar Remito sobre una Factura</span>
-              </v-tooltip>
-              <v-tooltip bottom>
-                <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    fab color="lime accent-1" :class="tl"
-                    @click="nuevo('facrem')" v-on="on">Fac/R
-                  </v-btn>
-                </template>
-                <span>Facturar un Remito</span>
-              </v-tooltip>
-              <v-tooltip bottom>
-                <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    fab color="indigo lighten-3" :class="tl"
-                    @click="nuevo('pre')" v-on="on">Pre
-                  </v-btn>
-                </template>
-                <span>Nuevo Presupuesto</span>
-              </v-tooltip>
-              <v-tooltip bottom>
-                <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    fab color="indigo lighten-3" :class="tl"
-                    @click="nuevo('facpre')" v-on="on">Fac/P
-                  </v-btn>
-                </template>
-                <span>Facturar un Presupuesto</span>
-              </v-tooltip>
-              <v-tooltip bottom>
-                <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    fab color="deep-orange lighten-2" :class="tl"
-                    @click="nuevo('ped')" v-on="on">ped
+                    fab color="cyan accent-3" :class="tl"
+                    @click="nuevo('ped')" v-on="on">Ped
                   </v-btn>
                 </template>
                 <span>Nuevo Pedido</span>
               </v-tooltip>
-              <v-tooltip bottom>
-                <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    fab color="deep-orange lighten-2" :class="tl"
-                    @click="nuevo('facped')" v-on="on">Fac/P
-                  </v-btn>
-                </template>
-                <span>Facturar un Pedido</span>
-              </v-tooltip>
-              <v-tooltip bottom>
-                <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    fab color="deep-purple accent-1" :class="tl"
-                    @click="nuevo('not')" v-on="on">Notas
-                  </v-btn>
-                </template>
-                <span>Anotador de Ventas</span>
-              </v-tooltip>
-              <v-tooltip bottom>
-                <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    fab color="deep-purple accent-1" :class="tl"
-                    @click="nuevo('facnot')" v-on="on">Fac/N
-                  </v-btn>
-                </template>
-                <span>Facturar Anotaciones de Ventas</span>
-              </v-tooltip>
-              <v-tooltip bottom>
-                <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    fab color="green accent-3" :class="tl"
-                    @click="nuevo('rec')" v-on="on">Rec
-                  </v-btn>
-                </template>
-                <span>Nuevo Recibo</span>
-              </v-tooltip>
-              <v-tooltip bottom>
-                <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    fab color="green accent-1" :class="tl"
-                    @click="nuevo('ndcfac')" v-on="on">Ndc/F
-                  </v-btn>
-                </template>
-                <span>Aplicar Nota de Crédito a Factura</span>
-              </v-tooltip>
-              <v-tooltip bottom>
-                <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    fab color="green accent-1" :class="tl"
-                    @click="nuevo('facndc')" v-on="on">Fac/C
-                  </v-btn>
-                </template>
-                <span>Aplicar Factura a Nota de Crédito</span>
-              </v-tooltip>
-              <v-tooltip bottom>
-                <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    fab color="green accent-1" :class="tl"
-                    @click="nuevo('nddfac')" v-on="on">Ndd/F
-                  </v-btn>
-                </template>
-                <span>Aplicar Nota de Débito a Factura</span>
-              </v-tooltip>
-              <v-btn
-                fab color="white accent-3"
-                @click='exportarAXLS'>
-                <v-icon>mdi-file-excel</v-icon>
-              </v-btn>
-              <v-btn
-                fab color="white accent-3"
-                @click='exportarAPDF'>
-                <v-icon>mdi-file-pdf</v-icon>
-              </v-btn>
-              -->
             </template>
             <v-toolbar-title
               class="white--text" @click="listarHTTP()" v-model="sucursal">
-              Central de Ventas sucursal ({{ sucursal }}) caja ({{ caja }})
+              Central de Compras sucursal ({{ sucursal }}) caja ({{ caja }})
             </v-toolbar-title>
             <v-divider class="mx-4" inset vertical></v-divider>
             <v-spacer></v-spacer>
             <!-- Modal del diálogo para Alta y Edicion -->
-            <v-dialog v-model="dialog" max-width="550px" :fullscreen="true">
+
+            <!-- DIALOGO DE LA CABECERA -->
+            <v-dialog v-model="dialogCab" max-width="550px" :fullscreen="true">
               <template v-slot:activator="{ on }"></template>
               <v-card>
-
                 <v-card-title  class="cyan white--text">
                   <span class="headline">{{ formTitle }}</span>
                   <v-spacer></v-spacer>
@@ -193,11 +74,12 @@
                   </span>
                 </v-card-title>
 
+                <!--// CABECERA DE LA COMPRA // -->
                 <v-form ref="form">
                   <v-card-text>
                     <v-container>
                       <v-row>
-                        <v-col cols="6" sm="6" md="6">
+                        <v-col cols="5" sm="5" md="5">
                           <v-autocomplete
                             v-model="editado.tercero_id"
                             :items="itemsTerceros"
@@ -206,19 +88,73 @@
                             item-text="nombre"
                             item-value="id"
                             autofocus
-                            label="Cliente"
+                            label="Proveedor"
                             placeholder="Escriba para buscar"
                             prepend-icon="mdi-database-search">
                           </v-autocomplete>
                         </v-col>
                         <v-col cols="1" sm="1" md="1">
+                          <v-select
+                            label="Comprobante" v-model="editado.afipcpr_id"
+                            :items="cprItems" item-value="id" item-text="abrev"
+                            autocomplete return-object>
+                          </v-select>
+                        </v-col>
+                        <v-col cols="1" sm="1" md="1">
                           <v-text-field
-                            disabled
-                            class="subtitle-1"
-                            v-model="editado.letra"
-                            label="Letra">
+                            v-model="editado.afipSuc"
+                            @change="afipsuc()"
+                            label="Suc">
                           </v-text-field>
                         </v-col>
+                        <v-col cols="2" sm="2" md="2">
+                          <v-text-field
+                            v-model="editado.afipNro"
+                            label="Numero"
+                            @change="afipnro()">
+                          </v-text-field>
+                        </v-col>
+
+                        <v-col cols="2" sm="2" md="2">
+                          <!--<input type="datetime-local" name="datetime">-->
+                          <v-menu
+                            ref="menu1"
+                            v-model="menu1"
+                            :close-on-content-click="false"
+                            transition="scale-transition"
+                            offset-y
+                            max-width="290px"
+                            min-width="290px">
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-text-field
+                                v-model="fecha"
+                                label="Fecha"
+                                hint="MM/DD/YYYY"
+                                persistent-hint
+                                prepend-icon="event"
+                                v-bind="attrs"
+                                @blur="date = parseDate(fecha)"
+                                v-on="on"
+                              ></v-text-field>
+                            </template>
+                            <v-date-picker
+                              v-model="date"
+                              no-title
+                              locale="es"
+                              @input="menu1 = false">
+                            </v-date-picker>
+                          </v-menu>
+                        </v-col>
+                        <v-spacer></v-spacer>
+
+                        <v-col cols="1" sm="1" md="1">
+                          <v-text-field
+                            v-model="editado.perfiscal"
+                            label="Per.Fiscal">
+                          </v-text-field>
+                        </v-col>
+                      </v-row>
+                      <v-row>
                         <v-col cols="1" sm="1" md="1">
                           <v-text-field
                             disabled
@@ -243,14 +179,6 @@
                             label="Numero">
                           </v-text-field>
                         </v-col>
-                        <v-col cols="2" sm="2" md="2">
-                          <v-select
-                            class="body-2" label="Depósito" v-model="editado.deposito_id"
-                            :items="depItems" item-value="id" item-text="nombre" return-object>
-                          </v-select>
-                        </v-col>
-                      </v-row>
-                      <v-row>
                         <v-col cols="6" sm="6" md="6">
                           <v-select
                             label='Direccion'
@@ -268,35 +196,318 @@
                             <!--return-object>-->
                           </v-select>
                         </v-col>
+                        <v-col cols="1" sm="1" md="1">
+                          <v-select
+                            label="Moneda" v-model="editado.moneda_id"
+                            :items="monItems" item-value="id" item-text="simbolo" return-object>
+                          </v-select>
+                        </v-col>
                         <v-col cols="2" sm="2" md="2">
-                          <!--
-                          <v-switch
-                            label="Cuenta Corriente"
-                            v-model="ctacte"
-                            @change="efectivo=!ctacte"
-                            :disabled="!habcte">
-                          </v-switch>
-                          -->
-                          <!--
                           <v-select
                             label="Medio de Pago" v-model="editado.medio_id"
                             :items="medItems" item-value="id" item-text="nombre" return-object>
                           </v-select>
-                          -->
-                        </v-col>
-                        <v-col cols="2" sm="2" md="2">
-                          <v-select
-                            label="Moneda" v-model="editado.moneda_id"
-                            :items="monItems" item-value="id" item-text="nombre" return-object>
-                          </v-select>
-                        </v-col>
-                        <v-col cols="2" sm="2" md="2">
-                          <v-select
-                            label="Lista de Precio" v-model="editado.lista_id"
-                            :items="lisItems" item-value="id" item-text="nombre" return-object>
-                          </v-select>
                         </v-col>
                       </v-row>
+
+                      <!--// TOTALES DEL COMPROBANTE // -->
+                      <v-row>
+                        <v-col cols="7" sm="7" md="7">
+                          <v-row>
+                            <v-col cols="4" sm="4" md="4">
+                              <v-text-field
+                                v-model="editado.total"
+                                label="Total del Comprobante"
+                                @change="calculos('total')">
+                              </v-text-field>
+                            </v-col>
+                          </v-row>
+                          <v-row>
+                            <v-col cols="4" sm="4" md="4">
+                              <v-text-field
+                                v-model="editado.retib"
+                                label="Ret.Ing.Brutos"
+                                @change="calculos('retib')">
+                              </v-text-field>
+                            </v-col>
+                            <v-col cols="4" sm="4" md="4">
+                              <v-text-field
+                                v-model="editado.retgan"
+                                label="Ret.Ganancias"
+                                @change="calculos('retgan')">
+                              </v-text-field>
+                            </v-col>
+                            <v-col cols="4" sm="4" md="4">
+                              <v-text-field
+                                v-model="editado.retiva"
+                                label="Ret.IVA"
+                                @change="calculos('retiva')">
+                              </v-text-field>
+                            </v-col>
+                          </v-row>
+                          <v-row>
+                            <v-col cols="4" sm="4" md="4">
+                              <v-text-field
+                                v-model="editado.exento"
+                                label="Exento"
+                                @change="calculos('exento')">
+                              </v-text-field>
+                            </v-col>
+                            <v-col cols="4" sm="4" md="4">
+                              <v-text-field
+                                v-model="editado.gravado"
+                                label="Gravado"
+                                @change="calculos('gravado')">
+                              </v-text-field>
+                            </v-col>
+                            <v-col cols="4" sm="4" md="4">
+                              <v-text-field
+                                v-model="editado.iva"
+                                label="IVA"
+                                @change="calculos('iva')">
+                              </v-text-field>
+                            </v-col>
+                          </v-row>
+                        </v-col>
+
+                        <!--// DETALLES DEL IVA // -->
+                        <v-col cols="5" sm="5" md="5">
+                          <v-data-table
+                            :headers="headersTasasDeIVA"
+                            :items="tasasIVA"
+                            class="elevation-3"
+                            hide-default-footer>
+                            <template v-slot:top>
+                              <v-dialog v-model="dialogTasaArt" max-width="900px">
+                                <template v-slot:activator="{ on, attrs }">
+                                </template>
+                                <v-card>
+                                  <v-card-title>
+                                    <span class="headline">TASAS DE IVA</span>
+                                  </v-card-title>
+                                  <v-card-text>
+                                    <v-container>
+                                    </v-container>
+                                  </v-card-text>
+                                  <v-card-actions>
+                                  </v-card-actions>
+                                </v-card>
+                              </v-dialog>
+                            </template>
+                            <template v-slot:item.activo="{ item }">
+                              <v-chip
+                                :color="getColor(item.activo)"
+                                dark>{{item.activo?'Sí':'No'}}
+                              </v-chip>
+                            </template>
+                            <template v-slot:item.accion="{item}">
+                              <v-btn
+                                class="mr-2" fab x-small color="white"
+                                @click="activarDesactivarDep(item)">
+                                <v-icon dark>mdi-checkbox-marked-outline</v-icon>
+                              </v-btn>
+                            </template>
+
+                            <template v-slot:item.base="props">
+                              <v-edit-dialog
+                                :return-value.sync="props.item.base"
+                                @save="save(props.item)"
+                                @cancel="cancel(props.item)"
+                                @open="open(props.item)"
+                                @close="close(props.item)"> {{ props.item.base }}
+                                <template v-slot:input>
+                                  <v-text-field
+                                    v-model="props.item.base"
+                                    :rules="[max25chars]"
+                                    label="Editar"
+                                    single-line
+                                    counter
+                                  ></v-text-field>
+                                </template>
+                              </v-edit-dialog>
+                            </template>
+
+                          </v-data-table>
+                        </v-col>
+                      </v-row>
+
+                      <!--// PIE DEL FORMULARIO CABECERA // -->
+                      <v-row>
+                        <v-col cols="12" sx="12" mx="12">
+                          <span dense class="headline">Valores</span>
+                          <v-row>
+                            <v-col cols="2" sm="2" md="2">
+                              <v-text-field
+                                dense outlined
+                                v-model="valEfectivo"
+                                label="Efectivo"
+                                @change="calculosValores('E')">
+                              </v-text-field>
+                            </v-col>
+                            <v-col cols="2" sm="2" md="2">
+                              <v-text-field
+                                dense outlined
+                                :disabled="!ctacte"
+                                v-model="valCtaCte"
+                                label="Cta.Cte."
+                                @change="calculosValores('C')">
+                              </v-text-field>
+                            </v-col>
+                            <v-col cols="2" sm="2" md="2">
+                              <v-menu
+                                ref="menu2"
+                                v-model="menu2"
+                                :disabled="!ctacte"
+                                :close-on-content-click="false"
+                                transition="scale-transition"
+                                offset-y
+                                max-width="290px"
+                                min-width="290px">
+                                <template v-slot:activator="{ on, attrs }">
+                                  <v-text-field
+                                    v-model="vencimiento"
+                                    dense outlined
+                                    :disabled="!ctacte"
+                                    label="Vencimiento"
+                                    hint="MM/DD/YYYY"
+                                    persistent-hint
+                                    prepend-icon="event"
+                                    v-bind="attrs"
+                                    @blur="date = parseDate(vencimiento)"
+                                    v-on="on"
+                                  ></v-text-field>
+                                </template>
+                                <v-date-picker
+                                  v-model="date"
+                                  no-title
+                                  locale="es"
+                                  @input="menu2 = false">
+                                </v-date-picker>
+                              </v-menu>
+                            </v-col>
+
+                            <v-col cols="2" sm="2" md="2">
+                              <v-text-field
+                                dense outlined
+                                v-model="valValores"
+                                label="Valores"
+                                @change="calculosValores('V')">
+                              </v-text-field>
+                            </v-col>
+                            <v-col cols="2" sm="2" md="2">
+                            </v-col>
+                            <v-col cols="2" sm="2" md="2">
+                            </v-col>
+                            <v-col cols="2" sm="2" md="2">
+                              <v-text-field
+                                disabled dense outlined
+                                v-model="valDiferencia"
+                                label="Diferencia"
+                                @change="calculos()">
+                              </v-text-field>
+                            </v-col>
+                          </v-row>
+
+                          <!--// TABLA DE VALORES // -->
+                          <v-data-table
+                            :headers="headersMed"
+                            :items="valores"
+                            dense
+                            class="elevation-3"
+                            hide-default-footer>
+                            <template v-slot:top>
+                              <v-dialog v-model="dialogMed" max-width="900px">
+                                <template v-slot:activator="{ on, attrs }">
+                                  <v-btn
+                                    x-small fab color="cyan accent-3"
+                                    @click="nuevoMed">
+                                    <v-icon>mdi-plus</v-icon>
+                                  </v-btn>
+                                </template>
+                                <v-card>
+                                  <v-card-title>
+                                    <span
+                                      class="headline">{{ formTitleMed }}
+                                    </span>
+                                  </v-card-title>
+                                  <v-card-text>
+                                    <v-container>
+                                      <v-row>
+                                        <v-col cols="3" sm="3" md="3">
+                                          <v-text-field
+                                            v-model="editadoMed.forpag_id"
+                                            label="Forma de Pago">
+                                          </v-text-field>
+                                        </v-col>
+                                      </v-row>
+                                    </v-container>
+                                  </v-card-text>
+                                  <v-card-actions>
+                                    <v-spacer></v-spacer>
+                                    <v-btn
+                                      color="blue darken-1"
+                                      text
+                                      @click="cancelarMed">
+                                      Cancelar
+                                    </v-btn>
+                                    <v-btn
+                                      color="blue darken-1"
+                                      text
+                                      @click="guardarMed(editadoMed)">
+                                      Guardar
+                                    </v-btn>
+                                  </v-card-actions>
+                                </v-card>
+                              </v-dialog>
+                            </template>
+                            <template v-slot:item.activo="{ item }">
+                              <v-chip
+                                :color="getColor(item.activo)"
+                                dark>{{item.activo?'Sí':'No'}}
+                              </v-chip>
+                            </template>
+                            <template v-slot:item.accion="{item}">
+                              <v-btn
+                                class="mr-2" fab dark x-small color="cyan"
+                                @click="editarMed(item)">
+                                <v-icon dark>mdi-pencil</v-icon>
+                              </v-btn>
+                              <v-btn
+                                class="mr-2" fab x-small color="white"
+                                @click="borrarMed(item)">
+                                <v-icon dark>mdi-checkbox-marked-outline</v-icon>
+                              </v-btn>
+                            </template>
+                          </v-data-table>
+                        </v-col>
+                      </v-row>
+                    </v-container>
+                  </v-card-text>
+                </v-form>
+              </v-card>
+            </v-dialog>
+            <!--// FIN DE LA CABECERA DE LA COMPRA // -->
+
+            <!--// ARTICULOS // -->
+            <v-dialog v-model="dialogArt" max-width="550px" :fullscreen="true">
+              <template v-slot:activator="{ on }"></template>
+              <v-card>
+                <v-card-title  class="cyan white--text">
+                  <span class="headline">{{ formTitle }}</span>
+                  <v-spacer></v-spacer>
+                  <span class="text--right">
+                    <v-btn
+                      color="blue-grey" class="ma-2 white--text" @click="cancelarArt">Cancelar
+                    </v-btn>
+                    <v-btn
+                      color="teal accent-4" class="ma-2 white--text" @click="guardarArt">Guardar
+                    </v-btn>
+                  </span>
+                </v-card-title>
+
+                <v-form ref="art">
+                  <v-card-text>
+                    <v-container>
                       <v-row>
                         <v-col cols="12" sx="12" mx="12">
                           <span dense class="headline">Items</span>
@@ -307,7 +518,7 @@
                             class="elevation-3"
                             hide-default-footer>
                             <template v-slot:top>
-                              <v-dialog v-model="dialogArt" max-width="900px">
+                              <v-dialog v-model="dialogEditArt" max-width="900px">
                                 <template v-slot:activator="{ on, attrs }">
                                   <v-btn
                                     fab color="cyan accent-3"
@@ -318,9 +529,7 @@
                                 </template>
                                 <v-card>
                                   <v-card-title>
-                                    <span
-                                      class="headline">{{ formTitleArt }}
-                                    </span>
+                                    <span class="headline">{{ formTitleArt }}</span>
                                   </v-card-title>
                                   <v-card-text>
                                     <v-container>
@@ -330,8 +539,7 @@
                                             autofocus
                                             label="Codigo"
                                             v-model="editadoArt.codigo"
-                                            class = "inputField input-name p-3 styled-input"
-                                            >
+                                            class = "inputField input-name p-3 styled-input">
                                           </v-text-field>
                                         </v-col>
                                         <v-col cols="3" sm="3" md="3">
@@ -433,13 +641,13 @@
                                     <v-btn
                                       color="blue darken-1"
                                       text
-                                      @click="cancelarArt">
+                                      @click="cancelarEditArt">
                                       Cancelar
                                     </v-btn>
                                     <v-btn
                                       color="blue darken-1"
                                       text
-                                      @click="guardarArt(editadoArt)">
+                                      @click="guardarEditArt(editadoArt)">
                                       Guardar
                                     </v-btn>
                                   </v-card-actions>
@@ -488,13 +696,6 @@
                         <v-col cols="2" sm="2" md="2">
                           <v-text-field
                             disabled dense outlined
-                            v-model="editado.gravado"
-                            label="Gravado">
-                          </v-text-field>
-                        </v-col>
-                        <v-col cols="2" sm="2" md="2">
-                          <v-text-field
-                            disabled dense outlined
                             v-model="editado.exento"
                             label="Exento">
                           </v-text-field>
@@ -509,145 +710,25 @@
                         <v-col cols="2" sm="2" md="2">
                           <v-text-field
                             disabled dense outlined
+                            v-model="editado.gravado"
+                            label="Gravado">
+                          </v-text-field>
+                        </v-col>
+                        <v-col cols="2" sm="2" md="2">
+                          <v-text-field
+                            disabled dense outlined
                             v-model="editado.total"
                             label="TOTAL">
                           </v-text-field>
                         </v-col>
                       </v-row>
 
-                      <!--
-                      <v-row v-if="!ctacte">
-                        <v-col cols="4" sm="4">
-                          <v-switch
-                            label="Es una operacion en Efectivo"
-                            v-model="efectivo">
-                          </v-switch>
-                        </v-col>
-                      </v-row>
-                      -->
-                      <!--<v-row v-if="!efectivo && !ctacte">-->
-
-                      <v-row>
-                        <v-col cols="12" sx="12" mx="12">
-                          <span dense class="headline">Valores</span>
-
-                          <v-row>
-                            <v-col cols="2" sm="2" md="2">
-                              <v-text-field
-                                dense outlined
-                                v-model="valEfectivo"
-                                label="Efectivo"
-                                @change="calculosValores('E')">
-                              </v-text-field>
-                            </v-col>
-                            <v-col cols="2" sm="2" md="2">
-                              <v-text-field
-                                dense outlined
-                                :disabled="!ctacte"
-                                v-model="valCtaCte"
-                                label="Cta.Cte."
-                                @change="calculosValores('C')">
-                              </v-text-field>
-                            </v-col>
-                            <v-col cols="2" sm="2" md="2">
-                              <v-text-field
-                                dense outlined
-                                v-model="valValores"
-                                label="Valores"
-                                @change="calculosValores('V')">
-                              </v-text-field>
-                            </v-col>
-                            <v-col cols="2" sm="2" md="2">
-                            </v-col>
-                            <v-col cols="2" sm="2" md="2">
-                            </v-col>
-                            <v-col cols="2" sm="2" md="2">
-                              <v-text-field
-                                disabled dense outlined
-                                v-model="valDiferencia"
-                                label="Diferencia"
-                                @change="calculos()">
-                              </v-text-field>
-                            </v-col>
-                          </v-row>
-
-                          <v-data-table
-                            :headers="headersMed"
-                            :items="valores"
-                            dense
-                            class="elevation-3"
-                            hide-default-footer>
-                            <template v-slot:top>
-                              <v-dialog v-model="dialogMed" max-width="900px">
-                                <template v-slot:activator="{ on, attrs }">
-                                  <v-btn
-                                    x-small fab color="cyan accent-3"
-                                    @click="nuevoMed">
-                                    <v-icon>mdi-plus</v-icon>
-                                  </v-btn>
-                                </template>
-                                <v-card>
-                                  <v-card-title>
-                                    <span
-                                      class="headline">{{ formTitleMed }}
-                                    </span>
-                                  </v-card-title>
-                                  <v-card-text>
-                                    <v-container>
-                                      <v-row>
-                                        <v-col cols="3" sm="3" md="3">
-                                          <v-text-field
-                                            v-model="editadoMed.forpag_id"
-                                            label="Forma de Pago">
-                                          </v-text-field>
-                                        </v-col>
-                                      </v-row>
-                                    </v-container>
-                                  </v-card-text>
-                                  <v-card-actions>
-                                    <v-spacer></v-spacer>
-                                    <v-btn
-                                      color="blue darken-1"
-                                      text
-                                      @click="cancelarMed">
-                                      Cancelar
-                                    </v-btn>
-                                    <v-btn
-                                      color="blue darken-1"
-                                      text
-                                      @click="guardarMed(editadoMed)">
-                                      Guardar
-                                    </v-btn>
-                                  </v-card-actions>
-                                </v-card>
-                              </v-dialog>
-                            </template>
-                            <template v-slot:item.activo="{ item }">
-                              <v-chip
-                                :color="getColor(item.activo)"
-                                dark>{{item.activo?'Sí':'No'}}
-                              </v-chip>
-                            </template>
-                            <template v-slot:item.accion="{item}">
-                              <v-btn
-                                class="mr-2" fab dark x-small color="cyan"
-                                @click="editarMed(item)">
-                                <v-icon dark>mdi-pencil</v-icon>
-                              </v-btn>
-                              <v-btn
-                                class="mr-2" fab x-small color="white"
-                                @click="borrarMed(item)">
-                                <v-icon dark>mdi-checkbox-marked-outline</v-icon>
-                              </v-btn>
-                            </template>
-                          </v-data-table>
-                        </v-col>
-                      </v-row>
                     </v-container>
                   </v-card-text>
                 </v-form>
               </v-card>
             </v-dialog>
+
           </v-toolbar>
           <v-col cols="12" sm="12">  <!-- Barra de búsqueda  -->
             <v-text-field
@@ -676,6 +757,11 @@
             class="mr-2" fab x-small color="white"
             @click="print(item)">
             <v-icon dark>mdi-printer</v-icon>
+          </v-btn>
+          <v-btn v-if="item.estado='P'"
+            class="mr-2" fab x-small color="white"
+            @click="cargarArt(item)">
+            <v-icon dark>mdi-barcode</v-icon>
           </v-btn>
           <v-btn v-if="cobrar(item)"
             class="mr-2" fab x-small color="white"
@@ -714,10 +800,23 @@ export default {
     Confirmacion,
   },
   data: () => ({
+
+    // fecha
+    date: new Date().toISOString().substr(0, 10),
+    fecha: moment().format('MM-DD-YYYY'),
+    vencimiento: moment().format('MM-DD-YYYY'),
+    menu1: false,
+    menu2: false,
+
+    snack: false,
+    snackColor: '',
+    snackText: '',
+
     cfUser: '',
   //sucursal: '',
     coef: 1,  // para signar los comprobantes + o -
-    modelo: 'ventas',
+    modelo: 'compras',
+    queMostrar: 'C',
     ctacte: false,
     formTitle: '',
     formTitleArt: '',
@@ -725,6 +824,7 @@ export default {
     itemActual: null,
     tl: "text-lowercase",
     medFijos: [],
+    cprItems: [],
     lisItems: [],
     depItems: [],
     uniItems: [],
@@ -744,6 +844,7 @@ export default {
       msgBody: '',
       msgButtons: ['']
     },
+    max25chars: v => v.length <= 25 || 'Input too long!',
     nombreRules: [
       (v) => !!v || 'El nombre es requerido',
       (v) => v.length <= 50 || 'Ingrese hasta 50 caracteres'
@@ -752,10 +853,13 @@ export default {
     search: '',           // para el cuadro de búsqueda de datatables
     searchTerceros: '',   // para el cuadro de búsqueda de datatables
     searchArticulos: '',  // para el cuadro de búsqueda de datatables
-    dialog: false,        // para que la ventana de dialogo o modal no aparezca automáticamente
+    dialogCab: false,     // para que la ventana de dialogo o modal no aparezca automáticamente
     dialogArt: false,     // para que la ventana de dialogo o modal no aparezca automáticamente
-    dialogMed: false,      // para que la ventana de dialogo o modal no aparezca automáticamente
+    dialogEditArt: false, // para que la ventana de dialogo o modal no aparezca automáticamente
+    dialogTasaArt: false, // para que la ventana de dialogo o modal no aparezca automáticamente
+    dialogMed: false,     // para que la ventana de dialogo o modal no aparezca automáticamente
     items: [],
+    tasasIVA: [],
     articulos: [],
     valores: [],
     pendientes: [],
@@ -767,18 +871,27 @@ export default {
 
     // definimos los headers de la datatables
     headers: [
+      /*
       {
         text: 'ID',
         align: 'left',
         sortable: false,
         value: 'id',
       },
-      { text: 'FECHA', value:'fecha'},
+      */
       { text: 'COMPROBANTE', value:'cpr'},
+      { text: 'FECHA', value:'fecha'},
       { text: 'CLIENTE', value:'tercero.nombre'},
       { text: 'TOTAL', value:'total'},
       { text: 'PENDIENTE', value:'pendientes[0].pendiente'},
+      { text: 'ESTADO', value:'estado'},
       { text: 'ACCIONES', value: 'accion', sortable: false },
+    ],
+    headersTasasDeIVA: [
+      { text: 'ACCIONES', value: 'accion', sortable: false },
+      { text: 'TASA', value:'tasa'},
+      { text: 'BASE', value:'base'},
+      { text: 'IVA', value:'iva'},
     ],
     headersArt: [
       { text: 'CODIGO', value:'codigo'},
@@ -805,8 +918,13 @@ export default {
     editedIndexMed: -1,
     editado: {
       id: '',
+      fecha: moment().format('DD-MM-YYYY'),
+      vencimiento: moment().format('DD-MM-YYYY'),
+      perfiscal: '',
       tercero_id: '',
-      cpr: '',
+      afipcpr_id: '',
+      afipsuc: '',
+      afipnro: '',
       lista_id: '',
       deposito_id: '',
       medio_id: '',
@@ -823,12 +941,20 @@ export default {
       gravado: 0,
       exento: 0,
       iva: 0,
+      retib: 0,
+      retgan: 0,
+      retiva: 0,
       total: 0,
     },
     defaultItem: {
       id: '',
+      fecha: moment().format('DD-MM-YYYY'),
+      vencimiento: moment().format('DD-MM-YYYY'),
+      perfiscal: '',
       tercero_id: '',
-      cpr: '',
+      afipcpr_id: '',
+      afipsuc: '',
+      afipnro: '',
       lista_id: '',
       deposito_id: '',
       medio_id: '',
@@ -845,6 +971,9 @@ export default {
       gravado: 0,
       exento: 0,
       iva: 0,
+      retib: 0,
+      retgan: 0,
+      retiva: 0,
       total: 0,
     },
     editadoArt: {
@@ -907,11 +1036,16 @@ export default {
     isLoadingTerceros: false,
     isLoadingArticulos: false,
     isLoadingMedios: false,
+    isLoadingCprs: false,
     search: null,
   }),
   computed: {
     ...mapGetters('authentication', ['isLoggedIn', 'userName', 'userId', 'sucursal', 'sucursalFiscal', 'caja']),
     ...mapMutations(['alert','closeAlert']),
+
+    computedDateFormatted () {
+      return this.formatDate(this.date)
+    },
     itemsTerceros () {
       return this.entriesTerceros.map(entry => {
         const nombre = entry.nombre.length > this.descriptionLimit
@@ -944,6 +1078,10 @@ export default {
       val || this.cancelar();
     },
     */
+    date (val) {
+      // debugger
+      this.fecha = this.formatDate(this.date)
+    },
     searchTerceros (val) {
       // Items have already been loaded
       // if (this.entriesPaises.length > 0) return
@@ -951,7 +1089,7 @@ export default {
       if (this.isLoadingTerceros) return
       this.isLoadingTerceros = true
       // Lazily load input items
-      return HTTP().get('/usersclientes')
+      return HTTP().get('/usersproveedores')
         .then(({ data }) => {
           this.entriesTerceros = []
           this.tercerosUserId = []
@@ -990,19 +1128,8 @@ export default {
                 this.editado.documentoNumero = data[0].tercero.cuit;
                 this.editado.responsableAbrev = data[0].tercero.responsable.abrev;
 
-//              debugger
-                /*
-                if (data[0].tercero.direcciones.length > 0) {
-                  data[0].tercero.direcciones.forEach(e => {
-                    this.dirItems.push(e)
-                    this.depItems.push(data[0].sucursales[psuc].depositos[i])
-//                  this.dirItems.push(e.calle0.nombre+' '+e.numero+' ('+e.postal.codigo+') '+e.postal.nombre+' - '+e.postal.provincia.nombre+' - '+e.postal.provincia.pais.nombre)
-                  })
-                  this.editado.direccion_id = this.dirItems[0].id
-                }
-                */
-               this.dirItems = []
-               for (let i=0; i<= data[0].tercero.direcciones.length-1; i++) {
+                this.dirItems = []
+                for (let i=0; i<= data[0].tercero.direcciones.length-1; i++) {
                   this.dirItems.push(data[0].tercero.direcciones[i])
                 }
                 this.editado.direccion_id = this.dirItems[0].id
@@ -1030,8 +1157,15 @@ export default {
                     this.lisObj.push(element.lista)
                   })
                 }
-                // debugger
                 this.editado.lista_id = this.lisItems[0].id
+
+                const a = HTTP().get('/afipcomprobantes')
+                  .then(({ data }) => {
+                    data.forEach(element => {
+                      this.cprItems.push(element)
+                    })
+                  })
+
               })
           }
         })
@@ -1057,23 +1191,19 @@ export default {
             this.entriesArticulos.push(art)
           })
 
-          //this.entriesArticulos = data;
           let ipos = -1
-          // debugger
           for (let i=0; i<=this.entriesArticulos.length-1; i++) {
             if (this.editadoArt.articulo_id === this.entriesArticulos[i].id) {
               ipos = i
               break
             }
           }
-//        if (ipos==-1) { return }
 
           this.editadoArt.codigo = this.entriesArticulos[ipos].codigo;
           this.editadoArt.nombre = this.entriesArticulos[ipos].nombre;
           this.editadoArt.codbar = this.entriesArticulos[ipos].codbar;
 
           let iArt = this.entriesArticulos[ipos].id
-          // debugger
           let iLis = this.editado.lista_id
           return HTTP().get('/precio/'+iArt+'/'+iLis)
             .then(({ data }) => {
@@ -1097,6 +1227,22 @@ export default {
           console.log(err)
         })
         .finally(() => (this.isLoadingArticulos = false))
+    },
+    searchCprs (val) {
+      // Items have already been loaded
+      // if (this.items.length > 0) return
+      // Items have already been requested
+      if (this.isLoadingCprs) return
+      this.isLoadingCprs = true
+      // Lazily load input items
+      return HTTP().get('/afipcomprobantes')
+        .then(({ data }) => {
+          this.entriesCprs = data;
+        })
+        .catch(err => {
+          console.log(err)
+        })
+        .finally(() => (this.isLoadingCprs = false))
     },
     searchMedios (val) {
       // Items have already been loaded
@@ -1146,8 +1292,61 @@ export default {
       .then(({ data }) => {
         this.monItems = data
     });
+
+    this.tasasIVA.push({tasa:'0', base: 0, iva: 0})
+    this.tasasIVA.push({tasa:'2.5', base: 0, iva: 0})
+    this.tasasIVA.push({tasa:'5', base: 0, iva: 0})
+    this.tasasIVA.push({tasa:'10.5', base: 0, iva: 0})
+    this.tasasIVA.push({tasa:'21', base: 0, iva: 0})
+    this.tasasIVA.push({tasa:'27', base: 0, iva: 0})
+
   },
   methods: {
+    afipsuc() {
+      this.editado.afipSuc = this.editado.afipSuc.padStart(4,'0')
+    },
+    afipnro() {
+      this.editado.afipNro = this.editado.afipNro.padStart(8,'0')
+    },
+    save (item) {
+      item.iva = this.roundTo(item.base*((Number(item.tasa)/100)),2)
+      this.snack = true
+//    this.snackColor = 'success'
+//    this.snackText = 'Data saved'
+    },
+    cancel (item) {
+//    debugger
+      this.snack = false
+//    this.snackColor = 'error'
+//    this.snackText = 'Canceled'
+    },
+    open (item) {
+//    debugger
+      let res = this.editado.gravado;
+      for (let i=0; i<=this.tasasIVA.length-1; i++) {
+        res -= this.tasasIVA[i].base
+      }
+      item.base = this.roundTo(res,2);
+      this.snack = true
+//    this.snackColor = 'info'
+//    this.snackText = 'Dialog opened'
+    },
+    close (item) {
+      this.snack = false
+//    console.log('Dialog closed')
+    },
+    formatDate (date) {
+      // debugger
+      if (!date) return null
+      const [year, month, day] = date.split('-')
+      return `${month}/${day}/${year}`
+    },
+    parseDate (date) {
+      // debugger
+      if (!date) return null
+      const [month, day, year] = date.split('-')
+      return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+    },
     cobrar(item) {
       if (!item.pendientes[0]) return false
       if (item.pendientes[0].pendiente>0) {
@@ -1155,6 +1354,11 @@ export default {
       } else {
         return false
       }
+    }, 
+    cargarArt(item) {
+      // debugger
+      // this.dialoCab = false;
+      this.dialogArt = true;
     }, 
     formatMoney(amount, decimalCount = 2, decimal = ".", thousands = ",") {
       try {
@@ -1175,7 +1379,7 @@ export default {
     buscoPrecio(idArt, idLis) {
       return HTTP().get('/precios/'+idArt+'/'+idLis)
         .then(({ data }) => {
-          // debugger
+       // debugger
           return data.precio
       })
     },
@@ -1212,12 +1416,17 @@ export default {
       return this.editadoArt.total
     },
     nuevo(que) {
-      this.dialog = true;
+      debugger
+      this.dialogCab = true;
+      this.dialogArt = false;
+      this.dialogEditArt = false;
       this.lisItems = [];
       this.depItems = [];
+
       this.searchTerceros = '';
       this.searchArticulos = '';
       this.isLoadingTerceros = false;
+      this.isLoadingCprs = false;
 
       this.valEfectivo = 0;
       this.valCtaCte = 0;
@@ -1259,44 +1468,24 @@ export default {
       this.formTitleMed = 'Nuevo Valor';
       this.editadoArt = Object.assign({}, this.defaultItemArt);
       this.editado = Object.assign({}, this.defaultItem);
-      if (que === 'fac') {
-        this.formTitle = 'Nueva Factura Sucursal ('+this.sucursal+')'+ ' Caja ('+this.caja+')';
+      this.editado.fecha = moment().format('DD-MM-YYYY');
+      this.editado.perfiscal = moment().format('YYYY-MM');
+      if (que === 'com') {
+        this.formTitle = 'Nuevo Comprobante Sucursal ('+this.sucursal+')'+ ' Caja ('+this.caja+')';
         this.editado.cpr = 'FAC';
         this.coef = 1;
-      } else if (que === 'ndc') {
-        this.formTitle = 'Nueva Nota de Crédito Sucursal ('+this.sucursal+')'+ ' Caja ('+this.caja+')';
-        this.editado.cpr = 'NDC';
-        this.coef = -1;
-      } else if (que === 'ndd') {
-        this.formTitle = 'Nueva Nota de Débito Sucursal ('+this.sucursal+')'+ ' Caja ('+this.caja+')';
-        this.editado.cpr = 'NDD';
+      } else if (que === 'gas') {
+        this.formTitle = 'Nuevo Gasto Sucursal ('+this.sucursal+')'+ ' Caja ('+this.caja+')';
+        this.editado.cpr = 'FAC';
         this.coef = 1;
       } else if (que === 'rem') {
-        this.formTitle = 'Nuevo Remito'
-      } else if (que === 'remfac') {
-        this.formTitle = 'Generar Remito sobre una Factura'
-      } else if (que === 'facrem') {
-        this.formTitle = 'Facturar un Remito'
-      } else if (que === 'pre') {
-        this.formTitle = 'Nuevo Presupuesto'
-      } else if (que === 'facpre') {
-        this.formTitle = 'Facturar un Presupuesto'
+        this.formTitle = 'Nuevo Remito Sucursal ('+this.sucursal+')'+ ' Caja ('+this.caja+')';
+        this.editado.cpr = 'REM';
+        this.coef = 1;
       } else if (que === 'ped') {
-        this.formTitle = 'Nuevo Pedido'
-      } else if (que === 'facped') {
-        this.formTitle = 'Facturar un Pedido'
-      } else if (que === 'not') {
-        this.formTitle = 'Anotador de Ventas'
-      } else if (que === 'facnot') {
-        this.formTitle = 'Facturar Anotaciones de Ventas'
-      } else if (que === 'rec') {
-        this.formTitle = 'Nuevo Recibo'
-      } else if (que === 'ndcfac') {
-        this.formTitle = 'Aplicar Nota de Crédito a Factura'
-      } else if (que === 'facndc') {
-        this.formTitle = 'Aplicar Factura a Nota de Crédito'
-      } else if (que === 'nddfac') {
-        this.formTitle = 'Aplicar Nota de Débito a Factura'
+        this.formTitle = 'Nuevo Pedido Sucursal ('+this.sucursal+')'+ ' Caja ('+this.caja+')';
+        this.editado.cpr = 'PED';
+        this.coef = 1;
       }
     },
     exportExcel: function () {
@@ -1314,24 +1503,18 @@ export default {
         var doc = new jsPDF();
 
         doc.setFontStyle("bold");
-
         doc.setFontSize(20);
         doc.text ( 'GOHUApp S.A.', 15, 30 )
-
         doc.setFontSize(9);
         doc.text ( 'Razón Social:', 15, 47 )
         doc.text ( 'Domicilio Comercial:', 15, 53 )
         doc.text ( 'Condicion frente al IVA:', 15, 59 )
-
         doc.setFontSize(14);
         doc.text ( 'ORIGINAL', 93, 16 )
-
         doc.setFontSize(16);
         doc.text ( 'FACTURA', 120, 27 )
-
         doc.setFontSize(36);
         doc.text ( this.items[this.editedIndex].cpr.substring(4,5), 100.5, 32 )
-
         doc.setFontSize(9);
         doc.text ( 'Punto de Venta', 120, 35 )
         doc.text ( 'Comp. Nro', 157, 35 )
@@ -1339,7 +1522,6 @@ export default {
         doc.text ( 'CUIT', 120, 47 )
         doc.text ( 'Ingresos Brutos', 120, 53 )
         doc.text ( 'Fecha de Inicio de Actividades', 120, 59 )
-
         doc.setFontStyle("normal");
         doc.text ( moment(String(this.items[this.editedIndex].fecha)).format('L'), 148, 41 )
         doc.text ( this.items[this.editedIndex].cpr.substring(6,10), 145, 35 )
@@ -1347,17 +1529,13 @@ export default {
         doc.text ( this.items[this.editedIndex].tercero.cuit, 129, 47 )
         doc.text ( 'NO', 146, 53 )
         doc.text ( '01/01/2000', 168, 59 )
-
         doc.setFontStyle("bold");
         doc.text ( 'Vencimiento del Comprobante', 15, 72 )
-
         doc.text ( 'CUIT', 15, 83 )
         doc.text ( 'Condicion de IVA', 15, 89 )
         doc.text ( 'Condicion de Venta', 15, 95 )
-
         doc.text ( 'Apellido y Nombre Razón Social', 90, 83 )
         doc.text ( 'Domicilio', 90, 89 )
-
         // pie
         doc.text ( 'Subtotal', 155, 245 )
         doc.text ( '%Descuento', 155, 251 )
@@ -1486,12 +1664,18 @@ export default {
       });
     },
     altaHTTP:function() {
-      debugger
-      let pf = moment().format('YYYYMM');
-      return HTTP().post('/ventas', {
-        fecha: moment().format('YYYY-MM-DD'),
-        perfiscal: pf,
-        cpr: this.editado.cpr+'-'+this.editado.letra+' '+this.sucursalFiscal+'-'+'00000001',
+      // debugger
+      this.editado.perfiscal = this.editado.perfiscal.substring(0,4)+this.editado.perfiscal.substring(5,7)
+      this.editado.fecha = this.editado.fecha.substring(6,10)+'-'+this.editado.fecha.substring(3,5)+'-'+this.editado.fecha.substring(0,2)
+      this.editado.estado = 'F'
+      if (valCtaCte!==0) {
+        this.editado.estado = 'P'
+      }
+      return HTTP().post('/compras', {
+        fecha: this.editado.fecha,
+        perfiscal: this.editado.perfiscal,
+        tipo: 'CO',
+        cpr: this.editado.afipcpr_id.abrev+' '+this.editado.afipSuc+'-'+this.editado.afipNro,
         user_id: this.userId,
         sucursal_id: this.sucursal,
         tercero_id: this.editado.tercero_id,
@@ -1509,7 +1693,7 @@ export default {
         iva: this.editado.iva*this.coef,
         total: this.editado.total*this.coef,
         regstk: true,
-        estado: 'F',
+        estado: this.editado.estado,
         activo: true,
         articulos: this.articulos,
         valores: this.valores,
@@ -1535,12 +1719,25 @@ export default {
       this.msg.msgButtons = ['Aceptar','Cancelar']
     },
     cancelar() {
-      this.dialog = false;
-      // debugger
+      this.dialogCab = false;
+    //debugger
       this.articulos = []
       this.editado = Object.assign({}, this.defaultItem);
       this.editadoArt = Object.assign({}, this.defaultItemArt);
       this.editedIndex = -1;
+    },
+    cancelarArt() {
+      // debugger
+      // this.dialoCab = true;
+      this.dialogArt = false;
+      this.articulos = []
+      this.editadoArt = Object.assign({}, this.defaultItemArt);
+      this.editedIndexArt = -1;
+    },
+    cancelarEditArt() {
+      // debugger
+      this.dialogEditArt = false;
+      this.editedIndexArt = -1;
     },
     guardar() {
       if (!this.$refs.form.validate()) {
@@ -1550,7 +1747,7 @@ export default {
       this.mensaje('¡Alta Exitosa!', 'blue', 1500) 
 
       // Si es efectivo debo agregar el pago en 'valores' para que grabe en efectivo
-      debugger
+      // debugger
       for (let i=0; i<=this.articulos.length-1; i++) {
         this.articulos[i].cantidad*=this.coef
       }
@@ -1574,7 +1771,7 @@ export default {
       } 
       if (Number(this.valCtaCte) !== 0) {
         // Si es ctacte agrego en 'pendientes' para que grabe la cuenta corriente
-        debugger
+        // debugger
         this.pendientes.push({ 
           comprobante_id: null,
           vencimiento: moment(new Date).add(30, 'd').format('YYYY-MM-DD'),
@@ -1589,7 +1786,7 @@ export default {
     },
     nuevoArt() {
       this.editedIndexArt = -1;
-      this.dialogArt = true;
+      this.dialogEditArt = true;
       this.uniItems = [];
       this.editadoArt = Object.assign({}, this.defaultItemArt);
     },
@@ -1599,7 +1796,7 @@ export default {
     },
     editarArt() {
     },
-    guardarArt() {
+    guardarEditArt() {
       const part1 = this.editadoArt.codigo.substring( 0, this.editadoArt.codigo.indexOf('@')+1);
       const codig = this.editadoArt.codigo.substring( this.editadoArt.codigo.indexOf('@')+1, this.editadoArt.codigo.indexOf('$'));
       const part2 = this.editadoArt.codigo.substring( this.editadoArt.codigo.indexOf('$'));
@@ -1643,49 +1840,47 @@ export default {
         })
       }
       this.calculos()
-      this.dialogArt = false;
+      this.dialogEditArt = false;
     },
 
-    calculos() {
-      let gra = 0
-      let exe = 0
-      let iva = 0
-      let tas = 0
-      let des = 0
-      this.editado.importedescuento = 0;
-      this.editado.gravado = 0;
-      this.editado.exento = 0;
-      this.editado.iva = 0;
-      this.editado.total = 0;
-      for(let i=0; i<=this.articulos.length-1; i++) {
-        let base = this.articulos[i].total
-        // debugger
-        if (this.editado.tasadescuento>0) {
-          des = base*(Number(this.editado.tasadescuento)/100) 
-          base = base - des
-        }
-        if (this.articulos[i].iva_id==2) {
-          exe = base
-        } else {
-          gra = base
-          tas = this.ivaTasas[this.articulos[i].iva_id-1].tasa
-          iva = (base*(1+(tas/100)))-base
-        }
-        this.editado.importedescuento += des
-        this.editado.gravado += gra
-        this.editado.exento += exe
-        this.editado.iva += iva
-        this.editado.total += exe+gra+iva
+    calculos(cual) {
+      let tot = Number(this.editado.total)
+      let gra = Number(this.editado.gravado)
+      let exe = Number(this.editado.exento)
+      let iva = Number(this.editado.iva)
+      let retib = Number(this.editado.retib)
+      let retgan = Number(this.editado.retgan)
+      let retiva = Number(this.editado.retiva)
+      if (cual=='total') {
+        gra = this.roundTo( ( ( tot - (retib+retgan+retiva) ) / 1.21 ), 2 )
+        iva = this.roundTo( ( tot - ( gra+exe+retib+retgan+retiva ) ) , 2 )
+      } else if (cual=='retib' || cual=='retgan' || cual=='retiva') {
+        gra = this.roundTo( ( ( tot - (retib+retgan+retiva) ) / 1.21 ), 2 )
+        iva = this.roundTo( ( tot - ( gra+exe+retib+retgan+retiva ) ) , 2 )
+      } else if (cual=='gravado') {
+        iva = this.roundTo( ( tot - ( gra+exe+retib+retgan+retiva ) ) , 2 )
+      } else if (cual=='exento') {
+        gra = this.roundTo( ( ( (tot-exe) - (retib+retgan+retiva) ) / 1.21 ), 2 )
+        iva = this.roundTo( ( tot - ( gra+exe+retib+retgan+retiva ) ) , 2 )
+      } else if (cual=='iva') {
+        gra = this.roundTo( ( tot - ( iva+exe+retib+retgan+retiva ) ) , 2 )
       }
-      this.editado.importedescuento = this.roundTo(this.editado.importedescuento,2)
-      this.editado.gravado = this.roundTo(this.editado.gravado,2)
-      this.editado.exento = this.roundTo(this.editado.exento,2)
-      this.editado.iva = this.roundTo(this.editado.iva,2)
-      this.editado.total = this.roundTo(this.editado.total,2)
-      this.valEfectivo = (this.editado.total-(this.valCtaCte+this.valValores))
+      this.editado.total = tot
+      this.editado.gravado = gra
+      this.editado.exento = exe
+      this.editado.iva = iva
+      this.editado.retib = retib
+      this.editado.retgan = retgan
+      this.editado.retiva = retiva
+
+      // ASIGNO EL VALOR INICIAL DE LA COMPRA COMO EFECTIVO
+      debugger
+      if (this.valEfectivo==0 && this.valCtaCte==0 && this.valValores == 0)
+        this.valEfectivo = (this.editado.total-(this.valCtaCte+this.valValores))
+
     },
     calculosValores(cual) {
-      debugger
+      // debugger
       if (cual=='E') {
         if (this.ctacte) {
           this.valCtaCte = this.roundTo((Number(this.editado.total) - (Number(this.valEfectivo)+Number(this.valValores))),2)
@@ -1697,12 +1892,11 @@ export default {
     },
     guardarMed() {
     },
-    cancelarArt() {
-      this.dialogArt = false;
-    },
     cancelarMed() {
       this.dialogMed = false;
     },
+    guardarArt() {
+    }
 
   },
 };

@@ -124,6 +124,13 @@ Route.group(() => {
   Route.delete('afipresponsables/:id','AfipResponsableController.destroy').middleware('auth')
   Route.patch('afipresponsables/:id','AfipResponsableController.update').middleware('auth')
 
+  Route.get('afipcomprobantes','AfipComprobanteController.index').middleware('auth')
+  Route.get('afipcomprobantes/last','AfipComprobanteController.last').middleware('auth')
+  Route.get('afipcomprobantes/exists/:codigo','AfipComprobanteController.exists').middleware('auth')
+  Route.post('afipcomprobantes','AfipComprobanteController.create').middleware('auth')
+  Route.delete('afipcomprobantes/:id','AfipComprobanteController.destroy').middleware('auth')
+  Route.patch('afipcomprobantes/:id','AfipComprobanteController.update').middleware('auth')
+
   Route.get('paises','PaisController.index').middleware('auth')
   Route.get('paises/last','PaisController.last').middleware('auth')
   Route.get('paises/exists/:codigo','PaisController.exists').middleware('auth')
@@ -199,5 +206,11 @@ Route.group(() => {
   Route.post('ventas','VentaController.create').middleware('auth')
   Route.delete('ventas/:id','VentaController.destroy').middleware('auth')
   Route.patch('ventas/:id','VentaController.update').middleware('auth')
+
+  // COMPRA
+  Route.get('compras/:id','CompraController.index').middleware('auth')
+  Route.post('compras','CompraController.create').middleware('auth')
+  Route.delete('compras/:id','CompraController.destroy').middleware('auth')
+  Route.patch('compras/:id','CompraController.update').middleware('auth')
 
 }).prefix('api')

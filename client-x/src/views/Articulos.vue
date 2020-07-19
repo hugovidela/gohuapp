@@ -1319,33 +1319,61 @@ export default {
             const p = HTTP().get('/precio/'+iArt+'/'+iLis)
               .then(({ data }) => {
                 // BUSCO EL PRECIO PARA AGREARLO A LA MATRIZ
-                this.editado.precios.push({
-                  articulo_id: iArt,
-                  comprobante_item_id: data[0].comprobante_item_id,
-                  costo: data[0].costo,
-                  created_at: data[0].created_at,
-                  id: data[0].id,
-                  lista: lis[i],
-                  lista_id: iLis,
-                  porrem: data[0].porrem,
-                  precio: data[0].precio,
-                  updated_at: data[0].updated_at
-                })
-                //  debugger
-                this.lisItems.push({
-                  activo: lis[i].activo,
-                  created_at: lis[i].created_at,
-                  fechaultact: lis[i].fechaultact,
-                  id: lis[i].id,
-                  nombre: lis[i].nombre,
-                  porrem: data[0].porrem,
-                  updated_at: lis[i].updated_at,
-                  user_id: lis[i].user_id,
-                  precio: data[0].precio,
-                  costo: data[0].costo,
-                  porrem: data[0].porrem
-                })
-                this.costo = data[0].costo;
+                if (data.length>0) {
+                  this.editado.precios.push({
+                    articulo_id: iArt,
+                    comprobante_item_id: data[0].comprobante_item_id,
+                    costo: data[0].costo,
+                    created_at: data[0].created_at,
+                    id: data[0].id,
+                    lista: lis[i],
+                    lista_id: iLis,
+                    porrem: data[0].porrem,
+                    precio: data[0].precio,
+                    updated_at: data[0].updated_at
+                  })
+                  //  debugger
+                  this.lisItems.push({
+                    activo: lis[i].activo,
+                    created_at: lis[i].created_at,
+                    fechaultact: lis[i].fechaultact,
+                    id: lis[i].id,
+                    nombre: lis[i].nombre,
+                    porrem: data[0].porrem,
+                    updated_at: lis[i].updated_at,
+                    user_id: lis[i].user_id,
+                    precio: data[0].precio,
+                    costo: data[0].costo,
+                  })
+                  this.costo = data[0].costo;
+                } else {
+                  this.editado.precios.push({
+                    articulo_id: iArt,
+                    comprobante_item_id: null,
+                    costo: 0,
+                    created_at: '',
+                    id: 0,
+                    lista: lis[i],
+                    lista_id: iLis,
+                    porrem: lis[i].porrem,
+                    precio: 0,
+                    updated_at: ''
+                  })
+                  //  debugger
+                  this.lisItems.push({
+                    activo: lis[i].activo,
+                    created_at: lis[i].created_at,
+                    fechaultact: lis[i].fechaultact,
+                    id: lis[i].id,
+                    nombre: lis[i].nombre,
+                    porrem: lis[i].porrem,
+                    updated_at: '',
+                    user_id: lis[i].user_id,
+                    precio: 0,
+                    costo: 0,
+                  })
+                  this.costo = 0;
+                }
             })
           }
         })

@@ -40,7 +40,7 @@
               Proveedores
             </v-list-item-title>
           </v-list-item>
-          <v-list-item link :to="{name:'articulos'}">
+          <v-list-item link :to="{name:'compras'}">
             <v-list-item-title>
               <v-icon>mdi-face</v-icon>
               Central de Compras

@@ -6,12 +6,12 @@ const Valor = use('App/Models/Valor')
 const ComprobantePendiente = use('App/Models/ComprobantePendiente')
 const AuthorizationService = use('App/Services/AuthorizationService')
 
-class VentaController {
+class CompraController {
 
   async index ({ auth, params }) {
     const { id } = params
     const user = await auth.getUser()
-    const venta = await Comprobante.query()
+    const compra = await Comprobante.query()
     .where('sucursal_id', id)
     .orderBy('created_at', 'desc')
     .with('tercero')
@@ -21,27 +21,35 @@ class VentaController {
     .with('items.articulo')
     .with('valoresIngresos')
     .with('pendientes')
-    .where('tipo','VE')
+    .where('tipo','CO')
     .fetch()
-    return venta
+    return compra
   }
-
+  
   async create ({ auth, request }) {
+    console.log('0')
     const user = await auth.getUser()
+    console.log('1')
     const { 
       fecha,
       perfiscal,
+      cpr,
+      tipo,
+      user_id,
       sucursal_id,
       tercero_id,
-      direccion_id,
       documento_id,
       mediodepago_id,
       lista_id,
       deposito_id,
       vendedor_id,
       moneda_id,
+      direccion_id,
       tasadescuento,
       importedescuento,
+      retiva,
+      retgan,
+      retib,
       gravado,
       exento,
       iva,
@@ -54,71 +62,75 @@ class VentaController {
       pendientes,
      } = request.all()
 
-    let { cpr } = request.all()
-    let cbte = ''
-    let part = cpr.substring(0,10)+'%'
-    let tipo = 'VE'
+    console.log('2')
+    const compra = new Comprobante()
+    console.log('3')
+    AuthorizationService.verifyPermission(compra, user)
+    console.log('4')
 
-    console.log('a')
-    let nrocpr = await Comprobante.query()
-      .where('user_id', user.id)
-      .where('cpr', 'LIKE', part)
-      .orderBy('cpr', 'desc')
-      .limit(1)
-      .fetch()
+    console.log(fecha);
+    console.log(perfiscal);
+    console.log(cpr);
+    console.log(tipo);
+    console.log(user_id);
+    console.log(sucursal_id);
+    console.log(tercero_id);
+    console.log(documento_id);
+    console.log(mediodepago_id);
+    console.log(lista_id);
+    console.log(deposito_id);
+    console.log(vendedor_id);
+    console.log(moneda_id);
+    console.log(direccion_id);
+    console.log(tasadescuento);
+    console.log(importedescuento);
+    console.log(retiva);
+    console.log(retgan);
+    console.log(retib);
+    console.log(gravado);
+    console.log(exento);
+    console.log(iva);
+    console.log(total);
+    console.log(regstk);
+    console.log(estado);
+    console.log(activo);
 
-      console.log('b')
-      if (nrocpr.rows.length>0) {
-      let oldNro = nrocpr.rows[0].cpr.substring(12,19)
-      let newNro = parseInt(oldNro, 10);
-      newNro ++
-      newNro = newNro.toString()
-      newNro = '00000000'+newNro
-      newNro = newNro.substr(newNro.length - 8)
-      cbte = nrocpr.rows[0].cpr.substring(0,10)+'-'+newNro
-    } else {
-      cbte = cpr.substring(0,10)+'-00000001'
-    }
-    console.log('c')
-
-    cpr = cbte
-    const venta = new Comprobante()
-    const user_id = user.id
-    AuthorizationService.verifyPermission(venta, user)
-
-    console.log(perfiscal)
-
-    venta.fill({fecha,
-                perfiscal,
-                user_id,
-                cpr,
-                tipo,
-                sucursal_id,
-                tercero_id,
-                direccion_id,
-                documento_id,
-                mediodepago_id,
-                lista_id,
-                deposito_id,
-                vendedor_id,
-                moneda_id,
-                tasadescuento,
-                importedescuento,
-                gravado,
-                exento,
-                iva,
-                total,
-                regstk,
-                estado,
-                activo})
-    await venta.save()
+    compra.fill({
+      fecha,
+      perfiscal,
+      cpr,
+      tipo,
+      user_id,
+      sucursal_id,
+      tercero_id,
+      documento_id,
+      mediodepago_id,
+      lista_id,
+      deposito_id,
+      vendedor_id,
+      moneda_id,
+      direccion_id,
+      tasadescuento,
+      importedescuento,
+      retiva,
+      retgan,
+      retib,
+      gravado,
+      exento,
+      iva,
+      total,
+      regstk,
+      estado,
+      activo})
+    await compra.save()
+    console.log('5')
 
     // ARTICULOS
     for (let i=0; i<=articulos.length-1; i++) {
       let item = new ComprobanteItem()
       AuthorizationService.verifyPermission(item, user)
       item.fill({
-        comprobante_id: venta.id,
+        comprobante_id: compra.id,
         articulo_id: articulos[i].articulo_id,
         deposito_id: articulos[i].deposito_id.id,
         unidad_id: articulos[i].unidad_id,
@@ -143,7 +155,7 @@ class VentaController {
       item.fill({
         caja_id: valores[i].caja_id,
         medio_id: valores[i].medio_id,
-        cpringreso_id: venta.id,
+        cpringreso_id: compra.id,
         cpregreso_id: valores[i].cpregreso_id,
         librador_id: valores[i].librador_id,
         librador_medio_id: valores[i].librador_medio_id,
@@ -163,7 +175,7 @@ class VentaController {
       let item = new ComprobantePendiente()
       AuthorizationService.verifyPermission(item, user)
       item.fill({
-        comprobante_id: venta.id,
+        comprobante_id: compra.id,
         vencimiento: pendientes[0].vencimiento,
         importe: pendientes[0].importe,
         pendiente: pendientes[0].pendiente,
@@ -174,28 +186,28 @@ class VentaController {
 
     console.log('finalizo')
 
-    return venta
+    return compra
   }
 
   async destroy ( { auth, request, params }) {
     const user = await auth.getUser()
     const { id } = params
-    const venta = await Comprobante.find(id)
-    AuthorizationService.verifyPermission(venta, user)
-    await venta.delete()
-    return venta
+    const compra = await Comprobante.find(id)
+    AuthorizationService.verifyPermission(compra, user)
+    await compra.delete()
+    return compra
   }
 
   async update ( { auth, request, params }) {
     const user = await auth.getUser()
     const { id } = params
-    const venta = await Comprobante.find(id)
-    AuthorizationService.verifyPermission(venta, user)
-    venta.merge(request.only(['fecha', 'cpr', 'activo']))
-    await venta.save()
-    return venta
+    const compra = await Comprobante.find(id)
+    AuthorizationService.verifyPermission(compra, user)
+    compra.merge(request.only(['fecha', 'cpr', 'activo']))
+    await compra.save()
+    return compra
   }
 
 }
 
-module.exports = VentaController
+module.exports = CompraController
