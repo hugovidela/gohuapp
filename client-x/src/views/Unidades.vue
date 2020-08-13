@@ -12,7 +12,11 @@
         <template v-slot:item.nombre="{ item }">{{ item.nombre.toUpperCase() }}</template>
         <template v-slot:item.unidad_id="{ item }">{{ busco_padre(item.unidad_id) }}</template>
         <template v-slot:top>
-          <v-system-bar color="indigo darken-2" dark></v-system-bar>
+          <v-system-bar color="indigo darken-2" dark>
+            <v-btn icon @click="closeForm">
+              <v-icon color="white" dark>mdi-close-circle</v-icon>
+            </v-btn>
+          </v-system-bar>
           <v-toolbar dense color="indigo">
             <template v-slot:extension>
               <v-btn
@@ -208,6 +212,9 @@ export default {
       }
     },
     methods: {
+      closeForm(){
+        router.push('/')
+      },
       busco_padre (pid) {
         if (pid!==null) {
           return this.buscar_arr('id', pid, 'nombre');

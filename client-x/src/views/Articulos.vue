@@ -4,15 +4,24 @@
       <v-data-table
         :headers="headers"
         :items="items"
-        :search="search"
-        sort-by="id"
         dense
-        class="elevation-3"
-        :footer-props="footerProps">
+        :options.sync= "pagination"
+        :server-items-length="totalItems"
+        :loading="loading"
+        :footer-props="footerProps"
+        class="elevation-1">
         <template v-slot:top>
-          <v-system-bar color="indigo darken-2" dark></v-system-bar>
-          <v-toolbar flat color="indigo">
-
+          <!--
+          <v-system-bar color="indigo darken-2" dark>
+            <v-btn icon @click="closeForm">
+              <v-icon color="white" dark>mdi-close-circle</v-icon>
+            </v-btn>
+          </v-system-bar>
+          -->
+          <v-toolbar flat :color="colorSucursal">
+            <v-btn icon @click="closeForm">
+              <v-icon color="white" dark>mdi-close-circle</v-icon>
+            </v-btn>
             <template v-slot:extension>
               <v-btn
                 fab color="cyan accent-3"
@@ -40,18 +49,43 @@
               <template v-slot:activator="{ on }"></template>
               <v-card>
                 <!-- para el EDICION-->
+
+                <v-toolbar flat dark :color="colorSucursal">
+                  <v-btn icon @click="cancelar">
+                    <v-icon color="white" dark>mdi-close-circle</v-icon>
+                  </v-btn>
+                  <span class="headdline">{{ formTitle }}</span>
+                  <v-spacer></v-spacer>
+                  <!--<div v-if="icono!='mdi-glasses' || editedIndex===-1">-->
+                  <div v-if="elArticuloEsMio || editedIndex===-1">
+                    <v-btn
+                      color="teal accent-4" class="ma-2 white--text" @click="guardar">Guardar
+                    </v-btn>
+                  </div>
+                </v-toolbar>
+                <!--
                 <v-card-title  class="cyan white--text">
                   <span class="headline">{{ formTitle }}</span>
                   <v-spacer></v-spacer>
                   <span class="text--right">
-                    <v-btn
-                      color="blue-grey" class="ma-2 white--text" @click="cancelar">Cancelar
-                    </v-btn>
-                    <v-btn
-                      color="teal accent-4" class="ma-2 white--text" @click="guardar">Guardar
-                    </v-btn>
+                    <div v-if="icono!='mdi-glasses'">
+                      <v-btn
+                        color="blue-grey" class="ma-2 white--text" @click="cancelar">Cancelar
+                      </v-btn>
+                    </div>
+                    <div v-else>
+                      <v-btn
+                        color="blue-grey" class="ma-2 white--text" @click="cancelar">Cerrar
+                      </v-btn>
+                    </div>
+                    <div v-if="icono!='mdi-glasses'">
+                      <v-btn
+                        color="teal accent-4" class="ma-2 white--text" @click="guardar">Guardar
+                      </v-btn>
+                    </div>
                   </span>
                 </v-card-title>
+                -->
                 <v-form ref="form">
                   <v-card-text>
                     <v-container>
@@ -125,6 +159,7 @@
                                 </v-row>
                                 <v-row>
                                   <v-col cols="12" sx="12" mx="12">
+
                                     <v-autocomplete
                                       class="body-2"
                                       v-model="editado.marca_id"
@@ -137,6 +172,17 @@
                                       placeholder="Escriba para buscar"
                                       prepend-icon="mdi-database-search">
                                     </v-autocomplete>
+<!--
+                                    <v-select
+                                      label="Marca"
+                                      dense
+                                      v-model="editado.marca_id"
+                                      :items="marItems" item-value="id"
+                                      item-text="nombre"
+                                      autocomplete
+                                      return-object>
+                                    </v-select>
+-->
                                   </v-col>
                                 </v-row>
                                 <v-row align="center">
@@ -332,6 +378,26 @@
                               </v-text-field>
                             </v-col>
                           </v-row>
+                          <v-row>
+                            <v-col cols="2" sm="2" md="2">
+                              <v-btn
+                                color="blue-grey"
+                                class="ma-2 white--text"
+                                @click="verStock">Ver Stocks
+                              </v-btn>
+                            </v-col>
+                            <v-col cols="5" sm="5" md="5">
+                              <v-data-table v-if="dialogStk==true"
+                                :headers="headersStk"
+                                :items="stocks"
+                                dense
+                                class="elevation-3"
+                                hide-default-footer>
+                              </v-data-table>
+                            </v-col>
+
+                          </v-row>
+
                         </v-tab-item>
 
                         <v-tab href="#precios">
@@ -420,6 +486,11 @@
                             <template v-slot:item.editadoLis.costo="{ item }">
                               <span disable dark>{{ formatoImporte(item.editadoLis.costo) }}</span>
                             </template>
+                            <!--
+                            <template v-slot:item.editadoLis.preciofinal="{ item }">
+                              <span disable dark>{{ precioFinal(item.editadoLis.precio) }}</span>
+                            </template>
+                            -->
                             <!--
                             <template v-slot:item.porrem="{ item }">
                               <span disable dark>{{ formatoImporte(item.porrem) }}</span>
@@ -593,18 +664,20 @@
           </v-col>
         </template>
         <template v-slot:item.codigo="{ item }">
-          {{ item.codigo.substring( item.codigo.indexOf('@')+1, item.codigo.indexOf('$') ) }}
+          <!--{{ item.codigo.substring( item.codigo.indexOf('@')+1, item.codigo.indexOf('$') ) }}-->
+          {{ item.codigo.substring(0,item.codigo.indexOf('@')) }}
         </template>
         <template v-slot:item.activo="{ item }">
-          <v-chip :color="getColor(item.activo)" dark>{{ item.activo ? 'Sí' : 'No' }}</v-chip>
+          <v-chip :color="getColor(item.activo)" dark>{{ item.activo==null ? 'Sí' : 'No' }}</v-chip>
         </template>
         <template v-slot:item.accion="{ item }">
           <v-btn
             class="mr-2" fab dark x-small color="cyan"
             @click="editar(item)">
-          <v-icon dark>mdi-pencil</v-icon>
+            <v-icon>{{ item.userid==userId ? 'mdi-pencil': 'mdi-glasses' }}</v-icon>
           </v-btn>
           <v-btn
+            v-show="habDel(item)"
             class="mr-2" fab dark x-small color="error"
             @click="preguntoBorrar(item)">
             <v-icon dark>mdi-delete</v-icon>
@@ -639,7 +712,7 @@
 <script>
 /* eslint-disable */
 import HTTP from '../http';
-import { mapGetters, mapMutations } from 'vuex';
+import { mapGetters, mapMutations, mapState } from 'vuex';
 import router from '../router';
 import VueBarcode from 'vue-barcode';
 import SBar from './Forms/snackbar.vue';
@@ -654,13 +727,17 @@ export default {
   data: () => ({
     modelo: 'articulos',
     costo: 0,
+    elArticuloEsMio: false,
     rubItems: [],
+    marItems: [],
     rubValue: [],
     lisItems: [],
+    //vinItems: [2],
     rubObj: [],
     tagItems: [],
     tagValue: [],
     tabObj: [],
+    stocks: [],
 
     itemActual: null,
     msg: {
@@ -698,27 +775,38 @@ export default {
     //selected: [],
     //tagsDisp: [],
     // end chips
-    footerProps: {'items-per-page-options': [9, 12, 15, 100]},
     //searchRubros: '',   // para el cuadro de búsqueda de datatables
     searchGrupos: '',     // para el cuadro de búsqueda de datatables
-    searchMarcas: '',     // para el cuadro de búsqueda de datatables
     searchUmCompras: '',  // para el cuadro de busqueda de datatables
     searchUmVentas: '',   // para el cuadro de busqueda de datatables
     searchUmStock: '',    // para el cuadro de busqueda de datatables
     searchAfipIVA: '',    // para el cuadro de busqueda de datatables
+    searchMarcas: '',     // para el cuadro de busqueda de datatables
     searchMoneda: '',     // para el cuadro de busqueda de datatables
     snackbar: false,      // para el mensaje del snackbar
     textSnack: 'texto',   // texto que se ve en el snackbar
     dialog: false,        // para que la ventana de dialogo o modal no aparezca automáticamente
     dialogLis: false,     // para que la ventana de dialogo o modal no aparezca automáticamente
-    // definimos los headers de la datatables
+    dialogStk: false,     // para que la ventana de dialogo o modal no aparezca automáticamente
+
+    ////////////////////////////////////
+    // PARA EL DATATABLE ///////////////
+    ////////////////////////////////////
     items: [],
+    totalItems: 0,
+    loading: false,
+    pagination: {
+      page: 1,
+    },
+    footerProps: {'items-per-page-options': [9]},
+    search: '', 
     headers: [
-      { text: 'CODIGO', value:'codigo'},
-      { text: 'NOMBRE', value:'nombre'},
-      { text: 'GRUPO', value:'grupo.nombre'},
-      { text: 'MARCA', value:'marca.nombre'},
-      { text: 'ACTIVO', value:'activo'},
+      { text: 'CODIGO', value:'codigo', sortable: false, width: 110},
+      { text: 'NOMBRE', value:'nombre', sortable: false},
+      { text: 'CREADOR', value:'creador', sortable: false},
+      { text: 'GRUPO', value:'nomgru', sortable: false},
+      { text: 'MARCA', value:'nommar', sortable: false},
+      { text: 'ACTIVO', value:'activo', sortable: false},
       { text: 'ACCIONES', value: 'accion', sortable: false },
     ],
     headersLis: [
@@ -726,13 +814,18 @@ export default {
       { text: 'COSTO', value:'costo'},
       { text: '% REM', value:'porrem'},
       { text: 'PRECIO', value: 'precio'},
+      { text: 'FINAL', value: 'precioFinal'},
       { text: 'MODIFICADO', value: 'updated_at'},
       { text: 'ACCIONES', value: 'accion', sortable: false },
+    ],
+    headersStk: [
+      { text: 'SUCUSRAL', value:'sucursal'},
+      { text: 'DEPOSITO', value:'deposito'},
+      { text: 'EXISTENCIA', value:'existencia'},
     ],
     headers_fotos: [
       { text: 'FOTO', value:'foto'},
     ],
-    // marcas: [], //definimos el array marcas
     editedIndex: -1,
     editedIndexLis: -1,
     editado: {
@@ -804,26 +897,26 @@ export default {
       lista_id: null,
       porrem: null,
       precio: null,
+      precioFinal: null,
       updated_at: null,
     },
     descriptionLimit: 60,
     entriesRubros: [],
     entriesGrupos: [],
-    entriesMarcas: [],
     entriesUmCompras: [],
     entriesUmVentas: [],
     entriesUmStock: [],
     entriesAfipIVA: [],
+    entriesMarcas: [],
     entriesMoneda: [],
     isLoadingRubros: false,
-    isLoadingGrupos: false,
     isLoadingMarcas: false,
+    isLoadingGrupos: false,
     isLoadingUmCompras: false,
     isLoadingUmVentas: false,
     isLoadingUmStock: false,
     isLoadingAfipIVA: false,
     isLoadingMoneda: false,
-    search: null,
   }),
   /*
   components: {
@@ -833,6 +926,11 @@ export default {
   computed: {
     // Dependiendo si es Alta o Edición cambia el título del modal
     ...mapGetters('authentication', ['isLoggedIn','userId']),
+    ...mapState([
+      'colorSucursal', 'articulosVinculados'
+    ]),    
+
+
     formTitle () {
       // operadores condicionales "condición ? expr1 : expr2"
       // si <condicion> es true, devuelve <expr1>, de lo contrario devuelve <expr2>
@@ -857,14 +955,6 @@ export default {
       },    
     itemsGrupos () {
       return this.entriesGrupos.map(entry => {
-        const nombre = entry.nombre.length > this.descriptionLimit
-          ? entry.nombre.slice(0, this.descriptionLimit) + '...'
-          : entry.nombre
-        return Object.assign({}, entry, { nombre })
-        })
-      },    
-    itemsMarcas () {
-      return this.entriesMarcas.map(entry => {
         const nombre = entry.nombre.length > this.descriptionLimit
           ? entry.nombre.slice(0, this.descriptionLimit) + '...'
           : entry.nombre
@@ -897,6 +987,14 @@ export default {
     },
     itemsAfipIVA () {
       return this.entriesAfipIVA.map(entry => {
+        const nombre = entry.nombre.length > this.descriptionLimit
+          ? entry.nombre.slice(0, this.descriptionLimit) + '...'
+          : entry.nombre
+        return Object.assign({}, entry, { nombre })
+      })
+    },
+    itemsMarcas () {
+      return this.entriesMarcas.map(entry => {
         const nombre = entry.nombre.length > this.descriptionLimit
           ? entry.nombre.slice(0, this.descriptionLimit) + '...'
           : entry.nombre
@@ -981,22 +1079,6 @@ export default {
         })
         .finally(() => (this.isLoadingGrupos = false))
     },
-    searchMarcas (val) {
-      // Items have already been loaded
-      // if (this.items.length > 0) return
-      // Items have already been requested
-      if (this.isLoadingMarcas) return
-      this.isLoadingMarcas = true
-      // Lazily load input items
-      return HTTP().get('/marcas')
-        .then(({ data }) => {
-          this.entriesMarcas = data;
-        })
-        .catch(err => {
-          console.log(err)
-        })
-        .finally(() => (this.isLoadingMarcas = false))
-    },
     searchUmCompras (val) {
       // Items have already been loaded
       // if (this.items.length > 0) return
@@ -1061,6 +1143,22 @@ export default {
         })
         .finally(() => (this.isLoadingAfipIVA = false))
     },
+    searchMarcas (val) {
+      // Items have already been loaded
+      // if (this.items.length > 0) return
+      // Items have already been requested
+      if (this.isLoadingMarcas) return
+      this.isLoadingMarcas = true
+      // Lazily load input items
+      return HTTP().get('/marcasbus')
+        .then(({ data }) => {
+          this.entriesMarcas = data;
+        })
+        .catch(err => {
+          console.log(err)
+        })
+        .finally(() => (this.isLoadingMarcas = false))
+    },
     searchMoneda (val) {
       // Items have already been loaded
       // if (this.items.length > 0) return
@@ -1077,15 +1175,58 @@ export default {
         })
         .finally(() => (this.isLoadingMoneda = false))
     },
+    pagination: {
+      handler () {
+        this.listarHTTP()
+        .then(data => {
+          this.items = []
+          for(let i=0; i<data.items.length; i++) {
+            this.items.push(data.items[i])
+          }
+          this.totalItems = data.total
+        })
+      },
+      deep: true
+    },
+
+    search() {
+      this.listarHTTP()
+      .then(data => {
+        this.items = data.items
+        this.totalItems = data.total
+      })
+    }    
+
   },
   mounted () {
     if (!this.isLoggedIn) {
       return router.push('/login');
     } else {
+
+      return HTTP().get('/tags')
+        .then(({ data }) => {
+          this.tagItems = [];
+          this.tagObj = [];
+          data.forEach(element => {
+            this.tagItems.push(element.nombre)
+            this.tagObj.push(element)
+          })
+          return HTTP().get('/usersrubros')
+            .then(({ data }) => {
+              this.rubItems = [];
+              this.rubObj = [];
+              data.forEach(element => {
+                this.rubItems.push(element.rubro.nombre)
+                this.rubObj.push(element.rubro)
+              })
+            });
+          });
+        };
+
       //cargo los tags disponibles
+      /*
       const a = HTTP().get('/tags')
         .then(({ data }) => {
-//        this.tagsDisp = data;
           this.tagItems = [];
           this.tagObj = [];
           data.forEach(element => {
@@ -1101,22 +1242,75 @@ export default {
             this.rubItems.push(element.rubro.nombre)
             this.rubObj.push(element.rubro)
           })
-        });        
-      }
+        });
+      const c = HTTP().get('/articulosvinculos')
+        .then(({ data }) => {
+          this.vintems = [];
+          data.forEach(element => {
+            this.vinItems.push(element.user_id_hasta)
+          })
+        });
+      */
   },
   created () {
     this.listarHTTP();
   },
   methods: {
+    closeForm(){
+      router.push('/')
+    },
+    habDel(item) {
+      if (item.userid == this.userId) {
+        return true
+      } else {
+        return false
+      }
+     },
+    sayEditOrView(item) {
+      if (item.userid == this.userId) {
+        return 'mdi-pencil' 
+      } else {
+        return 'mdi-glasses'
+      }
+     },
     roundTo(value, places){
      var power = Math.pow(10, places);
      return Math.round(value * power) / power;
     },
+    verStock() {
+      this.dialogStk = true;
+      const a = HTTP().get('/depositos')
+        .then(({ data }) => {
+          this.stocks = [];
+          for (let i=0; i<=data[0].sucursales.length-1; i++) {
+            for (let j=0; j<=data[0].sucursales[i].depositos.length-1; j++) {
+              this.stocks.push({
+                sucursal: data[0].sucursales[i].nombre,
+                deposito: data[0].sucursales[i].depositos[j].nombre,
+                deposito_id: data[0].sucursales[i].depositos[j].id,
+                existencia: 0
+              })
+            }
+          }
+          const b = HTTP().get('/stocks/'+this.editado.id)
+            .then(({ data }) => {
+              for (let i=0; i<=data.length-1; i++) {
+                for (let j=0; j<=this.stocks.length-1; j++) {
+                  if (this.stocks[j].deposito_id===data[i].deposito_id) {
+                    this.stocks[j].existencia = data[i].stock
+                  }
+                }
+              }
+          })
+        }).catch((err)=>{
+          console.log(err);
+        })
+    },
     costoArticulo() {
-      // debugger
       for (let i=0; i<= this.editado.precios.length-1; i++) {
         this.editado.precios[i].costo = Number(this.costo)
         this.editado.precios[i].precio = this.roundTo(this.costo * (1+(this.editado.precios[i].porrem/100)),2)
+        this.editado.precios[i].precioFinal = this.roundTo(this.editado.precios[i].precio * (1+(this.editado.iva.tasa/100)),2)
       }
       /*
       for (let i=0; i<= this.lisItems.length-1; i++) {
@@ -1133,27 +1327,31 @@ export default {
       this.editadoLis.porrem = this.roundTo(((this.editadoLis.precio / this.editadoLis.costo )-1)*100,2)
       return this.editadoLis.precio
     },
+    /*
+    precioFinal(){
+      this.editadoLis.precioFinal = this.roundTo(((this.editadoLis.precio * this.editado.tasaiva )-1)*100,2)
+      return this.editadoLis.precioFinal
+    },
+    */
 
     nuevoArticulo() {
-      // debugger
       this.editedIndex = -1;
       this.dialog = true;
       this.editado = Object.assign({}, this.defaultItem);
       this.editado.rubros = this.rubItems;  // ASIGNO AL ART LOS RUBROS AL QUE PERTENECE EL USUARIO
       this.rubValue = this.rubItems;
       this.editado.fotos = []
+      this.stocks = []
+      this.dialogStk = false;
       this.costo = 0;
       this.searchGrupos = '';
-      this.searchMarcas = '';
 
       // CARGO LAS LISTAS DE PRECIOS QUE TIENE DEFINIDA EL USUARIO
       const a = HTTP().get('/user/'+this.userId)
         .then(({ data }) => {
-          // debugger
           this.lisItems = data[0].listas;
           this.editado.precios = []
 
-          // debugger
           for (let i=0; i<=this.lisItems.length-1; i++) {
             this.editado.precios.push({
               articulo_id: '',
@@ -1170,7 +1368,6 @@ export default {
           }
           //this.lisItems = this.editado.precios;
         });
-      
     },
     cargarFotos(sino) {
       this.verCargarFoto = sino;
@@ -1180,11 +1377,11 @@ export default {
       this.verCargarFoto = false
     },
     activarDesactivar(item) {
-      const valor = item.activo ? 0 : 1;
+      const valor = item.activo!=null ? 0 : 1;
       item.activo = valor
-      HTTP().patch(`${this.modelo}/${item.id}`,{activo: valor})
+      return HTTP().patch(`${this.modelo+'activardesactivar'}/${item.id}`)
         .then ((res) => {
-          console.log(res);
+          item.activo = res.data ? null : 0
         }).catch((err)=>{
           console.log(err);
         })
@@ -1209,7 +1406,7 @@ export default {
     },
     // PROCEDIMIENTOS para el CRUD
     getColor (activo) {
-      return (activo === 1) ? 'green' : 'orange'
+      return (activo == null) ? 'green' : 'orange'
     },
     buscoCodigo (event) {
       // who caused it? "event.target.id"
@@ -1226,22 +1423,65 @@ export default {
     // Se filtran los articulos cuyo rubros esten dentro de los rubros asignados al usuario.
     // Luego para todas las otras tareas del crud se utiliza el controlador de Articulos.
     // Por lo tanto this.modelo es = a 'articulos'
+
+    /*
     listarHTTP:function() {
       return HTTP().get('/userarticulos')
         .then(({ data }) => {
           this.items = []
-          // debugger
-          for(let i=0; i<data.length; i++) {
-            this.items.push(data[i].articulo)
+          for(let i=0; i<data.data.length; i++) {
+            this.items.push(data.data[i].articulo)
+//          this.items.push(data[i].articulo)
           }
         });
     },
+    */
+
+    listarHTTP () {
+      let localThis = this
+      this.loading = true
+      return new Promise((resolve, reject) => {
+          const { sortBy, descending, page, rowsPerPage } = this.pagination
+          let items = this.getJsonData().then(
+            function(response){
+              items = response.data;
+              const total = response.total
+              setTimeout(() => {
+                localThis.loading = false;
+                resolve({
+                  items,
+                  total
+                })
+              }, 0)
+          })
+      })    },
+    getJsonData () {
+      let s = this.search.length>0 ? this.search : 'all'
+      let v = this.$store.state.articulosVinculados
+      return HTTP().get(`userarticulos/${this.pagination.page}/9/${s}/${v}`)
+        .then(function(response){
+          var result  = response.data;
+          return result;
+        }).catch(function (error) {
+          console.log(error);
+      })
+    },
+
     // Procedimiento GRABAR LO EDITADO.
     editarHTTP:function(data) {
-      // debugger
       return HTTP().patch(`${this.modelo}/${data.id}`, data)
         .then(() => {
-          this.listarHTTP();
+
+          this.listarHTTP()
+          .then(data => {
+            this.items = []
+            for(let i=0; i<data.items.length; i++) {
+              this.items.push(data.items[i])
+            }
+            this.totalItems = data.total
+          })
+
+//        this.listarHTTP();
         });
     },
     // Procedimiento BORRAR.
@@ -1254,10 +1494,8 @@ export default {
     duplicarArticulo:function(item) {
       this.editedIndex = this.items.indexOf(item);
       this.editado = Object.assign({}, item);
-      const part1 = this.editado.codigo.substring( 0, this.editado.codigo.indexOf('@')+1);
-      const codig = this.editado.codigo.substring( this.editado.codigo.indexOf('@')+1, this.editado.codigo.indexOf('$'));
-      const part2 = this.editado.codigo.substring( this.editado.codigo.indexOf('$'));
-      this.editado.codigo = part1+codig+'bis'+part2;
+      const codig = this.editado.codigo.substring( 0, this.editado.codigo.indexOf('@'));
+      this.editado.codigo = codig+'bis'+this.userId;
       this.mensaje('¡Duplicación Exitosa!', 'blue', 1500) 
       this.altaHTTP();
     },
@@ -1287,99 +1525,138 @@ export default {
       this.msg.msgButtons = ['Aceptar','Cancelar']
     },
     editar (item) {
-      this.editedIndex = this.items.indexOf(item);
-      // debugger
-      this.editado = Object.assign({}, item);
-      this.editado.codigo = this.editado.codigo.substring( this.editado.codigo.indexOf('@')+1, this.editado.codigo.indexOf('$') )
-      this.dialog = true;
-
-      // CARGO RUBROS, TAGS Y PRECIOS DEL ARTICULO
-      this.rubValue = []
-      this.tagValue = []
-      this.editado.rubros.forEach(element => {
-        this.rubValue.push(element.nombre)
-      })
-      this.editado.tags.forEach(element => {
-        this.tagValue.push(element.nombre)
-      })
-      this.fotos = this.editado.fotos;
-
-      // CARGO LAS LISTAS DE PRECIOS QUE TIENE DEFINIDA EL USUARIO
-      this.editado.precios = [];
-      this.lisItems = [];
-      let lisPre = []
-      const a = HTTP().get('/user/'+this.userId)
+      const a = HTTP().get('/articulo/'+item.id)
         .then(({ data }) => {
-          let lis = data[0].listas
-          for (let i = 0; i<=lis.length-1; i++) {
-            //RECORRO TODAS LAS LISTAS DE PRECIOS 
-            //PR CADA LISTA TENGO QUE IR A BUSCAR EL PRECIO
-            let iLis = lis[i].id;
-            let iArt = this.editado.id;
-            const p = HTTP().get('/precio/'+iArt+'/'+iLis)
-              .then(({ data }) => {
-                // BUSCO EL PRECIO PARA AGREARLO A LA MATRIZ
-                if (data.length>0) {
-                  this.editado.precios.push({
-                    articulo_id: iArt,
-                    comprobante_item_id: data[0].comprobante_item_id,
-                    costo: data[0].costo,
-                    created_at: data[0].created_at,
-                    id: data[0].id,
-                    lista: lis[i],
-                    lista_id: iLis,
-                    porrem: data[0].porrem,
-                    precio: data[0].precio,
-                    updated_at: data[0].updated_at
-                  })
-                  //  debugger
-                  this.lisItems.push({
-                    activo: lis[i].activo,
-                    created_at: lis[i].created_at,
-                    fechaultact: lis[i].fechaultact,
-                    id: lis[i].id,
-                    nombre: lis[i].nombre,
-                    porrem: data[0].porrem,
-                    updated_at: lis[i].updated_at,
-                    user_id: lis[i].user_id,
-                    precio: data[0].precio,
-                    costo: data[0].costo,
-                  })
-                  this.costo = data[0].costo;
-                } else {
-                  this.editado.precios.push({
-                    articulo_id: iArt,
-                    comprobante_item_id: null,
-                    costo: 0,
-                    created_at: '',
-                    id: 0,
-                    lista: lis[i],
-                    lista_id: iLis,
-                    porrem: lis[i].porrem,
-                    precio: 0,
-                    updated_at: ''
-                  })
-                  //  debugger
-                  this.lisItems.push({
-                    activo: lis[i].activo,
-                    created_at: lis[i].created_at,
-                    fechaultact: lis[i].fechaultact,
-                    id: lis[i].id,
-                    nombre: lis[i].nombre,
-                    porrem: lis[i].porrem,
-                    updated_at: '',
-                    user_id: lis[i].user_id,
-                    precio: 0,
-                    costo: 0,
-                  })
-                  this.costo = 0;
-                }
+          this.editedIndex = this.items.indexOf(item);
+          this.elArticuloEsMio = item.userid == this.userId
+          this.editado = Object.assign({}, data[0]);
+          this.editado.codigo = this.editado.codigo.substring(0, this.editado.codigo.indexOf('@'))
+          this.dialog = true;
+
+          // CARGO RUBROS, TAGS Y PRECIOS DEL ARTICULO
+          /*
+          for (let i=0; i<=this.marItems.length-1; i++) {
+            if (this.marItems[i].id == this.editado.marca_id) {
+              break
+            }
+          }
+          */
+          this.rubValue = []
+          this.tagValue = []
+          this.stocks = []
+          this.dialogStk = false;
+          this.editado.rubros.forEach(element => {
+            this.rubValue.push(element.nombre)
+          })
+          this.editado.tags.forEach(element => {
+            this.tagValue.push(element.nombre)
+          })
+          this.fotos = this.editado.fotos;
+
+          // CARGO LAS LISTAS DE PRECIOS QUE TIENE DEFINIDA EL USUARIO
+          this.editado.precios = [];
+          this.lisItems = [];
+          let lisPre = [];
+          let lisusr = this.userId;
+          let precioCreador = 0;
+
+          debugger
+          if (this.userId!=data[0].creador_id) {
+            const a = HTTP().get('/userprecios/'+data[0].creador_id+'/'+data[0].id)
+            .then(({ data }) => {
+              precioCreador = data
             })
           }
-        })
+
+          const b = HTTP().get('/user/'+this.userId)
+            .then(({ data }) => {
+              let lis = data[0].listas
+              for (let i = 0; i<=lis.length-1; i++) {
+                //RECORRO TODAS LAS LISTAS DE PRECIOS 
+                //PR CADA LISTA TENGO QUE IR A BUSCAR EL PRECIO
+                let iLis = lis[i].id;
+                let iArt = this.editado.id;
+                const p = HTTP().get('/precio/'+iArt+'/'+iLis)
+                  .then(({ data }) => {
+                    debugger
+                    let costo = 0 
+                    let precio = 0
+                    let precioFinal = 0
+                    if (data.length > 0) {
+                      costo = data[0].costo 
+                      precio = data[0].precio
+                      precioFinal = this.roundTo(precio*(1+(this.editado.iva.tasa/100)),2)
+                      if (precioCreador != 0) {
+                        costo = precioCreador
+                        precio = this.roundTo(precioCreador*(1+(data[0].porrem/100)),2)
+                        precioFinal = this.roundTo(precio*(1+(this.editado.iva.tasa/100)),2)
+                      }
+                      this.editado.precios.push({
+                        articulo_id: iArt,
+                        comprobante_item_id: data[0].comprobante_item_id,
+                        costo: costo,
+                        created_at: data[0].created_at,
+                        id: data[0].id,
+                        lista: lis[i],
+                        lista_id: iLis,
+                        porrem: data[0].porrem,
+                        precio: precio,
+                        precioFinal: precioFinal,
+                        updated_at: data[0].updated_at
+                      })
+                      this.lisItems.push({
+                        activo: lis[i].activo,
+                        created_at: lis[i].created_at,
+                        fechaultact: lis[i].fechaultact,
+                        id: lis[i].id,
+                        nombre: lis[i].nombre,
+                        porrem: data[0].porrem,
+                        updated_at: lis[i].updated_at,
+                        user_id: lis[i].user_id,
+                        precio: precio,
+                        precioFinal: precioFinal,
+                        costo: data[0].costo,
+                      })
+                      this.costo = data[0].costo;
+                    } else {
+                      debugger
+                      costo = precioCreador
+                      precio = precioCreador*(1+(lis[i].porrem/100))
+                      precioFinal = precio*(1+(this.editado.iva.tasa/100))
+                      this.editado.precios.push({
+                        articulo_id: iArt,
+                        comprobante_item_id: null,
+                        costo: costo,
+                        created_at: '',
+                        id: 0,
+                        lista: lis[i],
+                        lista_id: iLis,
+                        porrem: lis[i].porrem,
+                        precio: precio,
+                        precioFinal: precioFinal,
+                        updated_at: ''
+                      })
+                      this.lisItems.push({
+                        activo: lis[i].activo,
+                        created_at: lis[i].created_at,
+                        fechaultact: lis[i].fechaultact,
+                        id: lis[i].id,
+                        nombre: lis[i].nombre,
+                        porrem: lis[i].porrem,
+                        updated_at: '',
+                        user_id: lis[i].user_id,
+                        precio: precio,
+                        precioFinal: precioFinal,
+                        costo: costo,
+                      })
+                      //this.costo = 0;
+                    }
+                })
+              }
+          })
+      })
     },
     editarLis (item) {
-      // debugger
       this.editadoLis = Object.assign({}, item);
       this.editedIndexLis = this.editado.precios.indexOf(item); // si this.editIndex es = -1 es una alta.
       this.dialogLis = true;
@@ -1405,7 +1682,8 @@ export default {
         this.mensaje('¡Debe completar todos los datos!', 'red', 1500) 
         return this.dialog = true;
       }
-      this.editado.codigo = this.editado.grupo_id+'#'+this.editado.marca_id+'@'+this.editado.codigo+'$.';
+      this.editado.codigo = this.editado.codigo+'@'+this.userId;
+      /*
       this.codigo = this.editado.codigo;
       this.codbar = this.editado.codbar;
       this.codbaroriginal = this.codbaroriginal;
@@ -1426,8 +1704,8 @@ export default {
       this.un_stock = Number(this.editado.un_stock);
       this.iva_id = this.editado.iva_id;
       this.activo = this.editado.activo ? 1 : 0;
+      */
 
-      //debugger
       let aux = [];
       for(let i=0; i<=this.rubValue.length-1; i++ ) {
         for(let j=0; j<=this.rubObj.length-1; j++) {
@@ -1451,7 +1729,6 @@ export default {
       this.editado.tags = aux;
 
       //this.tags = this.selected;
-      //debugger
       //this.rubros = this.rubValue;
       //this.tags = this.tagValue;
       //this.editado.tags = this.tagValue;
@@ -1469,7 +1746,6 @@ export default {
       this.cancelar();
     },
     guardarLis(item) {
-      // debugger
       this.editado.precios[this.editedIndexLis].costo = this.editadoLis.costo;
       this.editado.precios[this.editedIndexLis].porrem = this.editadoLis.porrem;
       this.editado.precios[this.editedIndexLis].precio = this.editadoLis.precio;
@@ -1477,7 +1753,6 @@ export default {
     },
     //Procedimiento Alta de Articulos.
     altaHTTP:function() {
-      // debugger
       return HTTP().post('/'+this.modelo, {
         codigo: this.editado.codigo,
         codbar: this.editado.codbar,
@@ -1510,4 +1785,4 @@ export default {
   },
 
 }; 
-</script> 
+</script>

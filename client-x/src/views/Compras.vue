@@ -9,11 +9,15 @@
         class="elevation-3"
         :footer-props="footerProps">
         <template v-slot:top>
-          <v-system-bar color="indigo darken-2" dark></v-system-bar>
+          <v-system-bar color="indigo darken-2" dark>
+            <v-btn icon @click="closeForm">
+              <v-icon color="white" dark>mdi-close-circle</v-icon>
+            </v-btn>
+          </v-system-bar>
           <v-toolbar flat color="indigo">
             <template v-slot:extension>
               <v-tooltip bottom>
-                <template v-slot:activator="{ on, attrs }">
+                <template v-slot:activator="{ on }">
                   <v-btn
                     fab color="cyan accent-3" :class="tl"
                     @click="nuevo('com')" v-on="on">Com
@@ -22,7 +26,7 @@
                 <span>Nueva Compra</span>
               </v-tooltip>
               <v-tooltip bottom>
-                <template v-slot:activator="{ on, attrs }">
+                <template v-slot:activator="{ on }">
                   <v-btn
                     fab color="cyan accent-3" :class="tl"
                     @click="nuevo('gas')" v-on="on">Gas
@@ -31,7 +35,7 @@
                 <span>Nuevo Gasto</span>
               </v-tooltip>
               <v-tooltip bottom>
-                <template v-slot:activator="{ on, attrs }">
+                <template v-slot:activator="{ on }">
                   <v-btn
                     fab color="cyan accent-3" :class="tl"
                     @click="nuevo('rem')" v-on="on">Rem
@@ -40,7 +44,7 @@
                 <span>Nuevo Remito</span>
               </v-tooltip>
               <v-tooltip bottom>
-                <template v-slot:activator="{ on, attrs }">
+                <template v-slot:activator="{ on }">
                   <v-btn
                     fab color="cyan accent-3" :class="tl"
                     @click="nuevo('ped')" v-on="on">Ped
@@ -59,7 +63,7 @@
 
             <!-- DIALOGO DE LA CABECERA -->
             <v-dialog v-model="dialogCab" max-width="550px" :fullscreen="true">
-              <template v-slot:activator="{ on }"></template>
+              <template v-slot:activator="{}"></template>
               <v-card>
                 <v-card-title  class="cyan white--text">
                   <span class="headline">{{ formTitle }}</span>
@@ -96,12 +100,14 @@
                         <v-col cols="1" sm="1" md="1">
                           <v-select
                             label="Comprobante" v-model="editado.afipcpr_id"
+                            :disabled = "esFiscal == false"
                             :items="cprItems" item-value="id" item-text="abrev"
                             autocomplete return-object>
                           </v-select>
                         </v-col>
                         <v-col cols="1" sm="1" md="1">
                           <v-text-field
+                            :disabled = "esFiscal == false"
                             v-model="editado.afipSuc"
                             @change="afipsuc()"
                             label="Suc">
@@ -109,6 +115,7 @@
                         </v-col>
                         <v-col cols="2" sm="2" md="2">
                           <v-text-field
+                            :disabled = "esFiscal == false"
                             v-model="editado.afipNro"
                             label="Numero"
                             @change="afipnro()">
@@ -125,14 +132,13 @@
                             offset-y
                             max-width="290px"
                             min-width="290px">
-                            <template v-slot:activator="{ on, attrs }">
+                            <template v-slot:activator="{ on }">
                               <v-text-field
                                 v-model="fecha"
                                 label="Fecha"
                                 hint="MM/DD/YYYY"
                                 persistent-hint
                                 prepend-icon="event"
-                                v-bind="attrs"
                                 @blur="date = parseDate(fecha)"
                                 v-on="on"
                               ></v-text-field>
@@ -147,7 +153,7 @@
                         </v-col>
                         <v-spacer></v-spacer>
 
-                        <v-col cols="1" sm="1" md="1">
+                        <v-col v-show="esFiscal == true" cols="1" sm="1" md="1">
                           <v-text-field
                             v-model="editado.perfiscal"
                             label="Per.Fiscal">
@@ -197,13 +203,13 @@
                           </v-select>
                         </v-col>
                         <v-col cols="1" sm="1" md="1">
-                          <v-select
+                          <v-select v-show="esFiscal == true"
                             label="Moneda" v-model="editado.moneda_id"
                             :items="monItems" item-value="id" item-text="simbolo" return-object>
                           </v-select>
                         </v-col>
                         <v-col cols="2" sm="2" md="2">
-                          <v-select
+                          <v-select v-show="esFiscal == true"
                             label="Medio de Pago" v-model="editado.medio_id"
                             :items="medItems" item-value="id" item-text="nombre" return-object>
                           </v-select>
@@ -211,7 +217,7 @@
                       </v-row>
 
                       <!--// TOTALES DEL COMPROBANTE // -->
-                      <v-row>
+                      <v-row v-show="esFiscal == true">
                         <v-col cols="7" sm="7" md="7">
                           <v-row>
                             <v-col cols="4" sm="4" md="4">
@@ -271,7 +277,7 @@
                         </v-col>
 
                         <!--// DETALLES DEL IVA // -->
-                        <v-col cols="5" sm="5" md="5">
+                        <v-col cols="5" sm="5" md="5" v-show="esFiscal == true">
                           <v-data-table
                             :headers="headersTasasDeIVA"
                             :items="tasasIVA"
@@ -279,7 +285,7 @@
                             hide-default-footer>
                             <template v-slot:top>
                               <v-dialog v-model="dialogTasaArt" max-width="900px">
-                                <template v-slot:activator="{ on, attrs }">
+                                <template v-slot:activator="{}">
                                 </template>
                                 <v-card>
                                   <v-card-title>
@@ -332,7 +338,7 @@
                       </v-row>
 
                       <!--// PIE DEL FORMULARIO CABECERA // -->
-                      <v-row>
+                      <v-row v-show="esFiscal == true">
                         <v-col cols="12" sx="12" mx="12">
                           <span dense class="headline">Valores</span>
                           <v-row>
@@ -363,7 +369,7 @@
                                 offset-y
                                 max-width="290px"
                                 min-width="290px">
-                                <template v-slot:activator="{ on, attrs }">
+                                <template v-slot:activator="{ on }">
                                   <v-text-field
                                     v-model="vencimiento"
                                     dense outlined
@@ -372,7 +378,6 @@
                                     hint="MM/DD/YYYY"
                                     persistent-hint
                                     prepend-icon="event"
-                                    v-bind="attrs"
                                     @blur="date = parseDate(vencimiento)"
                                     v-on="on"
                                   ></v-text-field>
@@ -397,8 +402,6 @@
                             <v-col cols="2" sm="2" md="2">
                             </v-col>
                             <v-col cols="2" sm="2" md="2">
-                            </v-col>
-                            <v-col cols="2" sm="2" md="2">
                               <v-text-field
                                 disabled dense outlined
                                 v-model="valDiferencia"
@@ -417,7 +420,7 @@
                             hide-default-footer>
                             <template v-slot:top>
                               <v-dialog v-model="dialogMed" max-width="900px">
-                                <template v-slot:activator="{ on, attrs }">
+                                <template v-slot:activator="{}">
                                   <v-btn
                                     x-small fab color="cyan accent-3"
                                     @click="nuevoMed">
@@ -490,10 +493,10 @@
 
             <!--// ARTICULOS // -->
             <v-dialog v-model="dialogArt" max-width="550px" :fullscreen="true">
-              <template v-slot:activator="{ on }"></template>
+              <template v-slot:activator="{}"></template>
               <v-card>
                 <v-card-title  class="cyan white--text">
-                  <span class="headline">{{ formTitle }}</span>
+                  <span class="headline">Articulos del comprobante: {{cpr}}</span>
                   <v-spacer></v-spacer>
                   <span class="text--right">
                     <v-btn
@@ -519,7 +522,7 @@
                             hide-default-footer>
                             <template v-slot:top>
                               <v-dialog v-model="dialogEditArt" max-width="900px">
-                                <template v-slot:activator="{ on, attrs }">
+                                <template v-slot:activator="{}">
                                   <v-btn
                                     fab color="cyan accent-3"
                                     x-small
@@ -609,22 +612,13 @@
                                         <v-col cols="3" sm="3" md="3">
                                           <v-text-field
                                             v-model="editadoArt.precio"
-                                            label="Precio">
+                                            label="Precio"
+                                            @change="precioItem()">
                                           </v-text-field>
                                         </v-col>
                                         <v-col cols="1" sm="1" md="1">
-                                          <v-text-field
-                                            v-model="editadoArt.tasadescuento"
-                                            label="%Desc."
-                                            @change="tasaDescuento()">>
-                                          </v-text-field>
                                         </v-col>
                                         <v-col cols="3" sm="3" md="3">
-                                          <v-text-field
-                                            v-model="editadoArt.importedescuento"
-                                            label="Imp.Descuento"
-                                            @change="importeDescuento()">>
-                                          </v-text-field>
                                         </v-col>
                                         <v-col cols="3" sm="3" md="3">
                                           <v-text-field
@@ -654,22 +648,16 @@
                                 </v-card>
                               </v-dialog>
                             </template>
-                            <template v-slot:item.activo="{ item }">
-                              <v-chip
-                                :color="getColor(item.activo)"
-                                dark>{{item.activo?'Sí':'No'}}
-                              </v-chip>
-                            </template>
                             <template v-slot:item.accion="{item}">
                               <v-btn
                                 class="mr-2" fab dark x-small color="cyan"
-                                @click="editarDep(item)">
+                                @click="editarArt(item)">
                                 <v-icon dark>mdi-pencil</v-icon>
                               </v-btn>
                               <v-btn
-                                class="mr-2" fab x-small color="white"
-                                @click="activarDesactivarDep(item)">
-                                <v-icon dark>mdi-checkbox-marked-outline</v-icon>
+                                class="mr-2" fab x-small color="error"
+                                @click="borrarArt(item)">
+                                <v-icon dark>mdi-delete</v-icon>
                               </v-btn>
                             </template>
                           </v-data-table>
@@ -678,47 +666,30 @@
 
                       <v-row>
                         <v-col cols="2" sm="2" md="2">
+                        </v-col>
+                        <v-col cols="2" sm="2" md="2">
+                        </v-col>
+                        <v-col cols="2" sm="2" md="2">
+                        </v-col>
+                        <v-col cols="2" sm="2" md="2">
                           <v-text-field
-                            dense outlined
-                            v-model="editado.tasadescuento"
-                            @change="calculos()"
-                            label="%Desc.">
+                            disabled dense outlined
+                            v-model="totalCabecera"
+                            label="Total Cabecera">
                           </v-text-field>
                         </v-col>
                         <v-col cols="2" sm="2" md="2">
                           <v-text-field
                             disabled dense outlined
-                            v-model="editado.importedescuento"
-                            @change="calculos()"
-                            label="Descuento">
+                            v-model="totalArticulos"
+                            label="Total Articulos">
                           </v-text-field>
                         </v-col>
                         <v-col cols="2" sm="2" md="2">
                           <v-text-field
                             disabled dense outlined
-                            v-model="editado.exento"
-                            label="Exento">
-                          </v-text-field>
-                        </v-col>
-                        <v-col cols="2" sm="2" md="2">
-                          <v-text-field
-                            disabled dense outlined
-                            v-model="editado.iva"
-                            label="IVA">
-                          </v-text-field>
-                        </v-col>
-                        <v-col cols="2" sm="2" md="2">
-                          <v-text-field
-                            disabled dense outlined
-                            v-model="editado.gravado"
-                            label="Gravado">
-                          </v-text-field>
-                        </v-col>
-                        <v-col cols="2" sm="2" md="2">
-                          <v-text-field
-                            disabled dense outlined
-                            v-model="editado.total"
-                            label="TOTAL">
+                            v-model="diferencia"
+                            label="DIFERENCIA">
                           </v-text-field>
                         </v-col>
                       </v-row>
@@ -746,11 +717,20 @@
           <span disable dark>{{ formatoImporte(item.total) }}</span>
         </template>
         <template v-slot:item.pendientes[0].pendiente="{ item }">
-          <span
-            disable
-            dark>
+          <span disable dark>
               {{ formatoImporte(item.pendientes[0] ? item.pendientes[0].pendiente : 0) }}
           </span>
+        </template>
+        <template v-slot:item.estado="{ item }">
+          <v-chip
+            class="caption" :color="getEstado(item.estado,'c',item.pendientes[0])">
+            {{ getEstado(item.estado,'e',item.pendientes[0], item.carga) }}
+            <v-badge v-show="item.carga=='I'"
+              color="red"
+              dot
+              :value="item.carga">
+            </v-badge>
+          </v-chip>
         </template>
         <template v-slot:item.accion="{ item }">
           <v-btn
@@ -758,15 +738,20 @@
             @click="print(item)">
             <v-icon dark>mdi-printer</v-icon>
           </v-btn>
-          <v-btn v-if="item.estado='P'"
+          <v-btn v-show="item.estado=='P'"
             class="mr-2" fab x-small color="white"
             @click="cargarArt(item)">
             <v-icon dark>mdi-barcode</v-icon>
           </v-btn>
-          <v-btn v-if="cobrar(item)"
+          <v-btn v-show="cobrar(item)"
             class="mr-2" fab x-small color="white"
             @click="print(item)">
             <v-icon dark>mdi-sticker-emoji</v-icon>
+          </v-btn>
+          <v-btn v-show="item.estado=='P' && item.cpr.substring(0,3)=='PED'"
+            class="mr-2" fab x-small color="white"
+            @click="preguntoEnvio(item)">
+            <v-icon dark>mdi-file-send</v-icon>
           </v-btn>
         </template>
       </v-data-table>
@@ -786,7 +771,7 @@
 
 /* eslint-disable */
 import HTTP from '../http';
-import { mapGetters, mapMutations } from 'vuex';
+import { mapGetters, mapMutations, mapState } from 'vuex';
 import router from '../router';
 import moment from 'moment';
 import SBar from './Forms/snackbar.vue';
@@ -808,24 +793,27 @@ export default {
     menu1: false,
     menu2: false,
 
+    /*
     snack: false,
     snackColor: '',
     snackText: '',
+    */
 
     cfUser: '',
   //sucursal: '',
     coef: 1,  // para signar los comprobantes + o -
     modelo: 'compras',
     queMostrar: 'C',
+    esFiscal: true,
     ctacte: false,
     formTitle: '',
     formTitleArt: '',
     formTitleMed: '',
     itemActual: null,
+    cpr: '',
     tl: "text-lowercase",
     medFijos: [],
     cprItems: [],
-    lisItems: [],
     depItems: [],
     uniItems: [],
     monItems: [],
@@ -869,16 +857,18 @@ export default {
     valValores: 0,
     valDiferencia: 0,
 
+    totalCabecera: 0,
+    totalArticulos: 0,
+    diferencia: 0,
+
     // definimos los headers de la datatables
     headers: [
-      /*
       {
         text: 'ID',
         align: 'left',
         sortable: false,
         value: 'id',
       },
-      */
       { text: 'COMPROBANTE', value:'cpr'},
       { text: 'FECHA', value:'fecha'},
       { text: 'CLIENTE', value:'tercero.nombre'},
@@ -897,9 +887,9 @@ export default {
       { text: 'CODIGO', value:'codigo'},
       { text: 'DESCRIPCION', value:'nombre'},
       { text: 'CTT', value:'cantidad'},
+      { text: 'UM', value:'unidad_id'},
       { text: 'PRECIO', value:'precio'},
-      { text: '%DES', value:'tasadescuento'},
-      { text: 'DES', value:'importedescuento'},
+      { text: 'DEPOSITO', value:'deposito_id'},
       { text: 'TOTAL', value:'total'},
       { text: 'ACCIONES', value: 'accion', sortable: false },
     ],
@@ -922,6 +912,7 @@ export default {
       vencimiento: moment().format('DD-MM-YYYY'),
       perfiscal: '',
       tercero_id: '',
+      comprobante_id: '',
       afipcpr_id: '',
       afipsuc: '',
       afipnro: '',
@@ -952,6 +943,7 @@ export default {
       vencimiento: moment().format('DD-MM-YYYY'),
       perfiscal: '',
       tercero_id: '',
+      comprobante_id: '',
       afipcpr_id: '',
       afipsuc: '',
       afipnro: '',
@@ -989,6 +981,7 @@ export default {
       iva_id: '',
       ivaNombre: '',
       cantidad: 1,
+      stock: 1,
       costo: 0,
       precio: 0,
       preciooriginal: 0,
@@ -1011,6 +1004,7 @@ export default {
       iva_id: '',
       ivaNombre: '',
       cantidad: 1,
+      stock: 1,
       costo: 0,
       precio: 0,
       preciooriginal: 0,
@@ -1042,6 +1036,7 @@ export default {
   computed: {
     ...mapGetters('authentication', ['isLoggedIn', 'userName', 'userId', 'sucursal', 'sucursalFiscal', 'caja']),
     ...mapMutations(['alert','closeAlert']),
+    ...mapState(['sucursal','sucursalFiscal']),
 
     computedDateFormatted () {
       return this.formatDate(this.date)
@@ -1082,6 +1077,11 @@ export default {
       // debugger
       this.fecha = this.formatDate(this.date)
     },
+    '$store.state.sucursal' () {
+      debugger
+      let xxx = this.sucursal
+      this.listarHTTP(this.sucursal)
+    },
     searchTerceros (val) {
       // Items have already been loaded
       // if (this.entriesPaises.length > 0) return
@@ -1089,7 +1089,7 @@ export default {
       if (this.isLoadingTerceros) return
       this.isLoadingTerceros = true
       // Lazily load input items
-      return HTTP().get('/usersproveedores')
+      return HTTP().get('/usersproveedores/false')
         .then(({ data }) => {
           this.entriesTerceros = []
           this.tercerosUserId = []
@@ -1135,30 +1135,24 @@ export default {
                 this.editado.direccion_id = this.dirItems[0].id
 
                 this.ctacte = false
-                for (let i=0; i<=this.medFijos.length-1; i++) {
-                  this.medItems.push(this.medFijos[i].nombre)
+                if (this.editado.cpr!=='PED') {
+                  for (let i=0; i<=this.medFijos.length-1; i++) {
+                    this.medItems.push(this.medFijos[i].nombre)
+                  }
+                  if (data[0].terceromediosdepago.length > 0) {
+                    data[0].terceromediosdepago.forEach(e => {
+                      this.medItems.push(e.mediodepago.nombre)
+                      if (e.mediodepago.id == 4) {
+                        this.ctacte = true
+                      }
+                    })
+                  }
+                  this.editado.medio_id = this.medItems[0]
                 }
-                if (data[0].terceromediosdepago.length > 0) {
-                  data[0].terceromediosdepago.forEach(e => {
-                    this.medItems.push(e.mediodepago.nombre)
-                    if (e.mediodepago.id == 4) {
-                      this.ctacte = true
-                    }
-                  })
-                }
-                //debugger
-                this.editado.medio_id = this.medItems[0]
+                // debugger
+                this.editado.lista_id = null
 
                 // debugger
-                if (data[0].terceroListas.length > 0) {
-                  data[0].terceroListas.forEach(element => {
-                    entro = true
-                    this.lisItems.push(element.lista)
-                    this.lisObj.push(element.lista)
-                  })
-                }
-                this.editado.lista_id = this.lisItems[0].id
-
                 const a = HTTP().get('/afipcomprobantes')
                   .then(({ data }) => {
                     data.forEach(element => {
@@ -1184,8 +1178,8 @@ export default {
       return HTTP().get('/userarticulos')         // /userarticulos
         .then(({ data }) => {
 
-          // debugger
           this.entriesArticulos = []
+          // debugger
           data.forEach(e => {
             let art = e.articulo
             this.entriesArticulos.push(art)
@@ -1203,25 +1197,25 @@ export default {
           this.editadoArt.nombre = this.entriesArticulos[ipos].nombre;
           this.editadoArt.codbar = this.entriesArticulos[ipos].codbar;
 
-          let iArt = this.entriesArticulos[ipos].id
-          let iLis = this.editado.lista_id
-          return HTTP().get('/precio/'+iArt+'/'+iLis)
-            .then(({ data }) => {
-              this.editadoArt.precio = data[0].precio
-              this.editadoArt.total = data[0].precio
-              this.editadoArt.tasadesuento = 0
-              this.editadoArt.importedescuento = 0
-              this.uniItems = this.entriesArticulos[ipos].umventa;
-              this.monItems = this.entriesArticulos[ipos].moneda;
-              this.ivaItems = this.entriesArticulos[ipos].iva;
-              this.editadoArt.deposito_id = this.depItems[0]
-              this.editadoArt.unidad_id = this.uniItems.id
-              this.editadoArt.unidadNombre = this.uniItems.nombre
-              this.editadoArt.moneda_id = this.monItems.id
-              this.editadoArt.monedaNombre = this.monItems.simbolo
-              this.editadoArt.iva_id = this.ivaItems.id
-              this.editadoArt.ivaNombre = this.ivaItems.nombre
-          })
+          this.editadoArt.precio = 0
+          // ACA NO TIENE QUE BUSCAR EL PRECIO, SOLO EL COSTO.
+          if (this.entriesArticulos[ipos].precios!==undefined) {
+            this.editadoArt.precio = this.entriesArticulos[ipos].precios[0].costo
+          }
+          // debugger
+          this.editadoArt.cantidad = 1
+          this.editadoArt.stock = 1
+          this.editadoArt.deposito_id = this.depItems[0].id
+          this.editadoArt.total = this.editadoArt.precio
+          this.uniItems = this.entriesArticulos[ipos].umventa;
+          this.monItems = this.entriesArticulos[ipos].moneda;
+          this.ivaItems = this.entriesArticulos[ipos].iva;
+          this.editadoArt.unidad_id = this.uniItems.id
+          this.editadoArt.unidadNombre = this.uniItems.nombre
+          this.editadoArt.moneda_id = this.monItems.id
+          this.editadoArt.monedaNombre = this.monItems.simbolo
+          this.editadoArt.iva_id = this.ivaItems.id
+          this.editadoArt.ivaNombre = this.ivaItems.nombre
         })
         .catch(err => {
           console.log(err)
@@ -1293,6 +1287,29 @@ export default {
         this.monItems = data
     });
 
+    // BUSCO LOS DEPOSITOS HABILITADOS EN LA SUCURSAL
+    const d = HTTP().get('/user/'+this.userId)
+      .then(({ data }) => {
+       /*
+        TENGO EL ID DE LA SUCURSAL DE LA BD EN 'sucursal'
+        pero necesito la posicion que ocupa dentro
+        de la matriz data[0].sucursales
+        busco el Id de la sucursal en la matriz
+       */
+        let psuc = 0
+        for (let i=0; i<=data[0].sucursales.length-1; i++) {
+          if (data[0].sucursales[i].id===this.sucursal) {
+            psuc = i;
+            break;
+          }
+        }
+        for (let i=0; i<= data[0].sucursales[psuc].depositos.length-1; i++) {
+          this.depItems.push(data[0].sucursales[psuc].depositos[i])
+        }
+        this.editado.deposito_id = this.depItems[0].id
+        this.cfUser = Number(data[0].tercero.responsable.codigo)
+      });
+
     this.tasasIVA.push({tasa:'0', base: 0, iva: 0})
     this.tasasIVA.push({tasa:'2.5', base: 0, iva: 0})
     this.tasasIVA.push({tasa:'5', base: 0, iva: 0})
@@ -1302,6 +1319,9 @@ export default {
 
   },
   methods: {
+    closeForm(){
+      router.push('/')
+    },
     afipsuc() {
       this.editado.afipSuc = this.editado.afipSuc.padStart(4,'0')
     },
@@ -1356,10 +1376,47 @@ export default {
       }
     }, 
     cargarArt(item) {
-      // debugger
       // this.dialoCab = false;
+      // debugger
+      this.editedIndex = this.items.indexOf(item)
+      this.totalCabecera = item.gravado+item.exento
+      this.cpr = item.cpr
       this.dialogArt = true;
-    }, 
+      this.articulos = [];
+      const a = HTTP().get('/comprasitems/'+item.id)
+        .then(({ data }) => {
+          for (let x=0; x<=data.length-1; x++) {
+            let cod = data[x].articulo.codigo;
+            // debugger
+            const codig = cod.substring(0, cod.indexOf('@'));
+            this.articulos.push({
+              id: data[x].id,
+              articulo_id: data[x].articulo.id,
+              cantidad: data[x].cantidad,
+              stock: data[x].cantidad,
+              stock: data[x].stock,
+              codigo: codig,
+              costo: data[x].costo,
+              deposito_id: data[x].deposito_id,
+              importedescuento: data[x].importedescuento,
+              iva_id: data[x].iva_id,
+              moneda_id: data[x].moneda_id,
+              nombre: data[x].articulo.nombre,
+              precio: data[x].precio,
+              preciooriginal: data[x].preciooriginal,
+              tasadescuento: data[x].tasadescuento,
+              texto: data[x].texto,
+              total: data[x].total,
+              unidad_id: data[x].unidad_id,
+              vencimiento: data[x].vencimiento
+            })
+          }
+        this.calculosArt()
+        debugger
+        //item.items = this.articulos;
+
+      })
+    },
     formatMoney(amount, decimalCount = 2, decimal = ".", thousands = ",") {
       try {
         decimalCount = Math.abs(decimalCount);
@@ -1384,6 +1441,12 @@ export default {
       })
     },
     cantidadItem() {
+      this.editadoArt.stock = Number(this.editadoArt.cantidad)
+      this.editadoArt.total = this.roundTo((Number(this.editadoArt.cantidad)*Number(this.editadoArt.precio)),2)
+      return this.editadoArt.total
+    },
+    precioItem() {
+      this.editadoArt.stock = Number(this.editadoArt.cantidad)
       this.editadoArt.total = this.roundTo((Number(this.editadoArt.cantidad)*Number(this.editadoArt.precio)),2)
       return this.editadoArt.total
     },
@@ -1416,12 +1479,10 @@ export default {
       return this.editadoArt.total
     },
     nuevo(que) {
-      debugger
+      // debugger
       this.dialogCab = true;
       this.dialogArt = false;
       this.dialogEditArt = false;
-      this.lisItems = [];
-      this.depItems = [];
 
       this.searchTerceros = '';
       this.searchArticulos = '';
@@ -1433,43 +1494,13 @@ export default {
       this.valValores = 0;
       this.valDiferencia = 0;
 
-      // BUSCO LOS DEPOSITOS HABILITADOS EN LA SUCURSAL
-      const b = HTTP().get('/user/'+this.userId)
-        .then(({ data }) => {
-          // debugger
-
-          /*
-          TENGO EL ID DE LA SUCURSAL DE LA BD EN 'sucursal' 
-          pero necesito la posicion que ocupa dentro
-          de la matriz data[0].sucursales
-          */
-          // busco el Id de la sucursal en la matriz
-          let psuc = 0
-          for (let i=0; i<=data[0].sucursales.length-1; i++) {
-            if (data[0].sucursales[i].id===this.sucursal) {
-              psuc = i;
-              break;
-            }
-          }
-          for (let i=0; i<= data[0].sucursales[psuc].depositos.length-1; i++) {
-            this.depItems.push(data[0].sucursales[psuc].depositos[i])
-          }
-          for (let i=0; i<= data[0].listas.length-1; i++) {
-            this.lisItems.push(data[0].listas[i])
-//          this.lisItems.push(data[0].listas[i].nombre)
-          }
-          // debugger
-          this.editado.lista_id = this.lisItems[0].id
-          this.editado.deposito_id = this.depItems[0].id
-          this.cfUser = Number(data[0].tercero.responsable.codigo)
-        });
-
       this.formTitleArt = 'Nuevo Item';
       this.formTitleMed = 'Nuevo Valor';
       this.editadoArt = Object.assign({}, this.defaultItemArt);
       this.editado = Object.assign({}, this.defaultItem);
       this.editado.fecha = moment().format('DD-MM-YYYY');
       this.editado.perfiscal = moment().format('YYYY-MM');
+      this.esFiscal = true;
       if (que === 'com') {
         this.formTitle = 'Nuevo Comprobante Sucursal ('+this.sucursal+')'+ ' Caja ('+this.caja+')';
         this.editado.cpr = 'FAC';
@@ -1486,6 +1517,9 @@ export default {
         this.formTitle = 'Nuevo Pedido Sucursal ('+this.sucursal+')'+ ' Caja ('+this.caja+')';
         this.editado.cpr = 'PED';
         this.coef = 1;
+        this.esFiscal = false;
+        this.editado.comprobante_id = 126
+        this.editado.afipSuc = this.sucursalFiscal;
       }
     },
     exportExcel: function () {
@@ -1634,8 +1668,11 @@ export default {
           this.borrar(this.itemActual)
         } else if (this.msg.msgAccion=='exportar a PDF') {
           alert('exportando a PDF...')
-        } else if (this.msg.msgAccion=='exportar a XLS')
-          this.exportExcel()
+        } else if (this.msg.msgAccion=='exportar a XLS') {
+          this.exportExcel() 
+        } else if (this.msg.msgAccion=='Enviar Pedido') {
+          this.enviar(this.itemActual) 
+        }
       }
       this.msg.msgVisible = false;
     },
@@ -1649,6 +1686,33 @@ export default {
     getColor (activo) {
       return (activo === 1) ? 'green' : 'orange'
     },
+    getEstado (estado, accion, pend, carga) {
+      let c = ''
+      let e = ''
+      let d = 0
+      if (pend!==undefined) {
+        let hoy = moment()
+        d = hoy.diff(pend.vencimiento, 'days')
+        if (d>0) {
+          e = 'Venc('+d+')'
+          c = 'red lighten-3'
+        } else  {
+          e = 'A venc('+d+')'
+          c = 'red lighten-4'
+        }
+      } else if (estado==='P') {
+        e = 'Pend'
+        c = 'purple lighten-4'
+      } else if (estado==='F') {
+        e = 'Finalizado'
+        c = 'light-green accent-1'
+      }
+      if (accion==='c') {
+        return c
+      } else {
+        return e
+      }
+    },
     formatoImporte(value) {
         let val = (value/1).toFixed(2).replace('.', ',')
         return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
@@ -1657,7 +1721,7 @@ export default {
       return moment(String(value)).format('L')
     },
     listarHTTP:function() {
-      // debugger
+      debugger
       return HTTP().get('/'+this.modelo+'/'+this.sucursal)
         .then(({ data }) => {
           this.items = data;
@@ -1667,10 +1731,19 @@ export default {
       // debugger
       this.editado.perfiscal = this.editado.perfiscal.substring(0,4)+this.editado.perfiscal.substring(5,7)
       this.editado.fecha = this.editado.fecha.substring(6,10)+'-'+this.editado.fecha.substring(3,5)+'-'+this.editado.fecha.substring(0,2)
-      this.editado.estado = 'F'
-      if (valCtaCte!==0) {
-        this.editado.estado = 'P'
+      this.editado.estado = 'P'
+      if (this.editado.cpr==='PED') {
+        for (let i=0; i<=this.cprItems.length-1; i++) {
+          if (this.cprItems[i].abrev === 'PED-P')  {
+            this.editado.afipcpr_id = this.cprItems[i]
+            break
+          }
+        }
+        // CUANDO ES UN PEDIDO, NO ENVIO LOS ITEMS, SOLO LA CABECERA
+        // LOS ITEMS SON ENVIADOS LUEGO DE SER CARGADOS
+        this.articulos = []
       }
+      // debugger
       return HTTP().post('/compras', {
         fecha: this.editado.fecha,
         perfiscal: this.editado.perfiscal,
@@ -1679,6 +1752,7 @@ export default {
         user_id: this.userId,
         sucursal_id: this.sucursal,
         tercero_id: this.editado.tercero_id,
+        comprobante_id: this.editado.comprobante_id,
         direccion_id: this.editado.direccion_id,
         documento_id: this.editado.documento_id,
         mediodepago_id: 1, //this.editado.medio_id,
@@ -1688,6 +1762,9 @@ export default {
         moneda_id: this.editado.moneda_id,
         tasadescuento: this.editado.tasadescuento,
         importedescuento: this.editado.importedescuento*this.coef,
+        retiva: 0,
+        retgan: 0,
+        retib: 0,
         gravado: this.editado.gravado*this.coef,
         exento: this.editado.exento*this.coef,
         iva: this.editado.iva*this.coef,
@@ -1698,10 +1775,30 @@ export default {
         articulos: this.articulos,
         valores: this.valores,
         pendientes: this.pendientes,
+        notificacion: 0,
       }).then(({ data }) => {
         this.listarHTTP();
       });
     },
+
+    enviar(item) {
+      this.editedIndex = this.items.indexOf(item)
+      if (this.items[this.editedIndex].tercero.user) { // esta modificando
+        // TIENE QUE ENVIAR EL PEDIDO POR SISTEMA
+        return HTTP().patch('/enviarpedido/'+this.items[this.editedIndex].id)
+          .then(({ data }) => {
+            if (data = 'ok') {
+              this.mensaje('¡Mensaje enviado correctamente!', 'blue', 1500)
+            } else {
+              this.mensaje('¡Ha ocurrido un problema con el envío del pedido!', 'red', 1500)
+            }
+            this.listarHTTP();
+        });
+      } else  {
+        // TIENE QUE ENVIAR EL PEDIDO POR MAIL
+      }
+    },
+
     exportarAPDF () {
       // este viene del form y activa el componente confirmacion, luego este va a msgRespuesta con lo confirmado
       this.msg.msgTitle = 'Exportar a PDF'
@@ -1751,7 +1848,6 @@ export default {
       for (let i=0; i<=this.articulos.length-1; i++) {
         this.articulos[i].cantidad*=this.coef
       }
-
       if (Number(this.valEfectivo) !== 0) {
         this.valores.push({ 
           caja_id: this.caja,
@@ -1797,19 +1893,20 @@ export default {
     editarArt() {
     },
     guardarEditArt() {
-      const part1 = this.editadoArt.codigo.substring( 0, this.editadoArt.codigo.indexOf('@')+1);
-      const codig = this.editadoArt.codigo.substring( this.editadoArt.codigo.indexOf('@')+1, this.editadoArt.codigo.indexOf('$'));
-      const part2 = this.editadoArt.codigo.substring( this.editadoArt.codigo.indexOf('$'));
+      const codig = this.editadoArt.codigo.substring(0, this.editadoArt.codigo.indexOf('@'));
       this.editadoArt.codigo = codig;
+      // debugger
       if (this.editedIndexArt > -1) { // esta modificando
+        this.articulos[this.editedIndexArt].id = this.editadoArt.id
         this.articulos[this.editedIndexArt].articulo_id = this.editadoArt.articulo_id
-        this.articulos[this.editedIndexArt].codigo = this.editadoArt.codigo
+        this.articulos[this.editedIndexArt].codigo = this.editadoArt.codigo+'@'+this.userId
         this.articulos[this.editedIndexArt].nombre = this.editadoArt.nombre
         this.articulos[this.editedIndexArt].deposito_id = this.editadoArt.deposito_id
         this.articulos[this.editedIndexArt].unidad_id = this.editadoArt.unidad_id
         this.articulos[this.editedIndexArt].moneda_id = this.editadoArt.moneda_id
         this.articulos[this.editedIndexArt].iva_id = this.editadoArt.iva_id
         this.articulos[this.editedIndexArt].cantidad = this.editadoArt.cantidad
+        this.articulos[this.editedIndexArt].stock = this.editadoArt.stock
         this.articulos[this.editedIndexArt].costo = this.editadoArt.costo
         this.articulos[this.editedIndexArt].precio = this.editadoArt.precio
         this.articulos[this.editedIndexArt].preciooriginal = 0
@@ -1819,8 +1916,8 @@ export default {
         this.articulos[this.editedIndexArt].texto = ''
         this.articulos[this.editedIndexArt].vencimiento = ''
       } else {
-        // debugger
         this.articulos.push({ 
+          id: 0,
           articulo_id: this.editadoArt.articulo_id,
           codigo: this.editadoArt.codigo,
           nombre: this.editadoArt.nombre,
@@ -1829,6 +1926,7 @@ export default {
           moneda_id: this.editadoArt.moneda_id,
           iva_id: this.editadoArt.iva_id,
           cantidad: this.editadoArt.cantidad,
+          stock: this.editadoArt.stock,
           costo: this.editadoArt.costo,
           precio: this.editadoArt.precio,
           preciooriginal: 0,
@@ -1839,8 +1937,17 @@ export default {
           vencimiento: ''
         })
       }
-      this.calculos()
+      this.calculosArt()
+      // debugger
       this.dialogEditArt = false;
+    },
+    calculosArt() {
+      this.totalArticulos = 0
+      debugger
+      for (let i=0; i<=this.articulos.length-1; i++) {
+        this.totalArticulos += this.roundTo((this.articulos[i].cantidad*this.articulos[i].precio),2)
+      }
+      this.diferencia = this.roundTo(this.totalCabecera - this.totalArticulos,2)
     },
 
     calculos(cual) {
@@ -1874,7 +1981,7 @@ export default {
       this.editado.retiva = retiva
 
       // ASIGNO EL VALOR INICIAL DE LA COMPRA COMO EFECTIVO
-      debugger
+      // debugger
       if (this.valEfectivo==0 && this.valCtaCte==0 && this.valValores == 0)
         this.valEfectivo = (this.editado.total-(this.valCtaCte+this.valValores))
 
@@ -1895,8 +2002,46 @@ export default {
     cancelarMed() {
       this.dialogMed = false;
     },
-    guardarArt() {
-    }
+    guardarArt(items) { // CONFIRMA EL GUARDADO EN LA BASE DE DATOS
+      // debugger
+      //this.editedIndex = this.items.indexOf(items)
+      this.dialogArt = false;
+      return HTTP().patch('/comprasitems/'+this.items[this.editedIndex].id, { articulos: this.articulos })
+        .then(({ data }) => {
+          // debugger
+          // this.items[this.editedIndex].items = this.articulos;
+          this.listarHTTP();
+      });
+    },
+    borrarArt() {
+    },
+    preguntoEnvio (item) {
+      // VEO CUANTOS ITEMS HAY EN EL COMPROBANTE
+      debugger
+      const a = HTTP().get('/comprasitems/'+item.id)
+        .then(({ data }) => {
+          this.msg.msgTitle = 'Enviar'
+          this.msg.msgVisible = true
+          this.msg.msgAccion = 'Enviar Pedido'
+          let txt = ''
+          debugger
+          if (data.length==0) {
+            this.msg.msgBody = 'Este pedido no posee items. Agrege items para poder enviar el pedido.'
+            this.msg.msgButtons = ['Cerrar']
+          } else {
+            if (item.tercero.user) {
+              txt = '¿Confirma enviar el pedido a '+item.tercero.user.username +'?<br> El pedido posee '+(data.length)+' item/s.'
+              txt = txt + '<br>y será enviado por sistema.'
+            } else {
+              txt = '¿Confirma enviar el pedido a '+item.tercero.nombre+'?<br> El pedido posee '+(data.length)+' item/s.'
+              txt = txt + 'El pedido será enviado por correo electrónico en formato Excel.'
+            }
+            this.msg.msgBody = txt
+            this.msg.msgButtons = ['Aceptar','Cancelar']
+          }
+        })
+      this.itemActual = item;
+    },
 
   },
 };

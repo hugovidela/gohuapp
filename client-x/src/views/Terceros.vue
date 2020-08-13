@@ -10,7 +10,11 @@
         class="elevation-3"
         :footer-props="footerProps">
         <template v-slot:top>
-          <v-system-bar color="indigo darken-2" dark></v-system-bar>
+          <v-system-bar color="indigo darken-2" dark>
+            <v-btn icon @click="closeForm">
+              <v-icon color="white" dark>mdi-close-circle</v-icon>
+            </v-btn>
+          </v-system-bar>
           <v-toolbar flat color="indigo">
 
             <template v-slot:extension>
@@ -68,19 +72,14 @@
                         </v-col>
                         -->
                         <v-col cols="3" sx="3" mx="3">
-                          <v-autocomplete
-                            class="body-2"
-                            autofocus
-                            v-model="editado.documento_id"
-                            :items="itemsDocumentos"
-                            :loading="isLoadingDocumentos"
-                            :search-input.sync="searchDocumentos"
-                            item-text="nombre"
-                            item-value="id"
+                          <v-select
                             label="Tipo de Documento"
-                            placeholder="Escriba para buscar"
-                            prepend-icon="mdi-database-search">
-                          </v-autocomplete>
+                            v-model="editado.documento_id"
+                            :items="itemsDocumentos" item-value="id"
+                            item-text="nombre"
+                            autocomplete
+                            return-object>
+                          </v-select>
                         </v-col>
                         <v-col cols="2" sm="2" md="2">
                           <v-text-field
@@ -135,69 +134,18 @@
                           </v-row>
                           <v-row>
                             <v-col cols="6" sx="6" mx="6">
-                              <v-autocomplete
-                                class="body-2"
+                              <v-select
+                                label="Cond.Fiscal"
                                 v-model="editado.responsable_id"
                                 :items="itemsResponsables"
-                                :loading="isLoadingResponsables"
-                                :search-input.sync="searchResponsables"
-                                item-text="nombre"
                                 item-value="id"
-                                label="Cond.Fiscal"
-                                placeholder="Escriba para buscar"
-                                prepend-icon="mdi-database-search">
-                              </v-autocomplete>
+                                item-text="nombre"
+                                autocomplete
+                                return-object>
+                              </v-select>
                             </v-col>
                           </v-row>
-
                           <v-row>
-                            <!--
-                            <v-col cols="4" sm="4" md="4">
-                              <p>Tipo de Tercero</p>
-                              <v-card>
-                                <v-card-text>
-                                  <v-row>
-                                    <v-col cols="6" sm="6" md="6"
-                                      v-for="item in categories" :key="item.nombre">
-                                      <v-chip
-                                        v-if="!selected.includes(item)"
-                                        :key="item.nombre"
-                                        :disabled="loading"
-                                        @click="selected.push(item)"
-                                        class="caption"
-                                        color="blue" dark>
-                                        {{item.nombre}}
-                                      </v-chip>
-                                    </v-col>
-                                  </v-row>
-                                </v-card-text>
-                              </v-card>
-                            </v-col>
-                            <v-col cols="4" sm="4" md="4">
-                              <p>El tercero es</p>
-                              <v-card>
-                                <v-card-text>
-                                  <v-container class="py-0">
-                                    <v-row>
-                                      <v-col cols="6" sm="6" md="6"
-                                        v-for="(selection, i) in selections"
-                                        :key="selection.text"
-                                        class="shrink">
-                                        <v-chip
-                                          :disabled="loading"
-                                          close
-                                          class="caption"
-                                          @click:close="selected.splice(i, 1)"
-                                          color="green" dark>
-                                          {{ selection.nombre }}
-                                        </v-chip>
-                                      </v-col>
-                                    </v-row>
-                                  </v-container>
-                                </v-card-text>
-                              </v-card>
-                            </v-col>
-                            -->
                             <v-col cols="6" sm="6" md="6">
                               <v-textarea
                                 v-model="editado.observaciones"
@@ -210,7 +158,6 @@
                               ></v-textarea>
                             </v-col>
                           </v-row>
-
                         </v-tab-item>
 
                         <v-tab href="#direccion">
@@ -396,57 +343,6 @@
                                     </v-card-title>
                                     <v-card-text>
                                       <v-container>
-                                        <!--
-                                        <v-row justify="space-around">
-                                          <v-col cols="12" sm="6" md="4" lg="3">
-                                            <v-sheet elevation="0" class="pa-2">
-                                              <v-chip-group
-                                                column
-                                                active-class="primary--text">
-                                                <v-btn v-for="item in entriesContactos"
-                                                  :key="item.icono"
-                                                  class="mr-2" fab dark x-small color="grey-2">
-                                                  <v-icon dark>{{item.icono}}</v-icon>
-                                                </v-btn>
-                                              </v-chip-group>
-                                            </v-sheet>
-                                          </v-col>
-                                        </v-row>
-                                        -->
-                                        <!--
-                                        <v-row justify="space-around">
-                                          <v-col cols="12" sm="6" md="4" lg="3">
-                                            <v-sheet elevation="0" class="pa-4">
-                                              <v-chip-group
-                                                column
-                                                active-class="
-                                                deep-purple--text text--accent-1">
-                                                <v-chip v-for="item in entriesContactos"
-                                                  :key="item.icono" fab color="white">
-                                                  <v-avatar left>
-                                                    <v-icon>{{ item.icono }}</v-icon>
-                                                  </v-avatar>
-                                                </v-chip>
-
-                                                <v-icon v-for="item in entriesContactos"
-                                                  :key="item.icono">
-                                                    {{ item.icono }}
-                                                </v-icon>
-                                              </v-chip-group>
-                                            </v-sheet>
-                                          </v-col>
-                                        </v-row>
-                                        -->
-                                        <!--
-                                        <v-row>
-                                          <v-btn v-for="item in contDisp"
-                                            :key="item.icono"
-                                            class="mr-2" fab dark x-small color="primary"
-                                            @click="preguntoBorrarCon(item)">
-                                            <v-icon dark>{{item.icono}}</v-icon>
-                                          </v-btn>
-                                        </v-row>
-                                        -->
                                         <v-row>
                                           <v-bottom-navigation
                                             :value="editadoCon.contacto_tipo_id-1"
@@ -460,32 +356,6 @@
                                             </v-btn>
                                           </v-bottom-navigation>
                                         </v-row>
-<!--
-                                        <v-btn
-                                          class="mr-2" fab dark x-small color="grey-2">
-                                          <v-icon dark>{{item.contactoTipo.icono}}</v-icon>
-                                        </v-btn>
--->
-<!--
-                                        <v-row>
-                                          <v-col cols="3" sm="3" md="3">
-                                            <v-autocomplete
-                                              ref="contacto"
-                                              class="body-2"
-                                              v-model="editadoCon.contacto_tipo_id"
-                                              :items="itemsContactos"
-                                              :loading="isLoadingContactos"
-                                              :search-input.sync="searchContactos"
-                                              item-text="icono"
-                                              item-value="id"
-                                              label="Contacto"
-                                              chips="true"
-                                              placeholder="Escriba para buscar"
-                                              prepend-icon="mdi-database-search">
-                                            </v-autocomplete>
-                                          </v-col>
-                                        </v-row>
--->
                                         <v-row>
                                           <v-col cols="12" sm="12" md="12">
                                             <v-text-field
@@ -571,19 +441,15 @@
                                       <v-container>
                                         <v-row>
                                           <v-col cols="5" sm="5" md="5" lg="5">
-                                            <v-autocomplete
+                                            <v-select
                                               ref="tipomediodepago"
-                                              class="body-2"
-                                              v-model="editadoMedio.mediodepago_id"
-                                              :items="itemsMedios"
-                                              :loading="isLoadingMedios"
-                                              :search-input.sync="searchMedios"
-                                              item-text="nombre"
-                                              item-value="id"
                                               label="Medio de Pago"
-                                              placeholder="Escriba para buscar"
-                                              prepend-icon="mdi-database-search">
-                                            </v-autocomplete>
+                                              v-model="editadoMedio.mediodepago_id"
+                                              :items="itemsMedios" item-value="id"
+                                              item-text="nombre"
+                                              autocomplete
+                                              return-object>
+                                            </v-select>
                                           </v-col>
                                           <v-col cols="2" sm="2" md="2">
                                             <v-text-field
@@ -597,19 +463,15 @@
 
                                         <v-row>
                                           <v-col cols="4" sm="4" md="4">
-                                            <v-autocomplete
+                                            <v-select
                                               ref="banco"
-                                              class="body-2"
-                                              v-model="editadoMedio.banco_id"
-                                              :items="itemsBancos"
-                                              :loading="isLoadingBancos"
-                                              :search-input.sync="searchBancos"
-                                              item-text="nombre"
-                                              item-value="id"
                                               label="Banco"
-                                              placeholder="Escriba para buscar"
-                                              prepend-icon="mdi-database-search">
-                                            </v-autocomplete>
+                                              v-model="editadoMedio.banco_id"
+                                              :items="itemsBancos" item-value="id"
+                                              item-text="nombre"
+                                              autocomplete
+                                              return-object>
+                                            </v-select>
                                           </v-col>
                                           <v-col cols="4" sm="4" md="4">
                                             <v-text-field
@@ -706,20 +568,15 @@
                                       <v-container>
                                         <v-row>
                                           <v-col cols="12" sm="12" md="12">
-                                            <v-autocomplete
+                                            <v-select
                                               ref="lista"
-                                              class="body-2"
-                                              v-model="editadoLis.user_lista_id"
-                                              :items="itemsListas"
-                                              :loading="isLoadingListas"
-                                              :search-input.sync="searchListas"
-                                              item-text="nombre"
-                                              item-value="id"
                                               label="Listas"
-                                              placeholder="Escriba para buscar"
-                                              prepend-icon="mdi-database-search"
-                                              @change="seleccionoLista()">
-                                            </v-autocomplete>
+                                              v-model="editadoLis.user_lista_id"
+                                              :items="itemsListas" item-value="id"
+                                              item-text="nombre"
+                                              autocomplete
+                                              return-object>
+                                            </v-select>
                                           </v-col>
                                         </v-row>
                                         <v-row>
@@ -799,9 +656,9 @@
             </v-text-field>
           </v-col>
         </template>
-        <template v-slot:item.tercero.activo="{ item }">
+        <template v-slot:item.activo="{ item }">
           <v-chip
-            :color="getColor(item.tercero.activo)" dark>{{item.tercero.activo?'Sí':'No'}}
+            :color="getColor(item.activo)" dark>{{item.activo?'Sí':'No'}}
           </v-chip>
         </template>
         <template v-slot:item.accion="{ item }">
@@ -817,7 +674,7 @@
           </v-btn>
           <v-btn
             class="mr-2" fab x-small color="white"
-            @click="activarDesactivar(item.tercero)">
+            @click="activarDesactivar(item)">
             <v-icon dark>mdi-checkbox-marked-outline</v-icon>
           </v-btn>
         </template>
@@ -875,8 +732,6 @@ export default {
       v => !!v || 'El cuit es requerido',
       v => (v && v.length <= 11) || 'Ingrese hasta 11 caracteres',
     ],
-    searchResponsables: '',   // para el cuadro de búsqueda de datatables
-    searchDocumentos: '',     // para el cuadro de búsqueda de datatables
     searchCalles: '',         // para el cuadro de búsqueda de datatables
     searchCalles1: '',        // para el cuadro de búsqueda de datatables
     searchCalles2: '',        // para el cuadro de búsqueda de datatables
@@ -918,7 +773,7 @@ export default {
       { text: 'FISCAL', value:'tercero.responsable.abrev'},
       { text: 'DOC', value:'tercero.documento.nombre'},
       { text: 'NRO', value:'tercero.cuit'},
-      { text: 'ACTIVO', value:'tercero.activo'},
+      { text: 'ACTIVO', value:'activo'},
       { text: 'ACCIONES', value: 'accion', sortable: false },
     ],
     headersDir: [
@@ -1073,26 +928,22 @@ export default {
       activo: true,
     },
     descriptionLimit: 60,
-    entriesResponsables: [],
-    entriesDocumentos: [],
     entriesCalles: [],
     entriesCalles1: [],
     entriesCalles2: [],
     entriesPostales: [],
     entriesContactos: [],
-    entriesMedios: [],
-    entriesBancos: [],
-    entriesListas: [],
-    isLoadingResponsables: false,
-    isLoadingDocumentos: false,
     isLoadingCalles: false,
     isLoadingCalles1: false,
     isLoadingCalles2: false,
     isLoadingPostales: false,
     isLoadingContactos: false,
-    isLoadingMedios: false,
-    isLoadingBancos: false,
-    isLoadingListas: false,
+
+    itemsMedios: [],
+    itemsBancos: [],
+    itemsResponsables: [],
+    itemsDocumentos: [],
+    itemsListas: [],
   }),
   computed: {
     ...mapGetters('authentication', ['isLoggedIn', 'userName', 'userId' ]),
@@ -1112,22 +963,6 @@ export default {
     formTitleMedio () {
       return this.editedIndexMedio === -1 ? 'Nuevo Medio de Pago' : 'Editar Medio de Pago';
     },
-    itemsResponsables () {
-      return this.entriesResponsables.map(entry => {
-        const nombre = entry.nombre.length > this.descriptionLimit
-          ? entry.nombre.slice(0, this.descriptionLimit) + '...'
-          : entry.nombre
-        return Object.assign({}, entry, { nombre })
-        })
-      },    
-    itemsDocumentos () {
-      return this.entriesDocumentos.map(entry => {
-        const nombre = entry.nombre.length > this.descriptionLimit
-          ? entry.nombre.slice(0, this.descriptionLimit) + '...'
-          : entry.nombre
-        return Object.assign({}, entry, { nombre })
-        })
-      },
     itemsCalles () {
       return this.entriesCalles.map(entry => {
         const nombre = entry.nombre.length > this.descriptionLimit
@@ -1166,33 +1001,6 @@ export default {
           ? entry.icono.slice(0, this.descriptionLimit) + '...'
           : entry.icono
         return Object.assign({}, entry, { icono })
-        })
-      },
-    itemsMedios () {
-      //debugger
-      return this.entriesMedios.map(entry => {
-        const nombre = entry.nombre.length > this.descriptionLimit
-          ? entry.nombre.slice(0, this.descriptionLimit) + '...'
-          : entry.nombre
-        return Object.assign({}, entry, { nombre })
-        })
-      },
-    itemsBancos () {
-      //debugger
-      return this.entriesBancos.map(entry => {
-        const nombre = entry.nombre.length > this.descriptionLimit
-          ? entry.nombre.slice(0, this.descriptionLimit) + '...'
-          : entry.nombre
-        return Object.assign({}, entry, { nombre })
-        })
-      },
-    itemsListas () {
-      // debugger
-      return this.entriesListas.map(entry => {
-        const nombre = entry.nombre.length > this.descriptionLimit
-          ? entry.nombre.slice(0, this.descriptionLimit) + '...'
-          : entry.nombre
-        return Object.assign({}, entry, { nombre })
         })
       },
 
@@ -1239,38 +1047,6 @@ export default {
     },
     dialogMedio (val) {
       val || this.cancelarMedio();
-    },
-    searchResponsables (val) {
-      // Items have already been loaded
-      // if (this.entriesPaises.length > 0) return
-      // Items have already been requested
-      if (this.isLoadingResponsables) return
-      this.isLoadingResponsables = true
-      // Lazily load input items
-      return HTTP().get('/afipresponsables')
-        .then(({ data }) => {
-          this.entriesResponsables = data;
-        })
-        .catch(err => {
-          console.log(err)
-        })
-        .finally(() => (this.isLoadingResponsables = false))
-    },
-    searchDocumentos (val) {
-      // Items have already been loaded
-      // if (this.entriesPaises.length > 0) return
-      // Items have already been requested
-      if (this.isLoadingDocumentos) return
-      this.isLoadingDocumentos = true
-      // Lazily load input items
-      return HTTP().get('/afipdocumentos')
-        .then(({ data }) => {
-          this.entriesDocumentos = data;
-        })
-        .catch(err => {
-          console.log(err)
-        })
-        .finally(() => (this.isLoadingDocumentos = false))
     },
     searchCalles (val) {
       // Items have already been loaded
@@ -1352,70 +1128,6 @@ export default {
         })
         .finally(() => (this.isLoadingContactos = false))
     },
-    searchMedios (val) {
-      // Items have already been loaded
-      // if (this.entriesPaises.length > 0) return
-      // Items have already been requested
-      if (this.isLoadingMedios) return
-      this.isLoadingMedios = true
-      // Lazily load input items
-      return HTTP().get('/mediosdepagos')
-        .then(({ data }) => {
-          this.entriesMedios = data;
-        })
-        .catch(err => {
-          console.log(err)
-        })
-        .finally(() => (this.isLoadingMedios = false))
-    },
-    searchBancos (val) {
-      // Items have already been loaded
-      // if (this.entriesPaises.length > 0) return
-      // Items have already been requested
-      if (this.isLoadingBancos) return
-      this.isLoadingBancos = true
-      // Lazily load input items
-      return HTTP().get('/bancos')
-        .then(({ data }) => {
-          this.entriesBancos = data;
-        })
-        .catch(err => {
-          console.log(err)
-        })
-        .finally(() => (this.isLoadingBancos = false))
-    },
-    searchListas (val) {
-      // Items have already been loaded
-      // if (this.entriesPaises.length > 0) return
-      // Items have already been requested
-      if (this.isLoadingListas) return
-      this.isLoadingListas = true
-      // Lazily load input items
-      // debugger
-      return HTTP().get('/user/'+this.userId)
-        .then(({ data }) => {
-          // debugger
-          this.entriesListas = data[0].listas;
-          if (val !== null) {
-            for(let i=0; i<=this.entriesListas.length; i++) {
-              if (this.entriesListas[i].nombre === val) {
-                // debugger
-                this.editadoLis.nombre = this.entriesListas[i].nombre
-                this.editadoLis.porrem = this.entriesListas[i].porrem
-                this.editadoLis.activo = this.entriesListas[i].activo
-                this.editadoLis.user_lista_id = this.entriesListas[i].id // es el ID de la lista
-//              this.editadoLis.user_tercero_id = this.editado.id
-              }
-            }
-          }
-          this.editadoLis.porrem = data[0].listas.porrem
-        })
-        .catch(err => {
-          console.log(err)
-        })
-        .finally(() => (this.isLoadingListas = false))
-    },
-
   },
   mounted () {
     if (!this.isLoggedIn) {
@@ -1430,19 +1142,38 @@ export default {
         .then(({ data }) => {
           this.contDisp = data;
         });
+      const c = HTTP().get('/mediosdepagos')
+        .then(({ data }) => {
+          this.itemsMedios = data
+        });
+      const d = HTTP().get('/bancos')
+        .then(({ data }) => {
+          this.itemsBancos = data
+        });
+      const e = HTTP().get('/afipresponsables')
+        .then(({ data }) => {
+          this.itemsResponsables = data;
+        })
+      const f = HTTP().get('/afipdocumentos')
+        .then(({ data }) => {
+          this.itemsDocumentos = data;
+        })
+      debugger
+      const g = HTTP().get('/user/'+this.userId)
+        .then(({ data }) => {
+          this.itemsListas = data[0].listas;
+        })
     }
   },
   created () {
-//  this.modelo = this.$store.state.formTercerosPath;
-//  console.log(this.modelo)
-//  this.listarHTTP();
     this.init_component()
   },
   methods: {
-    seleccionoLista() {
-      console.log(this.editadoLis.nombre)
+    closeForm(){
+      router.push('/')
     },
     init_component() {
+      //debugger
       let a = this.$store.state.route.fullPath.substring(1,this.$store.state.route.fullPath.length)
       if (a==='usersclientes') {
         this.tipo='Cliente'
@@ -1485,11 +1216,22 @@ export default {
     activarDesactivar(item) {
       const valor = item.activo ? 0 : 1;
       item.activo = valor
+      debugger
+      HTTP().patch(`usertercero/${item.id}`,{activo: valor})
+        .then ((res) => {
+          debugger
+          console.log(res);
+        }).catch((err)=>{
+          console.log(err);
+        })
+      /*
       HTTP().patch(`${this.modelo}/${item.tercero.id}`,{activo: valor}).then ((res) => {
           console.log(res);
         }).catch((err)=>{
           console.log(err);
         })
+      */
+
     },
     activarDesactivarMedio(item) {
       const valor = item.activo ? 0 : 1;
@@ -1564,9 +1306,10 @@ export default {
       });
     },
     listarHTTP:function() {
-      const a = HTTP().get('/'+this.modelo)
+      debugger
+      const a = HTTP().get('/'+this.modelo+'/true')
         .then(({ data }) => {
-          // debugger
+          debugger
           this.items = data;
       });
     },
@@ -1579,8 +1322,8 @@ export default {
       return HTTP().post('/'+this.modelo, {
         nombre: this.editado.nombre,
         razon_social: this.editado.razon_social,
-        responsable_id: this.editado.responsable_id,
-        documento_id: this.editado.documento_id,
+        responsable_id: this.editado.responsable.id,
+        documento_id: this.editado.documento.id,
         cuit: this.editado.cuit,
         observaciones: this.editado.observaciones,
         activo: true,
@@ -1605,20 +1348,18 @@ export default {
         });
     },
     editar (item) {
-      // debugger
       this.editedIndex = this.items.indexOf(item); // si this.editIndex es = -1 es una alta.
       this.editado = Object.assign({}, item.tercero);
       this.usertereroid = item.tercero_id;
       this.dialog = true;
       this.selected = item.terceroTipos;
 
-      // debugger
+      //debugger
       this.lis = item.terceroListas;
       const a = HTTP().get('/direcciones/'+this.editado.id)
         .then(({ data }) => {
           this.dir = data;
         });
-
       const b = HTTP().get('/contactos/'+this.editado.id)
         .then(({ data }) => {
           this.con = [];
@@ -1630,17 +1371,12 @@ export default {
             })
           }
         });
-      
-//    this.medios = item.mediosdepago;
       const c = HTTP().get('/mediosdepago/'+item.id)
         .then(({ data }) => {
           this.medios = data[0].terceromediosdepago;
         });
-
-      // debugger
       const d = HTTP().get('/user/'+this.userId)
         .then(({ data }) => {
-          // debugger
           this.Userlis = data[0].listas;
         });
   
@@ -1688,7 +1424,6 @@ export default {
       this.itemActual = item;
     },
     preguntoBorrarMedio (item) {
-      // este viene del form y activa el componente confirmacion, luego este va a msgRespuesta con lo confirmado
       this.editedIndexMedio = this.medios.indexOf(item); // si this.editIndex es = -1 es una alta.
       this.msg.msgTitle = 'Borrar'
       this.msg.msgBody = 'Confirma borrar '+this.dir[this.editedIndexMedio].nombre
@@ -1698,7 +1433,6 @@ export default {
       this.itemActual = item;
     },
     exportarAPDF () {
-      // este viene del form y activa el componente confirmacion, luego este va a msgRespuesta con lo confirmado
       this.msg.msgTitle = 'Exportar a PDF'
       this.msg.msgBody = 'Desea exportar los datos a PDF'
       this.msg.msgVisible = true
@@ -1706,7 +1440,6 @@ export default {
       this.msg.msgButtons = ['Aceptar','Cancelar']
     },
     exportarAXLS () {
-      // este viene del form y activa el componente confirmacion, luego este va a msgRespuesta con lo confirmado
       this.msg.msgTitle = 'Exportar a XLS'
       this.msg.msgBody = 'Desea exportar los datos a XLS'
       this.msg.msgVisible = true
@@ -1756,17 +1489,21 @@ export default {
         this.mensaje('¡Debe completar todos los datos!', 'red', 1500) 
         return this.dialog = true;
       }
+      debugger
       this.nombre = this.editado.nombre;
       this.razon_social = this.editado.razon_social;
-      this.responsable_id = this.editado.responsable_id;
-      this.documento_id = this.editado.documento_id;
+      this.responsable_id = this.editado.responsable_id.id;
+      this.documento_id = this.editado.documento_id.id;
       this.cuit = this.editado.cuit;
       this.observaciones = this.editado.observaciones;
       this.activo = this.editado.activo;
+      this.editado.responsable_id = this.editado.responsable_id.id;
+      this.editado.documento_id = this.editado.documento_id.id;
       this.editado.tipos = this.selected;
       this.editado.direcciones = this.dir;
       this.editado.contactos = this.con;
       this.editado.medios = this.medios;
+      debugger
       this.editado.listas = this.lis;
       if (this.editedIndex > -1) { // esta modificando
         this.id = this.editado.id;
@@ -1879,43 +1616,39 @@ export default {
       this.cancelarCon();
     },
     guardarLis(item) {
+      debugger
       let mUserTerceroId = this.items[this.editedIndex].id;
       if (this.editedIndexLis > -1) { // esta modificando
-        this.lis[this.editedIndexLis].nombre = this.editadoLis.nombre;
+        this.lis[this.editedIndexLis].nombre = this.editadoLis.user_lista_id;
         this.lis[this.editedIndexLis].porrem = this.editadoLis.porrem;
       } else {
         this.lis.push({ 
           activo: 1,
-          nombre: this.editadoLis.nombre,
+          lista: this.editadoLis.user_lista_id,
           porrem: this.editadoLis.porrem,
-          user_lista_id: this.editadoLis.user_lista_id,
+          nombre: this.editadoLis.user_lista_id,
+          user_lista_id: this.editadoLis.user_lista_id.id,
           user_tercero_id: mUserTerceroId,
         })
       }
       this.dialogLis = false;
     },
     guardarMedio(item) {
-      // debugger
+      debugger
       let mDiasVenc = 0;
       if (this.editadoMedio.dias_vencimiento !== null && this.editadoMedio.dias_vencimiento !== undefined) {
         mDiasVenc = Number(this.editadoMedio.dias_vencimiento)
       }
       let mUserTerceroId = this.items[this.editedIndex].id;
-      let mMedioDePago = null
-      let mMedioDePagoId = null
-      if (this.$refs.tipomediodepago.selectedItem !== null && this.$refs.tipomediodepago.selectedItem !== undefined) {
-        mMedioDePago = this.$refs.tipomediodepago.selectedItem
-        mMedioDePagoId = this.$refs.tipomediodepago.selectedItem.id
-      }
       let mBanco = null;
       let mBancoId = null;
       let mBancoCuenta = null;
       let mBancoCbu = null;
-      if (this.$refs.banco.selectedItem !== null && this.$refs.banco.selectedItem !== undefined) {
-        mBancoId = this.$refs.banco.selectedItem.id
+      if (this.editadoMedio.banco_id !== null && this.editadoMedio.banco_id !== undefined) {
+        mBancoId = this.editadoMedio.banco_id.id
         mBancoCuenta = this.editadoMedio.banco_cuenta
         mBancoCbu = this.editadoMedio.banco_cbu
-        mBanco = this.$refs.banco.selectedItem
+        mBanco = this.editadoMedio.banco_id
       }
       let mTarjeta = null;
       if (this.editedIndexMedio > -1) { // esta modificando
@@ -1936,16 +1669,16 @@ export default {
         mediodepago:      {},   -> objeto
         tarjeta:          {},   -> objeto
         fin campos */
-        this.medios[this.editedIndexMedio].mediodepago = this.$refs.tipomediodepago.selectedItem;
-        this.medios[this.editedIndexMedio].banco = this.$refs.banco.selectedItem;
+        this.medios[this.editedIndexMedio].mediodepago = this.editadoMedio.mediodepago_id
+        this.medios[this.editedIndexMedio].banco = this.editadoMedio.banco_id
         this.medios[this.editedIndexMedio].banco_cuenta = this.editadoMedio.banco_cuenta;
         this.medios[this.editedIndexMedio].banco_cbu = this.editadoMedio.banco_cbu;
-        this.medios[this.editedIndexMedio].dias_vencimiento = diasvenc;
+        this.medios[this.editedIndexMedio].dias_vencimiento = mDiasVenc;
       } else {
         this.medios.push({ 
           id: null,
           user_tercero_id: mUserTerceroId,
-          mediodepago_id: mMedioDePagoId,
+          mediodepago_id: this.editadoMedio.mediodepago_id.id,
           banco_id: mBancoId,
           tarjeta_id: null,
           tarjeta_numero: null,
@@ -1956,7 +1689,7 @@ export default {
           created_at: null,
           updated_at: null,
           banco: mBanco,
-          mediodepago: mMedioDePago,
+          mediodepago: this.editadoMedio.mediodepago_id,
           tarjeta: null
         })
       }

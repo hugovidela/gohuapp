@@ -5,11 +5,11 @@ import Vuex from 'vuex';
 // eslint-disable-next-line import/no-cycle
 import authentication from './authentication';
 // eslint-disable-next-line import/no-cycle
-import contacts from './contacts';
+// import contacts from './contacts';
 // eslint-disable-next-line import/no-cycle
-import projects from './projects';
+// import projects from './projects';
 // eslint-disable-next-line import/no-cycle
-import tasks from './tasks';
+// import tasks from './tasks';
 // eslint-disable-next-line import/no-cycle
 // import marcas from './marcas';
 // eslint-disable-next-line import/no-cycle
@@ -18,17 +18,27 @@ import tasks from './tasks';
 // import browsemarcas from './browsemarcas';
 
 Vue.use(Vuex);
+Vue.config.devtools = true;
 
 export const strict = false;
 
 export default new Vuex.Store({
+  /* eslint-disable */
   strict: true,
   state: {
     formTercerosTitulo: '',
     formTercerosPath: '',
     sucursal: '',
+    sucursales: [],
+    notificaciones: [],
     sucursalFiscal: '',
+    colorSucursal: '',
+    articulosVinculados: [],
     caja: '',
+    tipo: '',
+    level: null,
+    empresa: null,
+    operario: null,
     baseUrl: '/api',
     snackbar: {
       visible: false,
@@ -46,9 +56,9 @@ export default new Vuex.Store({
   },
   modules: {
     authentication,
-    contacts,
-    projects,
-    tasks,
+    //contacts,
+    //projects,
+    //tasks,
   },
   mutations: {
     alert(state, payload) {
@@ -85,15 +95,54 @@ export default new Vuex.Store({
     setSucursal(state, payload) {
       state.sucursal = payload;
     },
+    setSucursales(state, payload) {
+      state.sucursales = payload;
+    },
+    setSucursalFiscal(state, payload) {
+      state.sucursalFiscal = payload;
+    },
+    setNotificaciones(state, payload) {
+      state.notificaciones = payload;
+    },
+    actNotificacion(state, payload) {
+      for (let i=0; i<=state.notificaciones.length-1; i++) {
+        if (payload== state.notificaciones[i].id) {
+          state.notificaciones[i].estado = 'R'
+          state.notificaciones[i].paraprocesar = false
+        }
+      }
+    },
     setCaja(state, payload) {
       state.caja = payload;
     },
+    setArticulosVinculados(state, payload) {
+      state.articulosVinculados = payload;
+    },
+    setTipo(state, payload) {
+      state.tipo = payload;
+    },
+    setColorSucursal(state, payload) {
+      state.colorSucursal = payload
+    },
+    setEmpresa(state, payload) {
+      state.empresa = payload;
+    },
+    setOperario(state, payload) {
+      state.operario = payload;
+    },
+    setLevel(state, payload) {
+      state.level = payload
+    }
   },
   actions: {
   },
   getters: {
-    sucursal: state => state.sucursal,
-    caja: state => state.caja,
+    //sucursal: state => state.sucursal,
+    //sucursalFiscal: state => state.sucursalFiscal,
+    //sucursales: state => state.sucursales,
+    //caja: state => state.caja,
+    //level: state => state.level,
+    //notificaciones: state => state.notificaciones,
   },
   plugins: [
     createPersistedState(),

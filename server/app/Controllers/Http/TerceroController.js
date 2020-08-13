@@ -10,6 +10,8 @@ const Calle = use('App/Models/Calle')
 const Postal = use('App/Models/Postal')
 const UserTercero = use('App/Models/UserTercero')
 const UserTerceroTipo = use('App/Models/UserTerceroTipo')
+const Comprobante = use('App/Models/Comprobante')
+const ComprobantePendiente = use('App/Models/ComprobantePendiente')
 const AuthorizationService = use('App/Services/AuthorizationService')
 
 class TerceroController {
@@ -195,6 +197,28 @@ class TerceroController {
     await tercero.save()
     console.log('okeyyyyy')
     return tercero
+  }
+
+  async resumenes ({ auth, params }) {
+    const user = await auth.getUser()
+    const { id } = params
+    console.log(id)
+    let cual = id == 'C' ? 'VE' : 'CO'
+    const pendientes = await ComprobantePendiente
+      .query('c.tipo')
+      .from('comprobantes_pendientes as cp')
+      .leftJoin('comprobantes as c', 'c.id', '=', 'cp.comprobante_id')
+      .leftJoin('terceros as t', 't.id', '=', 'c.tercero_id')
+      .leftJoin('sucursales as s', 's.id', '=', 'c.sucursal_id')
+      .select('c.tercero_id', 't.nombre', 'c.sucursal_id', 's.nombre as sucnom')
+      .sum('pendiente as saldo')
+      .whereIn('c.tipo', [cual])
+      .where('c.user_id',user.id)
+      .groupBy('c.tercero_id','c.sucursal_id')
+      .catch((err) => {
+      console.log(err)
+      })
+    return pendientes
   }
 }
  

@@ -8,8 +8,8 @@
           label="Email"
           placeholder="Email"
           :value="loginEmail"
-          @input="setLoginEmail"
-        ></v-text-field>
+          @input="setLoginEmail">
+        </v-text-field>
 
         <v-text-field
           label="Password"
@@ -17,8 +17,8 @@
           type="password"
           autocomplete="new-password"
           :value="loginPassword"
-          @input="setLoginPassword"
-        ></v-text-field>
+          @input="setLoginPassword">
+        </v-text-field>
 
         <v-alert type="error" :value="loginError">
           {{loginError}}
@@ -42,15 +42,35 @@ export default {
       'loginEmail',
       'loginPassword',
       'loginUserId',
-      'loginError',
-    ]),
+      'loginError'],
+      [
+        'sucursal',
+        'sucursales',
+        'sucursalFiscal',
+        'notificaciones',
+        'caja',
+        'colorSucursal',
+        'empresa',
+        'operario',
+        'level',
+      ]),
   },
   methods: {
     ...mapMutations('authentication', [
       'setLoginEmail',
       'setLoginPassword',
-      'setLoginUserId',
-    ]),
+      'setLoginUserId'],
+      [
+        'setSucursal',
+        'setSucursales',
+        'setSucursalFiscal',
+        'setNotificaciones',
+        'setCaja',
+        'setColorSucursal',
+        'setEmpresa',
+        'setOperario',
+        'setLevel',
+      ]),
     ...mapActions('authentication', [
       'login',
     ]),

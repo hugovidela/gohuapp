@@ -9,6 +9,11 @@ class AfipIvaController {
     const user = await auth.getUser()
     return await AfipIva.all()
   }
+  
+  async indexbus ({ auth }) {
+    const user = await auth.getUser()
+    return await AfipIva.all()
+  }
 
   async exists ({ auth, request, params }) {
     const user = await auth.getUser()

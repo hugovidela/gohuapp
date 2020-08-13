@@ -166,6 +166,9 @@
       }      
     },
     methods: {
+      closeForm(){
+        router.push('/')
+      },
       armoPath(node) {
         this.pt = []
         this.path = ''

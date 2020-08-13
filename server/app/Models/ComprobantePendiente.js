@@ -8,6 +8,10 @@ class ComprobantePendiente extends Model {
     return 'comprobantes_pendientes'
   }
 
+  comprobante() {
+    return this.belongsTo('App/Models/Comprobante', 'comprobante_id', 'id')
+  }
+
 }
 
 module.exports = ComprobantePendiente

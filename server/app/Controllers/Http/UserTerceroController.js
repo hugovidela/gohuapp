@@ -10,6 +10,7 @@ const AuthorizationService = use('App/Services/AuthorizationService')
 
 class UserTerceroController {
   // INDEX PRINCIPAL DEL FORMULARIO TERCEROS
+  // ESTO DEJO DE ANDAR Y NO SE PORQUE
   static scopeByUser (query, user_id) {
     if (user_id) {
       query.whereHas('users', query => {
@@ -22,8 +23,11 @@ class UserTerceroController {
     }
   }  
 
-  async indexclientes ({ auth }) {
+  async indexclientes ({ auth, params }) {
     const user = await auth.getUser()
+    const { saydisables } = params
+    const filtro = [true]
+    if (saydisables=='true') { filtro.push(false) }
     const usersTerceros = await UserTercero.query()
     .with('tercero')
     .with('tercero.documento')
@@ -35,13 +39,18 @@ class UserTerceroController {
     .with('tercero.contactos')
     .with('tercero.contactos.contactoTipo')
     .with('terceromediosdepago')
-    .byUser(user.id)
+    .where('user_id', user.id)
+    .whereIn('activo', filtro)
+//  .byUser(user.id)
     .fetch()
     return usersTerceros
   }
 
-  async indexproveedores ({ auth }) {
+  async indexproveedores ({ auth, params }) {
     const user = await auth.getUser()
+    const { saydisables } = params
+    const filtro = [true]
+    if (saydisables=='true') { filtro.push(false) }
     const usersTerceros = await UserTercero.query()
     .with('tercero')
     .with('tercero.documento')
@@ -52,7 +61,8 @@ class UserTerceroController {
     .with('tercero.contactos')
     .with('tercero.contactos.contactoTipo')
     .with('terceromediosdepago')
-    .byUser(user.id)
+    .where('user_id', user.id)
+    .whereIn('activo', filtro)
     .fetch()
     return usersTerceros
   }
@@ -68,6 +78,7 @@ class UserTerceroController {
     .with('tercero.direcciones.postal.provincia.pais')
     .with('terceromediosdepago.mediodepago')
     .with('terceromediosdepago.banco')
+    .where('activo',true)
     .fetch()
     return tercero
   }
@@ -233,6 +244,16 @@ class UserTerceroController {
     return tercero
   }
 
+  async activardesactivar ( { auth, request, params } ) {
+    const user = await auth.getUser()
+    const { usrter } = params
+    const { activo } = request.only(['activo'])
+    const ut = await UserTercero.find(usrter)
+    ut.merge(request.only(['activo']))
+    await ut.save()
+    return ut
+  }
+
   async update ( { auth, request, params }) {
 
     const user = await auth.getUser()
@@ -322,10 +343,10 @@ class UserTerceroController {
     const me = Object.values(medios)
     const me2 = me[0];
     let userTercero = ''
-    console.log('a?')
+    // console.log('a?')
     if(me2.length>0) {
       let arr = []
-      console.log('me2', me2)
+      // console.log('me2', me2)
       for (let i=0; i<me2.length; i++) {
         arr.push({user_tercero_id: me2[i].user_tercero_id,
                   mediodepago_id: me2[i].mediodepago.id,
@@ -339,7 +360,7 @@ class UserTerceroController {
                 })
       }
       userTercero = await UserTercero.find(me2[0].user_tercero_id)
-      console.log(userTercero)
+      // console.log(userTercero)
       await userTercero.terceromediosdepago().delete()
       await userTercero.terceromediosdepago().createMany(arr)
     }
@@ -358,7 +379,7 @@ class UserTerceroController {
                 })
       }
       userTercero = await UserTercero.find(li2[0].user_tercero_id)
-      console.log(userTercero)
+      // console.log(userTercero)
       await userTercero.terceroListas().delete()
       await userTercero.terceroListas().createMany(arr)
 

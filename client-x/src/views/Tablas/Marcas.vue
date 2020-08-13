@@ -1,6 +1,18 @@
 <template>
   <v-layout align-start>
     <v-flex>
+
+      <v-data-table
+      :headers="headers"
+      :items="items"
+      dense
+      :options.sync= "pagination"
+      :server-items-length="totalItems"
+      :loading="loading"
+      :footer-props="footerProps"
+      class="elevation-1">
+
+      <!--
       <v-data-table
         :headers="headers"
         :items="items"
@@ -9,8 +21,13 @@
         dense
         class="elevation-3"
         :footer-props="footerProps">
+      -->
         <template v-slot:top>
-          <v-system-bar color="indigo darken-2" dark></v-system-bar>
+          <v-system-bar color="indigo darken-2" dark>
+            <v-btn icon @click="closeForm">
+              <v-icon color="white" dark>mdi-close-circle</v-icon>
+            </v-btn>
+          </v-system-bar>
           <v-toolbar flat color="indigo">
 
             <template v-slot:extension>
@@ -159,11 +176,17 @@ export default {
       (v) => !!v || 'El nombre es requerido',
       (v) => v.length <= 50 || 'Ingrese hasta 50 caracteres'
     ],
-    footerProps: {'items-per-page-options': [9, 12, 15, 100]},
-    search: '', // para el cuadro de búsqueda de datatables  
-    dialog: false, // para que la ventana de dialogo o modal no aparezca automáticamente      
-    // definimos los headers de la datatables
+    ////////////////////////////////////
+    // PARA EL DATATABLE ///////////////
+    ////////////////////////////////////
     items: [],
+    totalItems: 0,
+    loading: false,
+    pagination: {
+      page: 1,
+    },
+    footerProps: {'items-per-page-options': [9]},
+    search: '', 
     headers: [
       {
         text: 'ID',
@@ -171,10 +194,14 @@ export default {
         sortable: false,
         value: 'id',
       },
-      { text: 'NOMBRE', value:'nombre'},
-      { text: 'ACTIVO', value:'activo'},
+      { text: 'NOMBRE', value:'nombre', sortable: false },
+      { text: 'ACTIVO', value:'activo', sortable: false },
       { text: 'ACCIONES', value: 'accion', sortable: false },
     ],
+    // FIN DEL DATATABLE ///////////////
+
+    dialog: false, // para que la ventana de dialogo o modal no aparezca automáticamente      
+    // definimos los headers de la datatables
     editedIndex: -1,
     editado: {
       id: '',
@@ -198,6 +225,23 @@ export default {
     dialog (val) {
       val || this.cancelar();
     },
+    pagination: {
+      handler () {
+        this.listarHTTP()
+        .then(data => {
+          this.items = data.items
+          this.totalItems = data.total
+        })
+      },
+      deep: true
+    },
+    search() {
+      this.listarHTTP()
+      .then(data => {
+        this.items = data.items
+        this.totalItems = data.total
+      })
+    }    
   },
   mounted () {
     this.$store.commit('closeAlert')
@@ -212,6 +256,9 @@ export default {
   },
   
   methods: {
+    closeForm(){
+      router.push('/')
+    },
     exportExcel: function () {
       let data = XLSX.utils.json_to_sheet(this.items)
       const workbook = XLSX.utils.book_new()
@@ -267,12 +314,44 @@ export default {
           }
       });
     },
+    /*
     listarHTTP:function() {
       return HTTP().get('/'+this.modelo)
         .then(({ data }) => {
           this.items = data;
       });
     },
+    */
+    listarHTTP () {
+      let localThis = this
+      this.loading = true
+      return new Promise((resolve, reject) => {
+          const { sortBy, descending, page, rowsPerPage } = this.pagination
+          let items = this.getJsonData().then(
+            function(response){
+              items = response.data;
+              const total = response.total
+              setTimeout(() => {
+                localThis.loading = false;
+                resolve({
+                  items,
+                  total
+                })
+              }, 0)
+          })
+      })
+    },
+    getJsonData () {
+      let s = this.search.length>0 ? this.search : 'all'
+      return HTTP().get(`${this.modelo}/${this.pagination.page}/${this.pagination.itemsPerPage}/${s}`)
+        .then(function(response){
+          var result  = response.data;
+          return result;
+        }).catch(function (error) {
+          console.log(error);
+      })
+    },
+
     altaHTTP:function() {
       return HTTP().post('/'+this.modelo, {
         nombre: this.nombre,

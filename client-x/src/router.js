@@ -28,6 +28,7 @@ import AfipDocumentos from './views/Tablas/AfipDocumentos.vue';
 import AfipResponsables from './views/Tablas/AfipResponsables.vue';
 import AfipOperaciones from './views/Tablas/AfipOperaciones.vue';
 import ImportarArticulos from './views/ImportarArticulos.vue';
+import Precios from './views/Precios.vue';
 import StocksInventarios from './views/Stocks/StocksInventarios.vue';
 import Ventas from './views/Ventas.vue';
 import Compras from './views/Compras.vue';
@@ -36,6 +37,7 @@ import StocksTransferencias from './views/Stocks/StocksTransferencias.vue';
 import TesoreriaCaja from './views/Tesoreria/TesoreriaCaja.vue';
 import TesoreriaInformes from './views/Tesoreria/TesoreriaInformes.vue';
 import StocksInformes from './views/Stocks/StocksInformes.vue';
+import Resumenes from './views/Resumenes.vue';
 
 Vue.use(Router);
 
@@ -189,9 +191,24 @@ export default new Router({
       component: ImportarArticulos,
     },
     {
+      path: '/precios',
+      name: 'precios',
+      component: Precios,
+    },
+    {
       path: '/ventas',
       name: 'ventas',
       component: Ventas,
+    },
+    {
+      path: '/resumenesclientes',
+      name: 'resumenesclientes',
+      component: Resumenes,
+    },
+    {
+      path: '/resumenesproveedores',
+      name: 'resumenesproveedores',
+      component: Resumenes,
     },
     {
       path: '/compras',

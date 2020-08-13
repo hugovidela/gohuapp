@@ -53,6 +53,10 @@ class User extends Model {
     return this.hasMany('App/Models/UserLista','id','user_id')
   }
 
+  users () {
+    return this.hasMany('App/Models/User','id','user_id')
+  }
+
   sucursales () {
     return this.hasMany('App/Models/Sucursal','id','user_id')
   }
@@ -63,6 +67,10 @@ class User extends Model {
 
   cajas () {
     return this.hasMany('App/Models/Caja','id','user_id')
+  }
+
+  vinculos () {
+    return this.hasMany('App/Models/Vinculo', 'id', 'user_id_desde')
   }
 
 /*

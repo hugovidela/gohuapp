@@ -5,7 +5,20 @@ const AuthorizationService = use('App/Services/AuthorizationService')
 
 class MarcaController {
 
-  async index ({ auth }) {
+  async index ({ auth, params }) {
+    let { page, rows, search } = params
+    page = Number(page)
+    rows = Number(rows)
+    let bus = search == 'all' ? '' : search
+    const user = await auth.getUser()
+    return await Marca
+      .query()
+      .where('id', 'like', '%'+bus+'%')
+      .orWhere('nombre', 'like', '%'+bus+'%')
+      .paginate(page, rows)
+  }
+
+  async indexbus ({ auth, params }) {
     const user = await auth.getUser()
     return await Marca.all()
   }

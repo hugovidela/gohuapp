@@ -26,6 +26,13 @@
               Central de Ventas
             </v-list-item-title>
           </v-list-item>
+          <v-list-item
+            link :to="{name: 'resumenesclientes'}">
+            <v-list-item-title>
+              <v-icon>mdi-sale</v-icon>
+              Resumen de Cuentas
+            </v-list-item-title>
+          </v-list-item>
         </v-list-group>
         <v-list-group no-action prepend-icon="shopping_cart">
           <template v-slot:activator>
@@ -44,6 +51,13 @@
             <v-list-item-title>
               <v-icon>mdi-face</v-icon>
               Central de Compras
+            </v-list-item-title>
+          </v-list-item>
+          <v-list-item
+            link :to="{name: 'resumenesproveedores'}">
+            <v-list-item-title>
+              <v-icon>mdi-sale</v-icon>
+              Resumen de Cuentas
             </v-list-item-title>
           </v-list-item>
         </v-list-group>
@@ -105,6 +119,12 @@
               <v-list-item-title>
                 <v-icon>verified_user</v-icon>
                 Tags
+              </v-list-item-title>
+          </v-list-item>
+          <v-list-item link :to="{name: 'precios'}">
+              <v-list-item-title>
+                <v-icon>verified_user</v-icon>
+                Precios
               </v-list-item-title>
           </v-list-item>
         </v-list-group>
@@ -260,24 +280,34 @@
 
       </v-list>
     </v-navigation-drawer>
-    <v-app-bar :clipped-left="$vuetify.breakpoint.lgAndUp" app color="blue darken-3" dark>
+    <v-app-bar
+      :clipped-left="$vuetify.breakpoint.lgAndUp"
+      app
+      v-bind:style="{'background-color': colorSucursal ? colorSucursal:'blue darken-3'}"
+      dark>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
       <v-toolbar-title style="width: 300px" class="ml-0 pl-4">
-        <span class="hidden-sm-and-down">Sistema</span>
+        <span class="hidden-sm-and-down">Gohu/{{empresa}}/{{operario}}</span>
       </v-toolbar-title>
+      <v-icon v-show="mostrarNotificaciones" dense class="mr-2">mdi-bell-ring</v-icon>
       <v-spacer />
       <v-toolbar-items class="hidden-sm-and-down">
         <v-select v-if="isLoggedIn"
           class="mt-3 caption"
-          v-model="sucursalNombre"
-          :items="sucItems"
+          v-bind:style="{'background-color': colorSucursal ? colorSucursal:'blue darken-3'}"
+          :value="$store.state.sucursal"
           dense
           outlined
-          @change="cambioSucursal">
+          @change="cambioSucursal"
+          :items="sucursales" item-value="id" item-text="nombre" return-object>
         </v-select>
         <v-btn class="text-capitalize" text link to="/profile" v-if="isLoggedIn">
           <v-icon class="mr-2">account_box</v-icon>
-          {{sucursal}} {{userId}} {{userName}}
+          c:{{ contador-1 }}
+          s:{{ sucursal }}
+          u:{{ userId }}
+          n:{{ userName }}
+          v:{{ level }}
         </v-btn>
         <v-btn class="text-capitalize" text to="/register" v-if="!isLoggedIn">
           <v-icon class="mr-2">account_box</v-icon>
@@ -305,7 +335,7 @@
   /* eslint-disable */
 
   import HTTP from './http';
-  import { mapGetters, mapActions } from 'vuex';
+  import { mapGetters, mapActions, mapMutations, mapState } from 'vuex';
   import router from './router';
 
   export default {
@@ -317,63 +347,177 @@
       sucursalId: '',
       sucursalNombre: '',
       sucItems: [],
+      contador: 0,
+      mostrarNotificaciones: false,
       }),
+    mounted() {
+      this.cambioSucursal(this.sucursales[0])
+    },
+    created() {
+      let vinItems = []
+      vinItems.push(this.userId)
+      const a = HTTP().get('/articulosvinculos')
+        .then(({ data }) => {
+          data.forEach(element => {
+            vinItems.push(element.user_id_hasta)
+          })
+        this.$store.commit('setArticulosVinculados', vinItems, { root: true });
+      })
 
-    mounted () {
-      /*
-      debugger
-      if (this.isLoggedIn) {
-        return HTTP().get('/user/'+this.userId)
-          .then(({ data }) => {
-            this.sucItems = []
-            this.sucObj = []
-            debugger
-            for (let i=0; i<=data[0].sucursales.length-1; i++) {
-              this.sucObj.push(data[0].sucursales[i])
-              this.sucItems.push(data[0].sucursales[i].nombre)
-            }
-            this.sucursalId = this.sucObj[0].id
-            this.sucursalNombre = this.sucObj[0].nombre
-            this.$store.commit('setSucursal', this.sucursalId);
-          });
-      }
-      */
+      this.mostrarNotificaciones = false;
+      var self=this;
+      this.contador = 1;
+      setInterval(function(){
+        self.actualizarContador()
+      },1000)
     },
     computed: {
-      ...mapGetters('authentication', ['isLoggedIn', 'userName', 'userId', 'sucursal']),
-      },
+      ...mapGetters('authentication', ['isLoggedIn', 'userName', 'userId']),
+      ...mapState([
+        'sucursal',
+        'sucursales',
+        'sucursalFiscal',
+        'notificaciones',
+        'caja',
+        'articulosViculados',
+        'colorSucursal',
+        'empresa',
+        'operario',
+        'level',
+      ]),    
+    },
     methods: {
       ...mapActions('authentication', ['logout']),
-      setTercero(cual) {
-        this.$store.commit('setTerceros', cual);
+      ...mapMutations([
+        'setSucursal',
+        'setSucursales',
+        'setSucursalFiscal',
+        'setNotificaciones',
+        'setCaja',
+        'setArticulosVinculados',
+        'setColorSucursal',
+        'setEmpresa',
+        'setOperario',
+        'setLevel',
+      ]),
+      actualizarContador() {
+        this.contador --
+        if (this.contador == 0) {
+          this.contador = 60;
+          let n = []
+          //alert(this.userId)
+          if (this.isLoggedIn) {
+            /*
+            SELECT users.id, users.username, users.tipo, rubros.id, rubros.nombre,
+            (select id from vinculos where user_id_hasta=users.id) as id
+            from users
+            left join users_rubros on users_rubros.user_id = users.id
+            left join rubros on rubros.id = users_rubros.rubro_id
+            where users.tipo = 'MI' and users.id <> 2 and rubros.id = rubro_id
+            */
+            return HTTP().get('/notificaciones/'+this.userId)
+              .then(({ data }) => {
+                if (data.length>0) {
+                  for (let i=0; i<=data.length-1; i++) {
+                    let p = -1
+                    for (let j=0; j<=n.length-1; j++) {
+                      if (data[i].comprobante_id == n[j].comprobante_id && n[j].tipo!='V') {
+                        p = j
+                        break
+                      }
+                    }
+                    if (p>=0) {
+                      n[p].notas.push( { nota: data[i].detalles, tipo: data[i].tipo } )
+                    } else {
+                      n.push( { 
+                        comprobante: data[i].comprobante,
+                        comprobante_id: data[i].comprobante_id,
+                        created_at: data[i].created_at,
+                        detalles: data[i].detalles,
+                        estado: data[i].estado,
+                        id: data[i].id,
+                        tipo: data[i].tipo,
+                        updated_at: data[i].updated_at,
+                        user_id_desde: data[i].user_id_desde,
+                        user_id_hasta: data[i].user_id_hasta,
+                        userdesde: data[i].userdesde,
+                        notas: [ { nota: data[i].detalles, tipo: data[i].tipo } ],
+                        paraprocesar: false
+                      })
+                    }
+                  }
+                  // reviso cuales notifiaciones estan listas para procesar asi Home.vue 
+                  // puede prender los botones de ver e importar.
+                  for (let i=0; i<=n.length-1; i++) {
+                    for (let j=0; j<=n[i].notas.length-1; j++) {
+                      if (n[i].notas[j].tipo == 'K' || n[i].notas[j].tipo == 'A' || n[i].notas[j].tipo == 'F' || n[i].notas[j].tipo == 'V' ) {
+                        n[i].paraprocesar = true;
+                      }
+                    }
+                  }
+                  this.$store.commit('setNotificaciones', n, { root: true });
+                  this.mostrarNotificaciones = true;
+                } else {
+                  this.mostrarNotificaciones = false;
+                  this.$store.commit('setNotificaciones', [], { root: true });
+                }
+              })
+          } else {
+            this.$store.commit('setNotificaciones', [], { root: true });
+          }
+        }
       },
 
+      setTercero(cual) {
+        this.$store.commit('setTerceros', cual, { root: true });
+      },
+
+      /*
       changed: function(event) {
         this.$store.commit("change", cual);
         if (this.$store.getters.saySucursal) {
           this.alerta();
         }
       },
+      */
 
       cambioSucursal(cual) {
-        debugger
-        let idSuc = 0;
-        for(let i=0; i<=this.sucObj.length-1; i++) {
-          if (this.sucObj[i].nombre === cual) {
-            idSuc = this.sucObj[i].id
+        console.log(this.notificaciones)
+        for (let i=0; i<=this.sucursales.length-1; i++) {
+          if (this.sucursales[i].id == cual.id) {
+//            this.$store.commit('setSucursalFiscal', this.sucursales[i].fiscal);
+//            this.$store.commit('setColorSucursal', this.sucursales[i].color);
+            this.$store.commit('setSucursalFiscal',this.sucursales[i].fiscal, { root: true })
+            this.$store.commit('setColorSucursal',this.sucursales[i].color, { root: true })
             break
           }
         }
-        this.$store.commit('setSucursal', idSuc);
-        //debugger
+
+//      this.$store.commit('setSucursal', cual.id);
+        this.$store.commit('setSucursal', cual.id, { root: true });
+        let aaa = this.sucursal;
+        let bbb = this.$store.getters.sucursal;
+        let ccc = this.$store.state.sucursal;
+
+        console.log(this.$store.getters.sucursal)
+
         //this.$store.emit('testEvent', idSuc);
         //this.$refs.Ventas.listarHTTP();
         //this.$root.$emit('cambiarSucursal')
-        // debugger
         // this.$refs.Ventas.listarHTTP()
-//      debugger
 //      this.$emit('envio', idSuc)
+      },
+
+      /*
+      toHex(str) {
+        var result = '';
+        for (var i=0; i<str.length; i++) {
+          result += str.charCodeAt(i).toString(16);
+        }
+        return result;
       }
-    }
+      */
+  }
+
   };
 </script>

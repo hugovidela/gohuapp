@@ -9,7 +9,11 @@
         class="elevation-3"
         :footer-props="footerProps">
         <template v-slot:top>
-          <v-system-bar color="indigo darken-2" dark></v-system-bar>
+          <v-system-bar color="indigo darken-2" dark>
+            <v-btn icon @click="closeForm">
+              <v-icon color="white" dark>mdi-close-circle</v-icon>
+            </v-btn>
+          </v-system-bar>
           <v-toolbar flat color="indigo">
             <template v-slot:extension>
               <v-tooltip bottom>
@@ -94,6 +98,7 @@
                 </template>
                 <span>Nuevo Pedido</span>
               </v-tooltip>
+              -->
               <v-tooltip bottom>
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn
@@ -103,6 +108,7 @@
                 </template>
                 <span>Facturar un Pedido</span>
               </v-tooltip>
+              <!--
               <v-tooltip bottom>
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn
@@ -170,8 +176,9 @@
               -->
             </template>
             <v-toolbar-title
-              class="white--text" @click="listarHTTP()" v-model="sucursal">
-              Central de Ventas sucursal ({{ sucursal }}) caja ({{ caja }})
+              class="white--text" @click="listarHTTP($store.state.sucursal)" v-model="sucursal">
+              Central de Ventas sucursal ({{ sucursal }})
+              caja ({{ caja }})
             </v-toolbar-title>
             <v-divider class="mx-4" inset vertical></v-divider>
             <v-spacer></v-spacer>
@@ -197,7 +204,7 @@
                   <v-card-text>
                     <v-container>
                       <v-row>
-                        <v-col cols="6" sm="6" md="6">
+                        <v-col v-show="basadoEnCpr==false" cols="6" sm="6" md="6">
                           <v-autocomplete
                             v-model="editado.tercero_id"
                             :items="itemsTerceros"
@@ -211,6 +218,14 @@
                             prepend-icon="mdi-database-search">
                           </v-autocomplete>
                         </v-col>
+                        <v-col v-show="basadoEnCpr==true" cols="6" sm="6" md="6">
+                          <v-text-field
+                            disabled
+                            v-model="editado.nombre"
+                            label="Cliente">
+                          </v-text-field>
+                        </v-col>
+
                         <v-col cols="1" sm="1" md="1">
                           <v-text-field
                             disabled
@@ -330,8 +345,7 @@
                                             autofocus
                                             label="Codigo"
                                             v-model="editadoArt.codigo"
-                                            class = "inputField input-name p-3 styled-input"
-                                            >
+                                            class = "inputField input-name p-3 styled-input">
                                           </v-text-field>
                                         </v-col>
                                         <v-col cols="3" sm="3" md="3">
@@ -343,13 +357,12 @@
                                         </v-col>
                                       </v-row>
                                       <v-row>
-                                        <v-col cols="12" sm="12" md="12">
+                                        <v-col cols="10" sm="10" md="10">
                                           <v-autocomplete
                                             v-model="editadoArt.articulo_id"
                                             :items="itemsArticulos"
                                             :loading="isLoadingArticulos"
                                             :search-input.sync="searchArticulos"
-                                            dense
                                             class="caption"
                                             item-text="nombre"
                                             item-value="id"
@@ -358,12 +371,20 @@
                                             prepend-icon="mdi-database-search">
                                           </v-autocomplete>
                                         </v-col>
+                                        <v-col cols="2" sm="2" md="2">
+                                          <v-text-field
+                                            label="Stock"
+                                            disabled class="caption"
+                                            v-model="editadoArt.stock">
+                                          </v-text-field>
+                                        </v-col>
                                       </v-row>
                                       <v-row>
                                         <v-col cols="4" sm="4" md="4">
                                           <v-select
-                                            label='Deposito' v-model='editadoArt.deposito_id'
-                                            :items='depItems' item-value='id' item-text='nombre'
+                                            class="body-2" label="Depósito"
+                                            v-model="editadoArt.deposito_id"
+                                            :items="depItems" item-value="id" item-text="nombre"
                                             return-object>
                                           </v-select>
                                         </v-col>
@@ -467,7 +488,6 @@
                           </v-data-table>
                         </v-col>
                       </v-row>
-
                       <v-row>
                         <v-col cols="2" sm="2" md="2">
                           <v-text-field
@@ -648,6 +668,111 @@
                 </v-form>
               </v-card>
             </v-dialog>
+
+            <!--// PROCESAMIENTO DE PEDIDOS // -->
+            <v-dialog v-model="dialogPed" max-width="550px" :fullscreen="true">
+              <template v-slot:activator="{}"></template>
+              <v-card>
+                <v-card-title  class="cyan white--text">
+                  <span class="headline">Articulos del Pedido: {{ editado.cpr }}</span>
+                  <v-spacer></v-spacer>
+                  <span class="text--right">
+                    <v-btn
+                      color="blue-grey" class="ma-2 white--text" @click="cancelarPed">Cancelar
+                    </v-btn>
+                    <v-btn
+                      color="teal accent-4" class="ma-2 white--text" @click="guardarPed">Procesar
+                    </v-btn>
+                  </span>
+                </v-card-title>
+
+                <v-form ref="art">
+                  <v-card-text>
+                    <v-container>
+                      <v-row>
+                        <v-col cols="12" sx="12" mx="12">
+                          <span dense class="headline">Items</span>
+                          <v-data-table
+                            :headers="headersPed"
+                            :items="artPed"
+                            dense
+                            class="elevation-3"
+                            hide-default-footer>
+                            <template v-slot:top>
+                              <v-dialog v-model="dialogEditArt" max-width="900px">
+
+                                <template v-slot:activator="{ on, attrs }">
+                                  <v-btn
+                                    fab color="cyan accent-3"
+                                    x-small
+                                    @click="nuevoArt">
+                                    <v-icon>mdi-plus</v-icon>
+                                  </v-btn>
+                                </template>
+
+                                <!--
+                                <v-card>
+                                  <v-card-title>
+                                    <span class="headline">{{ formTitleArt }}</span>
+                                  </v-card-title>
+                                  <v-card-text>
+                                    <v-container>
+                                      <v-row>
+                                        <v-col cols="3" sm="3" md="3">
+                                          <v-text-field
+                                            autofocus
+                                            label="Codigo"
+                                            v-model="editadoArt.codigo"
+                                            class = "inputField input-name p-3 styled-input">
+                                          </v-text-field>
+                                        </v-col>
+                                      </v-row>
+                                    </v-container>
+                                  </v-card-text>
+                                  <v-card-actions>
+                                    <v-spacer></v-spacer>
+                                    <v-btn
+                                      color="blue darken-1"
+                                      text
+                                      @click="cancelarEditArt">
+                                      Cancelar
+                                    </v-btn>
+                                    <v-btn
+                                      color="blue darken-1"
+                                      text
+                                      @click="guardarEditArt(editadoArt)">
+                                      Guardar
+                                    </v-btn>
+                                  </v-card-actions>
+                                </v-card>
+                                -->
+                              </v-dialog>
+                            </template>
+                            <template v-slot:item.estado="{ item }">
+                              <v-chip
+                                class="caption"
+                                :color="getEstadoPed(item.estado,'c')" dark>
+                                {{ getEstadoPed(item.estado,'e') }}
+                              </v-chip>
+                            </template>
+                            <template v-slot:item.accion="{item}">
+                              <v-btn
+                                class="mr-2" fab x-small color="white"
+                                @click="borrarArt(item)">
+                                <v-icon dark>mdi-checkbox-marked-outline</v-icon>
+                              </v-btn>
+                            </template>
+                          </v-data-table>
+                        </v-col>
+                      </v-row>
+
+                    </v-container>
+                  </v-card-text>
+                </v-form>
+              </v-card>
+            </v-dialog>
+            <!--// FIN DEL PROCESAMIENTO DE PEDIDOS // -->
+
           </v-toolbar>
           <v-col cols="12" sm="12">  <!-- Barra de búsqueda  -->
             <v-text-field
@@ -677,6 +802,16 @@
             @click="print(item)">
             <v-icon dark>mdi-printer</v-icon>
           </v-btn>
+          <v-btn v-show="item.cpr.substring(0,3)=='PED' && item.estado=='P'"
+            class="mr-2" fab x-small color="white"
+            @click="chequearArt(item)">
+            <v-icon dark>mdi-playlist-check</v-icon>
+          </v-btn>
+          <v-btn v-show="item.cpr.substring(0,3)=='PED' && item.estado=='P'"
+            class="mr-2" fab x-small color="white"
+            @click="nuevo(item)">
+            <v-icon dark>mdi-file-document</v-icon>
+          </v-btn>
           <v-btn v-if="cobrar(item)"
             class="mr-2" fab x-small color="white"
             @click="print(item)">
@@ -700,7 +835,7 @@
 
 /* eslint-disable */
 import HTTP from '../http';
-import { mapGetters, mapMutations } from 'vuex';
+import { mapGetters, mapMutations, mapState } from 'vuex';
 import router from '../router';
 import moment from 'moment';
 import SBar from './Forms/snackbar.vue';
@@ -714,6 +849,9 @@ export default {
     Confirmacion,
   },
   data: () => ({
+    basadoEnCpr: false,      // si el comprobante actual esta basado en otro comprobante. ( fac/ped, rem/fac, etc)
+    notificaEnBaseAOtro: [], // arreglo para realizar la notificacion de comprobantes.
+    notificaOriginal: [],    // cuando es notificaEnBaseAOtro, debo marcar el comprobante padre.
     cfUser: '',
   //sucursal: '',
     coef: 1,  // para signar los comprobantes + o -
@@ -755,8 +893,10 @@ export default {
     dialog: false,        // para que la ventana de dialogo o modal no aparezca automáticamente
     dialogArt: false,     // para que la ventana de dialogo o modal no aparezca automáticamente
     dialogMed: false,      // para que la ventana de dialogo o modal no aparezca automáticamente
+    dialogPed: false,      // para que la ventana de dialogo o modal no aparezca automáticamente
     items: [],
     articulos: [],
+    artPed: [],
     valores: [],
     pendientes: [],
 
@@ -773,11 +913,11 @@ export default {
         sortable: false,
         value: 'id',
       },
-      { text: 'FECHA', value:'fecha'},
-      { text: 'COMPROBANTE', value:'cpr'},
-      { text: 'CLIENTE', value:'tercero.nombre'},
-      { text: 'TOTAL', value:'total'},
-      { text: 'PENDIENTE', value:'pendientes[0].pendiente'},
+      { text: 'FECHA', value:'fecha', width: 80},
+      { text: 'COMPROBANTE', value:'cpr', width: 173},
+      { text: 'CLIENTE', value:'tercero.nombre', width: 200},
+      { text: 'TOTAL', value:'total', align: 'end', width: 120},
+      { text: 'PENDIENTE', value:'pendientes[0].pendiente', align: 'end', width: 120},
       { text: 'ACCIONES', value: 'accion', sortable: false },
     ],
     headersArt: [
@@ -788,6 +928,16 @@ export default {
       { text: '%DES', value:'tasadescuento'},
       { text: 'DES', value:'importedescuento'},
       { text: 'TOTAL', value:'total'},
+      { text: 'ACCIONES', value: 'accion', sortable: false },
+    ],
+    headersPed: [
+      { text: 'CODIGO', value:'codigo'},
+      { text: 'DESCRIPCION', value:'nombre'},
+      { text: 'Ctt.Ped.', value:'cttped'},
+      { text: 'Stock', value:'stock'},
+      { text: 'Ctt.Ent.', value:'cttent'},
+      { text: 'Nuevo Stock', value:'nuevostock'},
+      { text: 'Estado', value:'estado'},
       { text: 'ACCIONES', value: 'accion', sortable: false },
     ],
     headersMed: [
@@ -806,6 +956,7 @@ export default {
     editado: {
       id: '',
       tercero_id: '',
+      comprobante_id: '',
       cpr: '',
       lista_id: '',
       deposito_id: '',
@@ -828,6 +979,7 @@ export default {
     defaultItem: {
       id: '',
       tercero_id: '',
+      comprobante_id: '',
       cpr: '',
       lista_id: '',
       deposito_id: '',
@@ -860,6 +1012,7 @@ export default {
       iva_id: '',
       ivaNombre: '',
       cantidad: 1,
+      stock: 1,
       costo: 0,
       precio: 0,
       preciooriginal: 0,
@@ -882,6 +1035,7 @@ export default {
       iva_id: '',
       ivaNombre: '',
       cantidad: 1,
+      stock: 1,
       costo: 0,
       precio: 0,
       preciooriginal: 0,
@@ -912,6 +1066,7 @@ export default {
   computed: {
     ...mapGetters('authentication', ['isLoggedIn', 'userName', 'userId', 'sucursal', 'sucursalFiscal', 'caja']),
     ...mapMutations(['alert','closeAlert']),
+    ...mapState(['sucursal','sucursalFiscal']),
     itemsTerceros () {
       return this.entriesTerceros.map(entry => {
         const nombre = entry.nombre.length > this.descriptionLimit
@@ -944,15 +1099,22 @@ export default {
       val || this.cancelar();
     },
     */
+    '$store.state.sucursal' () {
+      debugger
+      let xxx = this.sucursal
+      this.listarHTTP(this.sucursal)
+    },
     searchTerceros (val) {
       // Items have already been loaded
       // if (this.entriesPaises.length > 0) return
       // Items have already been requested
+      debugger
       if (this.isLoadingTerceros) return
       this.isLoadingTerceros = true
       // Lazily load input items
-      return HTTP().get('/usersclientes')
+      return HTTP().get('/usersclientes/false')
         .then(({ data }) => {
+          debugger
           this.entriesTerceros = []
           this.tercerosUserId = []
           for (let i=0; i<= data.length-1; i++) {
@@ -1019,8 +1181,11 @@ export default {
                     }
                   })
                 }
-                //debugger
+                debugger
                 this.editado.medio_id = this.medItems[0]
+                this.editado.lista_id = this.lisItems[0].id
+                this.editado.deposito_id = this.depItems[0].id
+                this.cfUser = Number(data[0].tercero.responsable.codigo)
 
                 // debugger
                 if (data[0].terceroListas.length > 0) {
@@ -1057,7 +1222,6 @@ export default {
             this.entriesArticulos.push(art)
           })
 
-          //this.entriesArticulos = data;
           let ipos = -1
           // debugger
           for (let i=0; i<=this.entriesArticulos.length-1; i++) {
@@ -1066,17 +1230,17 @@ export default {
               break
             }
           }
-//        if (ipos==-1) { return }
 
           this.editadoArt.codigo = this.entriesArticulos[ipos].codigo;
           this.editadoArt.nombre = this.entriesArticulos[ipos].nombre;
           this.editadoArt.codbar = this.entriesArticulos[ipos].codbar;
 
           let iArt = this.entriesArticulos[ipos].id
-          // debugger
           let iLis = this.editado.lista_id
+          debugger
           return HTTP().get('/precio/'+iArt+'/'+iLis)
             .then(({ data }) => {
+              
               this.editadoArt.precio = data[0].precio
               this.editadoArt.total = data[0].precio
               this.editadoArt.tasadesuento = 0
@@ -1084,14 +1248,30 @@ export default {
               this.uniItems = this.entriesArticulos[ipos].umventa;
               this.monItems = this.entriesArticulos[ipos].moneda;
               this.ivaItems = this.entriesArticulos[ipos].iva;
-              this.editadoArt.deposito_id = this.depItems[0]
+              this.editadoArt.deposito_id = this.depItems[0].id
               this.editadoArt.unidad_id = this.uniItems.id
               this.editadoArt.unidadNombre = this.uniItems.nombre
               this.editadoArt.moneda_id = this.monItems.id
               this.editadoArt.monedaNombre = this.monItems.simbolo
               this.editadoArt.iva_id = this.ivaItems.id
               this.editadoArt.ivaNombre = this.ivaItems.nombre
+
+              debugger
+              let iDep = this.editadoArt.deposito_id
+              
+              debugger
+              return HTTP().get('/stock/'+iArt+'/'+iDep)
+                .then(({ data }) => {
+                  debugger
+                  if(data) {
+                    this.stock = data
+                  } else {
+                    this.stock = 0
+                  }
+              })
+
           })
+
         })
         .catch(err => {
           console.log(err)
@@ -1123,7 +1303,9 @@ export default {
     if (!this.isLoggedIn) {
       return router.push('/login');
     } else {
-      return this.listarHTTP()
+      debugger
+      return this.listarHTTP(this.sucursal)
+//    return this.listarHTTP(this.$store.state.sucursal)
     }
   },
   created () {
@@ -1146,8 +1328,36 @@ export default {
       .then(({ data }) => {
         this.monItems = data
     });
+
+    // BUSCO LOS DEPOSITOS HABILITADOS EN LA SUCURSAL
+    const d = HTTP().get('/user/'+this.userId)
+      .then(({ data }) => {
+        // debugger
+        //TENGO EL ID DE LA SUCURSAL DE LA BD EN 'sucursal' 
+        //pero necesito la posicion que ocupa dentro
+        //de la matriz data[0].sucursales
+        // busco el Id de la sucursal en la matriz
+        let psuc = 0
+        for (let i=0; i<=data[0].sucursales.length-1; i++) {
+          if (data[0].sucursales[i].id===this.sucursal) {
+            psuc = i;
+            break;
+          }
+        }
+        for (let i=0; i<= data[0].sucursales[psuc].depositos.length-1; i++) {
+          this.depItems.push(data[0].sucursales[psuc].depositos[i])
+        }
+        for (let i=0; i<= data[0].listas.length-1; i++) {
+          this.lisItems.push(data[0].listas[i])
+          //this.lisItems.push(data[0].listas[i].nombre)
+        }
+    });
+
   },
   methods: {
+    closeForm(){
+      router.push('/')
+    },
     cobrar(item) {
       if (!item.pendientes[0]) return false
       if (item.pendientes[0].pendiente>0) {
@@ -1180,6 +1390,7 @@ export default {
       })
     },
     cantidadItem() {
+      this.editadoArt.stock = this.editadoArt.cantidad
       this.editadoArt.total = this.roundTo((Number(this.editadoArt.cantidad)*Number(this.editadoArt.precio)),2)
       return this.editadoArt.total
     },
@@ -1212,9 +1423,14 @@ export default {
       return this.editadoArt.total
     },
     nuevo(que) {
+
+      // SI "que" VIENE CON DATOS, ES PORQUE ESTOY HACIENDO UN COMPROBANTE BASADO EN OTRO
+
       this.dialog = true;
-      this.lisItems = [];
-      this.depItems = [];
+      this.basadoEnCpr = false;         // SI EL CPR ESTA BASADO EN OTRO CPR. (FAC/PED, etc)
+      this.notificaEnBaseAOtro = [];    // LIMPIO NOTIFICACIONES PARA NO TENER PROBLEMAS
+      this.notificaOriginal = [];
+
       this.searchTerceros = '';
       this.searchArticulos = '';
       this.isLoadingTerceros = false;
@@ -1224,16 +1440,15 @@ export default {
       this.valValores = 0;
       this.valDiferencia = 0;
 
+      /*
       // BUSCO LOS DEPOSITOS HABILITADOS EN LA SUCURSAL
       const b = HTTP().get('/user/'+this.userId)
         .then(({ data }) => {
           // debugger
-
-          /*
-          TENGO EL ID DE LA SUCURSAL DE LA BD EN 'sucursal' 
-          pero necesito la posicion que ocupa dentro
-          de la matriz data[0].sucursales
-          */
+          
+          //TENGO EL ID DE LA SUCURSAL DE LA BD EN 'sucursal' 
+          //pero necesito la posicion que ocupa dentro
+          //de la matriz data[0].sucursales
           // busco el Id de la sucursal en la matriz
           let psuc = 0
           for (let i=0; i<=data[0].sucursales.length-1; i++) {
@@ -1253,7 +1468,8 @@ export default {
           this.editado.lista_id = this.lisItems[0].id
           this.editado.deposito_id = this.depItems[0].id
           this.cfUser = Number(data[0].tercero.responsable.codigo)
-        });
+      });
+      */
 
       this.formTitleArt = 'Nuevo Item';
       this.formTitleMed = 'Nuevo Valor';
@@ -1297,6 +1513,75 @@ export default {
         this.formTitle = 'Aplicar Factura a Nota de Crédito'
       } else if (que === 'nddfac') {
         this.formTitle = 'Aplicar Nota de Débito a Factura'
+      } else if (que.cpr.substring(0,3)=='PED') {
+        this.formTitle = 'Facturar el Pedido '+que.cpr+' - ('+que.tercero.nombre+')'
+        this.searchTerceros = ''
+        this.isLoadingTerceros = true // PARA QUE NO BUSQUE EL TERCERO, YA LO TENGO
+        this.basadoEnCpr = true;   // SI EL CPR ESTA BASADO EN OTRO CPR. (FAC/PED, etc)
+        this.editado.tercero_id = que.tercero_id;
+        this.editado.nombre = que.tercero.nombre;
+        this.editado.responsableAbrev = que.tercero.responsable.abrev;
+        this.editado.documento = que.tercero.documento.nombre
+        this.editado.documentoNumero = que.tercero.cuit
+        this.editado.moneda_id = que.moneda_id
+        let rid = que.tercero.responsable.id
+        this.cfUser = Number(que.tercero.responsable.codigo)
+
+        this.editado.cpr = 'FAC';
+        if (this.cfUser===1) { //EL USUARIO ES RESPONSABLE INSCRIPTO
+          if(rid===1 || rid===2 || rid===9 || rid===11) {
+            this.editado.letra = 'A'
+          } else {
+            this.editado.letra = 'B'
+          }
+        } else if (this.cfUser===6) { //EL USUARIO ES MONOTRIBUTISTA
+            this.editado.letra = 'C'
+        }
+        this.dirItems.push(que.tercero.direcciones[0])
+        this.editado.direccion_id = this.dirItems[0].id
+        this.editado.deposito_id = this.depItems[0].id
+        this.editado.lista_id = this.lisItems[0].id
+
+        //Cargo los articulos del pepdido
+        this.articulos = [];
+        for (let i=0; i<=que.items.length-1; i++) {
+          this.articulos.push({ 
+            articulo_id: que.items[i].articulo_id,
+            codigo: que.items[i].articulo.codigo.substring(0,que.items[i].articulo.codigo.indexOf('@')),
+            nombre: que.items[i].articulo.nombre,
+            deposito_id: this.editado.deposito_id,
+            unidad_id: que.items[i].articulo.um_venta_id,
+            moneda_id: que.items[i].articulo.um_moneda_id,
+            iva_id: que.items[i].articulo.iva_id,
+            cantidad: que.items[i].cantidad,
+            stock: que.items[i].cantidad,
+            costo: que.items[i].costo,
+            precio: que.items[i].precio,
+            preciooriginal: que.items[i].precio,
+            tasadescuento: que.items[i].tasadescuento,
+            importedescuento: que.items[i].importedescuento,
+            total: que.items[i].total,
+            texto: que.items[i].texto,
+            vencimiento: que.items[i].vencimiento
+          })
+        }
+
+        // Como es EnBaseAOtro, dejo listo el array para luego notificarlo
+        this.notificaEnBaseAOtro = [{
+          user_id_desde: this.userId,
+          user_id_hasta: que.tercero_id,
+          comprobante_id: 0, // En la API debe grabar el venta.id del nuevo comprobante 
+          tipo: 'F',
+          detalles: 'Pedido Facturado',
+          estado: 'P'
+        }]
+        // Como es EnBaseAOtro, debo marcar el comprobnate padre indicando que ya esta procesado
+        this.notificaOriginal = [{
+          comprobante_id: que.id,
+          estado: 'F'
+        }]
+
+        this.calculos()
       }
     },
     exportExcel: function () {
@@ -1314,10 +1599,8 @@ export default {
         var doc = new jsPDF();
 
         doc.setFontStyle("bold");
-
         doc.setFontSize(20);
         doc.text ( 'GOHUApp S.A.', 15, 30 )
-
         doc.setFontSize(9);
         doc.text ( 'Razón Social:', 15, 47 )
         doc.text ( 'Domicilio Comercial:', 15, 53 )
@@ -1386,7 +1669,6 @@ export default {
         doc.line( 105,40.1, 105,  65);     // linea vertical 1
         doc.rect(  10,  66, 190,  10);     // segundo rectangulo
         doc.rect(  10,  77, 190,  25);     // segundo rectangulo
-
         doc.rect(  10, 240, 190,  45);     // rectangulo al pie
 
         doc.setFontStyle("normal");
@@ -1450,6 +1732,53 @@ export default {
         doc.output ('dataurlnewwindow');
       }
     },
+
+    chequearArt(item){
+      this.itemActual = item; // para luego laburar con el cuando seleccione articlos en pedidos
+      this.artPed = []
+      // Cargo en artPed cada unos de los items que me piden
+      for (let i=0; i<=item.items.length-1; i++) {
+        this.artPed.push({
+          articulo_id: item.items[i].articulo.id,
+          codigo: item.items[i].articulo.codigo,
+          nombre: item.items[i].articulo.nombre,
+          cttped: item.items[i].cantidad,
+          stock: 0,
+          cttent: 0,
+          nuevostock: 0,
+          estado: 'K'
+        })
+      }
+      // Veo los stocks, no se como hacer con el tema sucursales, puede ser general o por cada una
+      // Por ahi lo que conviene hacer es mostrar los stoks solo de los depositos de la sucursal
+      // actual y trabajar con ellos, que el pedido salga igual si no hay
+      // Si maneja demo y tiene stock ahi que luego hagan transferencias y listo.
+      for (let i=0; i<=this.artPed.length-1; i++) {
+        let iArt = this.artPed[i].articulo_id
+        let iDep = this.depItems[0].id
+        const k = HTTP().get('/stock/'+iArt+'/'+iDep)
+          .then(({ data }) => {
+            if(data) {
+              this.artPed[i].stock = data
+              if (this.artPed[i].stock >= this.artPed[i].cttped) {
+                this.artPed[i].cttent = this.artPed[i].cttped
+                this.artPed[i].estado = 'T'
+              } else {
+                this.artPed[i].cttent = data
+                this.artPed[i].estado = 'P'
+              }
+            } else {
+              this.artPed[i].stock = 0
+              this.artPed[i].estado = 'N'
+            }
+            this.artPed[i].nuevostock = this.artPed[i].stock - this.artPed[i].cttent
+        })
+      }
+      debugger
+      this.dialogPed = true;
+
+    },
+
     msgRespuesta(op) {
       if (op==='Aceptar') {
         if (this.msg.msgAccion=='borrar item') {
@@ -1471,6 +1800,25 @@ export default {
     getColor (activo) {
       return (activo === 1) ? 'green' : 'orange'
     },
+    getEstadoPed (estado, accion) {
+      let c = ''
+      let e = ''
+      if (estado==='T') {
+        e = 'total'
+        c = 'green'
+      } else if (estado==='P') {
+        e = 'Parcial'
+        c = 'blue'
+      } else if (estado==='N') {
+        e = 'Parcial'
+        c = 'red'
+      }
+      if (accion==='c') {
+        return c
+      } else {
+        return e
+      }
+    },
     formatoImporte(value) {
         let val = (value/1).toFixed(2).replace('.', ',')
         return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
@@ -1478,9 +1826,8 @@ export default {
     formatoFecha(value) {
       return moment(String(value)).format('L')
     },
-    listarHTTP:function() {
-      // debugger
-      return HTTP().get('/'+this.modelo+'/'+this.sucursal)
+    listarHTTP:function(suc) {
+      return HTTP().get('/'+this.modelo+'/'+suc)
         .then(({ data }) => {
           this.items = data;
       });
@@ -1488,6 +1835,22 @@ export default {
     altaHTTP:function() {
       debugger
       let pf = moment().format('YYYYMM');
+      let s = this.sucursalFiscal
+
+      if (this.editado.cpr=='FAC') {
+        if (this.editado.letra=='A') { this.editado.comprobante_id = 1} 
+        else if (this.editado.letra=='B') { this.editado.comprobante_id = 6 } 
+        else if (this.editado.letra=='C') { this.editado.comprobante_id = 14 }
+      } else if (this.editado.cpr=='NDD') {
+        if (this.editado.letra=='A') { this.editado.comprobante_id = 2 } 
+        else if (this.editado.letra=='B') { this.editado.comprobante_id = 7 } 
+        else if (this.editado.letra=='C') { this.editado.comprobante_id = 15 }
+      } else if (this.editado.cpr=='NDC') {
+        if (this.editado.letra=='A') { this.editado.comprobante_id = 3 } 
+        else if (this.editado.letra=='B') { this.editado.comprobante_id = 8 } 
+        else if (this.editado.letra=='C') { this.editado.comprobante_id = 16 }
+      }
+
       return HTTP().post('/ventas', {
         fecha: moment().format('YYYY-MM-DD'),
         perfiscal: pf,
@@ -1495,9 +1858,10 @@ export default {
         user_id: this.userId,
         sucursal_id: this.sucursal,
         tercero_id: this.editado.tercero_id,
+        comprobante_id: this.editado.comprobante_id,
         direccion_id: this.editado.direccion_id,
         documento_id: this.editado.documento_id,
-        mediodepago_id: 1, //this.editado.medio_id,
+        mediodepago_id: 1, //this.editado.medio_id,             //VERRR
         lista_id: this.editado.lista_id,
         deposito_id: this.editado.deposito_id,
         vendedor_id: this.editado.tercero_id,
@@ -1514,8 +1878,11 @@ export default {
         articulos: this.articulos,
         valores: this.valores,
         pendientes: this.pendientes,
+        notificacion: 0,
+        notificaEnBaseAOtro: this.notificaEnBaseAOtro,
+        notificaOriginal: this.notificaOriginal
       }).then(({ data }) => {
-        this.listarHTTP();
+        this.listarHTTP(this.sucursal);
       });
     },
     exportarAPDF () {
@@ -1552,7 +1919,7 @@ export default {
       // Si es efectivo debo agregar el pago en 'valores' para que grabe en efectivo
       debugger
       for (let i=0; i<=this.articulos.length-1; i++) {
-        this.articulos[i].cantidad*=this.coef
+        this.articulos[i].stock*=(this.coef*-1)
       }
 
       if (Number(this.valEfectivo) !== 0) {
@@ -1599,10 +1966,9 @@ export default {
     },
     editarArt() {
     },
-    guardarArt() {
-      const part1 = this.editadoArt.codigo.substring( 0, this.editadoArt.codigo.indexOf('@')+1);
-      const codig = this.editadoArt.codigo.substring( this.editadoArt.codigo.indexOf('@')+1, this.editadoArt.codigo.indexOf('$'));
-      const part2 = this.editadoArt.codigo.substring( this.editadoArt.codigo.indexOf('$'));
+    guardarArt(item) {
+      debugger
+      const codig = this.editadoArt.codigo.substring( 0, this.editadoArt.codigo.indexOf('@'));
       this.editadoArt.codigo = codig;
       if (this.editedIndexArt > -1) { // esta modificando
         this.articulos[this.editedIndexArt].articulo_id = this.editadoArt.articulo_id
@@ -1613,6 +1979,7 @@ export default {
         this.articulos[this.editedIndexArt].moneda_id = this.editadoArt.moneda_id
         this.articulos[this.editedIndexArt].iva_id = this.editadoArt.iva_id
         this.articulos[this.editedIndexArt].cantidad = this.editadoArt.cantidad
+        this.articulos[this.editedIndexArt].stock = this.editadoArt.stock
         this.articulos[this.editedIndexArt].costo = this.editadoArt.costo
         this.articulos[this.editedIndexArt].precio = this.editadoArt.precio
         this.articulos[this.editedIndexArt].preciooriginal = 0
@@ -1632,6 +1999,7 @@ export default {
           moneda_id: this.editadoArt.moneda_id,
           iva_id: this.editadoArt.iva_id,
           cantidad: this.editadoArt.cantidad,
+          stock: this.editadoArt.stock,
           costo: this.editadoArt.costo,
           precio: this.editadoArt.precio,
           preciooriginal: 0,
@@ -1697,8 +2065,13 @@ export default {
     },
     guardarMed() {
     },
+    guardarPed() {
+    },
     cancelarArt() {
       this.dialogArt = false;
+    },
+    cancelarPed() {
+      this.dialogPed = false;
     },
     cancelarMed() {
       this.dialogMed = false;

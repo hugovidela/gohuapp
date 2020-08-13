@@ -18,7 +18,7 @@
           </v-btn>
           <v-btn
             v-show="buttons.indexOf('Aceptar')>=0"
-            color="green"
+            color="indigo darken-2"
             dark
             autofocus
             @click="handleClick('Aceptar')">
@@ -26,7 +26,7 @@
           </v-btn>
           <v-btn
             v-show="buttons.indexOf('Cancelar')>=0"
-            color="red"
+            color="grey"
             dark
             @click="handleClick('Cancelar')">
             Cancelar

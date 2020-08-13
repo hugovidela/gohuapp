@@ -8,6 +8,9 @@ class ComprobanteItem extends Model {
     return 'comprobantes_items'
   }
 
+  comprobante() {
+    return this.belongsTo('App/Models/Comprobante', 'comprobante_id', 'id')
+  }
   articulo () {
     return this.belongsTo('App/Models/Articulo', 'articulo_id','id')
   }

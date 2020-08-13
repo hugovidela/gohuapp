@@ -21,21 +21,33 @@ Route.group(() => {
   Route.post('auth/login', 'UserController.login')
   Route.post('auth/user', 'UserController.user')
   Route.get('auth/user', 'UserController.index').middleware('auth')
+  Route.get('empresa/:id', 'UserController.empresa').middleware('auth')
 
   Route.get('user/:id', 'UserController.user').middleware('auth')
-  Route.get('userarticulos', 'UserController.articulos').middleware('auth')
+  Route.get('userprecios/:user/:articulo', 'UserController.userprecios').middleware('auth')
+  Route.get('userarticulos/:page/:rows/:search/:vinculos', 'UserController.articulos').middleware('auth')
+  Route.get('userarticulosimp', 'UserController.userarticulosimp').middleware('auth')
+  Route.get('userarticulosprecios/:page/:rows/:search/:rub/:lis/:mar/:gru', 'UserController.userarticulosprecios').middleware('auth')
+  Route.get('userarticulosmisprecios/:rub/:lis', 'UserController.userarticulosmisprecios').middleware('auth')
+  Route.get('tengoelarticulo/:codigo/:grupo/:marca', 'UserController.tengoelarticulo').middleware('auth')
   Route.get('usersrubros', 'UserController.rubros').middleware('auth')
   Route.get('userscaja', 'UserController.caja').middleware('auth')
   Route.patch('user/:id', 'UserController.updateProfile').middleware('auth')
 
-  Route.get('articulos','ArticuloController.index').middleware('auth')
+  Route.get('articulos/:page/:rows/:search','ArticuloController.index').middleware('auth')
+  Route.get('articulosvinculos','UserController.articulosvinculos').middleware('auth')
+  Route.post ('import', 'ArticuloController.import')
+  Route.post ('actualizaprecios', 'ArticuloController.actualizaprecios')
+  Route.get('articulo/:id','ArticuloController.articulo').middleware('auth')
   Route.get('precio/:art/:lis','ArticuloController.precio').middleware('auth')
   Route.get('articulos/exists/:codigo','ArticuloController.exists').middleware('auth')
   Route.post('articulos','ArticuloController.create').middleware('auth')
   Route.delete('articulos/:id','ArticuloController.destroy').middleware('auth')
   Route.patch('articulos/:id','ArticuloController.update').middleware('auth')
+  Route.patch('articulosactivardesactivar/:id','ArticuloController.activardesactivar').middleware('auth')
 
-  Route.get('marcas','MarcaController.index').middleware('auth')
+  Route.get('marcas/:page/:rows/:search','MarcaController.index').middleware('auth')
+  Route.get('marcasbus/','MarcaController.indexbus').middleware('auth')
   Route.post('marcas','MarcaController.create').middleware('auth')
   Route.get('marcas/exists/:nombre','MarcaController.exists').middleware('auth')
   Route.delete('marcas/:id','MarcaController.destroy').middleware('auth')
@@ -47,6 +59,7 @@ Route.group(() => {
   Route.get('terceros/documento/:documento','TerceroController.documento').middleware('auth')
   Route.get('tercerostipos','TerceroController.tipos').middleware('auth')
   Route.get('tercerosmedios','TerceroController.medios').middleware('auth')
+  Route.patch('usertercero/:usrter','UserTerceroController.activardesactivar').middleware('auth')
 
   Route.get('tags','TagController.index').middleware('auth')
   Route.get('tags/exists/:nombre','TagController.exists').middleware('auth')
@@ -91,6 +104,7 @@ Route.group(() => {
   Route.patch('unidades/:id','UnidadController.update').middleware('auth')
 
   Route.get('afipiva','AfipIvaController.index').middleware('auth')
+  Route.get('ivabus/','AfipIvaController.indexbus').middleware('auth')
   Route.get('afipiva/last','AfipIvaController.last').middleware('auth')
   Route.get('afipiva/exists/:codigo','AfipIvaController.exists').middleware('auth')
   Route.post('afipiva','AfipIvaController.create').middleware('auth')
@@ -164,13 +178,13 @@ Route.group(() => {
   Route.delete('tarjetas/:id','TarjetaController.destroy').middleware('auth')
   Route.patch('tarjetas/:id','TarjetaController.update').middleware('auth')
 
-  Route.get('usersclientes','UserTerceroController.indexclientes').middleware('auth')
+  Route.get('usersclientes/:saydisables','UserTerceroController.indexclientes').middleware('auth')
   Route.get('usersclientes/exists/:nombre','UserTerceroController.exists').middleware('auth')
   Route.post('usersclientes','UserTerceroController.create').middleware('auth')
   Route.delete('usersclientes/:id','UserTerceroController.destroy').middleware('auth')
   Route.patch('usersclientes/:id','UserTerceroController.update').middleware('auth')
 
-  Route.get('usersproveedores','UserTerceroController.indexproveedores').middleware('auth')
+  Route.get('usersproveedores/:saydisables','UserTerceroController.indexproveedores').middleware('auth')
   Route.get('usersproveedores/exists/:nombre','UserTerceroController.exists').middleware('auth')
   Route.post('usersproveedores','UserTerceroController.create').middleware('auth')
   Route.delete('usersproveedores/:id','UserTerceroController.destroy').middleware('auth')
@@ -209,8 +223,26 @@ Route.group(() => {
 
   // COMPRA
   Route.get('compras/:id','CompraController.index').middleware('auth')
+  Route.get('comprasitems/:id','CompraController.comprasitems').middleware('auth')
   Route.post('compras','CompraController.create').middleware('auth')
   Route.delete('compras/:id','CompraController.destroy').middleware('auth')
   Route.patch('compras/:id','CompraController.update').middleware('auth')
+  Route.patch('comprasitems/:id','CompraController.updateitems').middleware('auth')
+  Route.patch('enviarpedido/:id','CompraController.enviarpedido').middleware('auth')
+
+  // STOCKS
+  Route.get('depositos','UserController.depositos').middleware('auth')
+  Route.get('stock/:id/:dep','ArticuloController.stock').middleware('auth')
+  Route.get('stocks/:id','ArticuloController.stocks').middleware('auth')
+
+  // NOTIFICACIONES
+  Route.get('vinculos','UserController.vinculos').middleware('auth')
+  Route.patch('vinculoconfirmarrechazar/:id','UserController.vinculoconfirmarrechazar').middleware('auth')
+  Route.get('notificaciones/:id','UserController.notificaciones').middleware('auth')
+
+  // RESUMENES DE CUENTAS
+  Route.get('resumenesclientes/:id','TerceroController.resumenes').middleware('auth')
+  Route.get('resumenesproveedores/:id','TerceroController.resumenes').middleware('auth')
+
 
 }).prefix('api')

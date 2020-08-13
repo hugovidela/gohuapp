@@ -47,6 +47,9 @@ class Tercero extends Model {
   contactos() {
     return this.hasMany('App/Models/TerceroContacto', 'id','tercero_id')
   }
+  user() {
+    return this.hasOne('App/Models/User', 'id', 'tercero_id')
+  }
   users () {
     return this.hasMany('App/Models/UserTercero')
   }

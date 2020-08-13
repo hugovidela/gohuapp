@@ -2,12 +2,12 @@
   <v-container>
     <v-layout row wrap>
       <v-flex xs6 offset-xs3>
-        <h1>Register</h1>
+        <h1>Registro</h1>
          <v-form
             ref="form" v-model="valid" lazy-validation>
             <v-text-field
               :rules="usernameRules"
-              label="Username"
+              label="Nombre de Usuario"
               :value="registerUsername"
               @input="setRegisterUsername"
               clearable
@@ -48,7 +48,7 @@
               @click="register"
               :disabled="!valid">
               <v-icon class="mr-2">account_circle</v-icon>
-              Register
+              Registrar
             </v-btn>
         </v-form>
 
@@ -67,11 +67,11 @@ export default {
     show: false,
     passRules: {
       required: value => !!value || 'Requerido',
-      min: v => v.length >= 8 || 'Míninmo 8 caracters',
+      min: v => v.length >= 3 || 'Míninmo 3 caracters',
     },
     usernameRules: [
       v => !!v || 'El nopmbre es requerido',
-      v => (v && v.length <= 10) || 'Hasta 10 caraceres',
+      v => (v && v.length <= 15) || 'Hasta 15 caraceres',
     ],
     emailRules: [
       v => !!v || 'E-mail es requerido',

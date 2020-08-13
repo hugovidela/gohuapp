@@ -10,7 +10,11 @@
         class="elevation-3"
         :footer-props="footerProps">
         <template v-slot:top>
-          <v-system-bar color="indigo darken-2" dark></v-system-bar>
+          <v-system-bar color="indigo darken-2" dark>
+            <v-btn icon @click="closeForm">
+              <v-icon color="white" dark>mdi-close-circle</v-icon>
+            </v-btn>
+          </v-system-bar>
           <v-toolbar flat color="indigo">
 
             <template v-slot:extension>
@@ -225,6 +229,9 @@ export default {
   },
   */
   methods: {
+    closeForm(){
+      router.push('/')
+    },
     activarDesactivar(item) {
       const valor = item.activo ? 0 : 1;
       item.activo = valor

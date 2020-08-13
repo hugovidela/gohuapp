@@ -7,7 +7,6 @@ class AfipComprobanteController {
 
   async index ({ auth }) {
     const user = await auth.getUser()
-    // return await AfipComprobante.all()
     return await AfipComprobante.query()
     .where('abrev','<>','null')
     .orderBy('nombre')
