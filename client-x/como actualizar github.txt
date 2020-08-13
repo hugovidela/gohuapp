@@ -1,0 +1,4 @@
+posicionarse en cliente-x
+git add .
+git commit -m "nombre de la actualizacion"
+git push
