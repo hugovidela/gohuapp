@@ -31,13 +31,17 @@ export default new Vuex.Store({
     sucursal: '',
     sucursales: [],
     notificaciones: [],
+    notificacionesgohu: [],
+    articulosVinculados: [],
     sucursalFiscal: '',
     colorSucursal: '',
-    articulosVinculados: [],
     caja: '',
     tipo: '',
     level: null,
+    activo: null,
     empresa: null,
+    responsable: null,
+    cuit: null,
     operario: null,
     baseUrl: '/api',
     snackbar: {
@@ -104,6 +108,9 @@ export default new Vuex.Store({
     setNotificaciones(state, payload) {
       state.notificaciones = payload;
     },
+    setNotificacionesgohu(state, payload) {
+      state.notificacionesgohu = payload;
+    },
     actNotificacion(state, payload) {
       for (let i=0; i<=state.notificaciones.length-1; i++) {
         if (payload== state.notificaciones[i].id) {
@@ -126,6 +133,15 @@ export default new Vuex.Store({
     },
     setEmpresa(state, payload) {
       state.empresa = payload;
+    },
+    setActivo(state, payload) {
+      state.activo = payload;
+    },
+    setResponsable(state, payload) {
+      state.responsable = payload;
+    },
+    setCuit(state, payload) {
+      state.cuit = payload;
     },
     setOperario(state, payload) {
       state.operario = payload;

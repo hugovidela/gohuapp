@@ -295,6 +295,7 @@ export default {
       router.push('/')
     },
     filtrar() {
+      debugger
       return HTTP().get(`/userarticulosprecios/${rubro}/${lista}/${marca}/${grupo}`)
         .then(({ data }) => {
           if (data) {
@@ -321,6 +322,7 @@ export default {
     },
 
     cargarXls() {
+      debugger
       if (this.nuevoXls.name != undefined) {
         try {
           this.xlsCargado = true;
@@ -334,6 +336,7 @@ export default {
             let dataset = await this.parseFileContent(sheet);
           }.bind(this);
           reader.readAsArrayBuffer(file);
+          debugger
           this.chequearArt()
         } catch (exception) {
         }
@@ -356,10 +359,12 @@ export default {
       this.encontradosXls = 0;
       let tmp = []
       let preciosIguales = 0;
+      debugger
       // ver de poner el rubro, por ahora van todos.
       let a = HTTP().get('/userarticulosmisprecios/'+this.lista_id)
         .then(({ data }) => {
           if (data) {
+            debugger
             for (let i=0; i<=data.length-1; i++) {
               this.mios.push({ codigo: data[i].codigo, precio: data[i].costo })
             }
@@ -376,6 +381,7 @@ export default {
             let lDone = true;
 
             // VER DE HACER UN APAREO, QUE VENGAN LAS DOS LISTAS ORDENADAS POR CODIGO PARA ELLO.
+            debugger
             while (lDone) {
               cod1 = this.items[pos1].codigo 
               cod2 = this.mios[pos2].codigo 
@@ -425,11 +431,6 @@ export default {
     async actualizarPrecios() {
       //ACA TIENE QUE CREAR UN ARCHIVO EXCEL CON LOS PRECIOS SELECCIONADOS
       //Y LUEGO ENVIARLO AL PROCESO DE ACTUALIZACION
-
-      // ESTO VA, PERO TENGO QUE VER COMO GENERARLO O SI DIRECTAMENTE
-      // TOMO EL ARCHIVO SELECCIONADO QUE ANDA.
-
-      /*
       let arr = []
       for (let i=0; i<=this.items.length-1; i++) {
         if (this.items[i].estado!='X') {
@@ -441,13 +442,13 @@ export default {
       const filename = 'precios.xlsx'
       XLSX.utils.book_append_sheet(workbook, data, filename)
       let f = XLSX.writeFile(workbook, filename)
-      */
+
+      debugger
       let formData = new FormData();
-      formData.append('file', this.nuevoXls );
-      formData.append('lista', this.lista_id );
+      formData.append('file', f );
+
       await HTTP().post('/actualizaprecios', formData)
         .then(({ response }) => { 
-          debugger
           console.log('SUCCESS!!');
         })
     }

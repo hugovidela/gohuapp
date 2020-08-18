@@ -8,13 +8,12 @@
         dense
         class="elevation-3"
         :footer-props="footerProps">
+
         <template v-slot:top>
-          <v-system-bar color="indigo darken-2" dark>
+          <v-toolbar flat :color="colorSucursal">
             <v-btn icon @click="closeForm">
               <v-icon color="white" dark>mdi-close-circle</v-icon>
             </v-btn>
-          </v-system-bar>
-          <v-toolbar flat color="indigo">
             <template v-slot:extension>
               <v-tooltip bottom>
                 <template v-slot:activator="{ on, attrs }">
@@ -177,8 +176,7 @@
             </template>
             <v-toolbar-title
               class="white--text" @click="listarHTTP($store.state.sucursal)" v-model="sucursal">
-              Central de Ventas sucursal ({{ sucursal }})
-              caja ({{ caja }})
+              Central de Ventas - sucursal ({{ sucursal }}) - caja ({{ caja }})
             </v-toolbar-title>
             <v-divider class="mx-4" inset vertical></v-divider>
             <v-spacer></v-spacer>
@@ -187,18 +185,16 @@
               <template v-slot:activator="{ on }"></template>
               <v-card>
 
-                <v-card-title  class="cyan white--text">
-                  <span class="headline">{{ formTitle }}</span>
+                <v-toolbar flat dark :color="colorSucursal">
+                  <v-btn icon @click="cancelar">
+                    <v-icon color="white" dark>mdi-close-circle</v-icon>
+                  </v-btn>
+                  <span class="headdline">{{ formTitle }}</span>
                   <v-spacer></v-spacer>
-                  <span class="text--right">
-                    <v-btn
-                      color="blue-grey" class="ma-2 white--text" @click="cancelar">Cancelar
-                    </v-btn>
-                    <v-btn
-                      color="teal accent-4" class="ma-2 white--text" @click="guardar">Guardar
-                    </v-btn>
-                  </span>
-                </v-card-title>
+                  <v-btn
+                    color="teal accent-4" class="ma-2 white--text" @click="guardar">Guardar
+                  </v-btn>
+                </v-toolbar>
 
                 <v-form ref="form">
                   <v-card-text>
@@ -363,9 +359,9 @@
                                             :items="itemsArticulos"
                                             :loading="isLoadingArticulos"
                                             :search-input.sync="searchArticulos"
-                                            class="caption"
                                             item-text="nombre"
                                             item-value="id"
+                                            autofocus
                                             label="Articulo"
                                             placeholder="Escriba para buscar"
                                             prepend-icon="mdi-database-search">
@@ -912,8 +908,9 @@ export default {
         align: 'left',
         sortable: false,
         value: 'id',
+        width: 80,
       },
-      { text: 'FECHA', value:'fecha', width: 80},
+      { text: 'FECHA', value:'fecha', width: 90},
       { text: 'COMPROBANTE', value:'cpr', width: 173},
       { text: 'CLIENTE', value:'tercero.nombre', width: 200},
       { text: 'TOTAL', value:'total', align: 'end', width: 120},
@@ -1012,7 +1009,7 @@ export default {
       iva_id: '',
       ivaNombre: '',
       cantidad: 1,
-      stock: 1,
+      stock: 0,
       costo: 0,
       precio: 0,
       preciooriginal: 0,
@@ -1035,7 +1032,7 @@ export default {
       iva_id: '',
       ivaNombre: '',
       cantidad: 1,
-      stock: 1,
+      stock: 0,
       costo: 0,
       precio: 0,
       preciooriginal: 0,
@@ -1064,9 +1061,22 @@ export default {
     search: null,
   }),
   computed: {
-    ...mapGetters('authentication', ['isLoggedIn', 'userName', 'userId', 'sucursal', 'sucursalFiscal', 'caja']),
-    ...mapMutations(['alert','closeAlert']),
-    ...mapState(['sucursal','sucursalFiscal']),
+    ...mapGetters('authentication', ['isLoggedIn', 'userName', 'userId']),
+    ...mapState([
+      'sucursal',
+      'sucursales',
+      'sucursalFiscal',
+      'notificaciones',
+      'caja',
+      'articulosViculados',
+      'colorSucursal',
+      'empresa',
+      'responsable',
+      'cuit',
+      'operario',
+      'level',
+    ]),    
+
     itemsTerceros () {
       return this.entriesTerceros.map(entry => {
         const nombre = entry.nombre.length > this.descriptionLimit
@@ -1100,7 +1110,6 @@ export default {
     },
     */
     '$store.state.sucursal' () {
-      debugger
       let xxx = this.sucursal
       this.listarHTTP(this.sucursal)
     },
@@ -1108,13 +1117,11 @@ export default {
       // Items have already been loaded
       // if (this.entriesPaises.length > 0) return
       // Items have already been requested
-      debugger
       if (this.isLoadingTerceros) return
       this.isLoadingTerceros = true
       // Lazily load input items
       return HTTP().get('/usersclientes/false')
         .then(({ data }) => {
-          debugger
           this.entriesTerceros = []
           this.tercerosUserId = []
           for (let i=0; i<= data.length-1; i++) {
@@ -1131,19 +1138,19 @@ export default {
             }
             let valor = this.tercerosUserId[ipos]
             let entro = false;
+            //debugger
             return HTTP().get('/tercero/'+valor)
               .then(({ data }) => {
                 this.medItems = [];
                 this.lisObj = [];
-                // debugger
                 let rid = data[0].tercero.responsable.id
-                if (this.cfUser===1) { //EL USUARIO ES RESPONSABLE INSCRIPTO
+                if (this.responsable===1) { //EL USUARIO ES RESPONSABLE INSCRIPTO ( VIENE DEL STORE )
                   if(rid===1 || rid===2 || rid===9 || rid===11) {
                     this.editado.letra = 'A'
                   } else {
                     this.editado.letra = 'B'
                   }
-                } else if (this.cfUser===6) { //EL USUARIO ES MONOTRIBUTISTA
+                } else if (this.responsable===6) { //EL USUARIO ES MONOTRIBUTISTA ( VIENE DEL STORE )
                     this.editado.letra = 'C'
                 }
 
@@ -1181,11 +1188,11 @@ export default {
                     }
                   })
                 }
-                debugger
                 this.editado.medio_id = this.medItems[0]
                 this.editado.lista_id = this.lisItems[0].id
                 this.editado.deposito_id = this.depItems[0].id
-                this.cfUser = Number(data[0].tercero.responsable.codigo)
+                //debugger
+                
 
                 // debugger
                 if (data[0].terceroListas.length > 0) {
@@ -1212,65 +1219,76 @@ export default {
       if (this.isLoadingArticulos) return
       this.isLoadingArticulos = true
       // Lazily load input items
-      return HTTP().get('/userarticulos')         // /userarticulos
-        .then(({ data }) => {
+      let v = this.$store.state.articulosVinculados
+      //debugger
 
-          // debugger
+      return HTTP().post('/userarticulosfac', { search: val, vinculos: v} )
+      //return HTTP().get('/userarticulosfac/'+val+'/'+v)         // /userarticulos
+        .then(({ data }) => {
           this.entriesArticulos = []
           data.forEach(e => {
-            let art = e.articulo
-            this.entriesArticulos.push(art)
+            this.entriesArticulos.push(e)
           })
-
-          let ipos = -1
-          // debugger
-          for (let i=0; i<=this.entriesArticulos.length-1; i++) {
-            if (this.editadoArt.articulo_id === this.entriesArticulos[i].id) {
-              ipos = i
-              break
+          //debugger
+          console.log('paso...')
+          if (val !== null && val !== '') {
+            let ipos = 0
+            for (let i=0; i<=this.entriesArticulos.length-1; i++) {
+              if (this.editadoArt.articulo_id === this.entriesArticulos[i].id) {
+                ipos = i
+                break
+              }
             }
+
+            this.editadoArt.codigo = this.entriesArticulos[ipos].codigo;
+            this.editadoArt.nombre = this.entriesArticulos[ipos].nombre;
+            this.editadoArt.codbar = this.entriesArticulos[ipos].codbar;
+  
+            let iArt = this.entriesArticulos[ipos].id
+            let iLis = this.editado.lista_id
+            //debugger
+            return HTTP().get('/precio/'+iArt+'/'+iLis)
+              .then(({ data }) => {
+                
+                this.editadoArt.precio = data[0].precio
+                this.editadoArt.total = data[0].precio
+                this.editadoArt.tasadesuento = 0
+                this.editadoArt.importedescuento = 0
+                
+  //            this.uniItems = this.entriesArticulos[ipos].umventa;
+  //            this.monItems = this.entriesArticulos[ipos].moneda;
+  //            this.ivaItems = this.entriesArticulos[ipos].iva;
+  
+                this.editadoArt.deposito_id = this.depItems[0].id
+  
+                //debugger
+                this.editadoArt.unidad_id = this.entriesArticulos[ipos].unimedid
+                this.editadoArt.moneda_id = this.entriesArticulos[ipos].monedaid
+                this.editadoArt.iva_id = this.entriesArticulos[ipos].ivaid
+                this.editadoArt.monedaNombre = this.entriesArticulos[ipos].simbolo
+                this.editadoArt.unidadNombre = this.entriesArticulos[ipos].unimed
+                this.editadoArt.ivaNombre = this.entriesArticulos[ipos].tasa
+  
+  //              this.editadoArt.unidad_id = this.uniItems.id
+  //              this.editadoArt.unidadNombre = this.uniItems.nombre
+  //              this.editadoArt.moneda_id = this.monItems.id
+  //              this.editadoArt.monedaNombre = this.monItems.simbolo
+  //              this.editadoArt.iva_id = this.ivaItems.id
+  //              this.editadoArt.ivaNombre = this.ivaItems.nombre
+  
+                //debugger
+                let iDep = this.editadoArt.deposito_id
+                
+                return HTTP().get('/stock/'+iArt+'/'+iDep)
+                  .then(({ data }) => {
+                    if(data) {
+                      this.editadoArt.stock = data
+                    } else {
+                      this.editadoArt.stock = 0
+                    }
+                })
+            })
           }
-
-          this.editadoArt.codigo = this.entriesArticulos[ipos].codigo;
-          this.editadoArt.nombre = this.entriesArticulos[ipos].nombre;
-          this.editadoArt.codbar = this.entriesArticulos[ipos].codbar;
-
-          let iArt = this.entriesArticulos[ipos].id
-          let iLis = this.editado.lista_id
-          debugger
-          return HTTP().get('/precio/'+iArt+'/'+iLis)
-            .then(({ data }) => {
-              
-              this.editadoArt.precio = data[0].precio
-              this.editadoArt.total = data[0].precio
-              this.editadoArt.tasadesuento = 0
-              this.editadoArt.importedescuento = 0
-              this.uniItems = this.entriesArticulos[ipos].umventa;
-              this.monItems = this.entriesArticulos[ipos].moneda;
-              this.ivaItems = this.entriesArticulos[ipos].iva;
-              this.editadoArt.deposito_id = this.depItems[0].id
-              this.editadoArt.unidad_id = this.uniItems.id
-              this.editadoArt.unidadNombre = this.uniItems.nombre
-              this.editadoArt.moneda_id = this.monItems.id
-              this.editadoArt.monedaNombre = this.monItems.simbolo
-              this.editadoArt.iva_id = this.ivaItems.id
-              this.editadoArt.ivaNombre = this.ivaItems.nombre
-
-              debugger
-              let iDep = this.editadoArt.deposito_id
-              
-              debugger
-              return HTTP().get('/stock/'+iArt+'/'+iDep)
-                .then(({ data }) => {
-                  debugger
-                  if(data) {
-                    this.stock = data
-                  } else {
-                    this.stock = 0
-                  }
-              })
-
-          })
 
         })
         .catch(err => {
@@ -1303,7 +1321,7 @@ export default {
     if (!this.isLoggedIn) {
       return router.push('/login');
     } else {
-      debugger
+      //debugger
       return this.listarHTTP(this.sucursal)
 //    return this.listarHTTP(this.$store.state.sucursal)
     }
@@ -1355,6 +1373,20 @@ export default {
 
   },
   methods: {
+    ...mapMutations([
+      'alert',
+      'closeAlert',
+      'setSucursal',
+      'setSucursales',
+      'setSucursalFiscal',
+      'setNotificaciones',
+      'setCaja',
+      'setArticulosVinculados',
+      'setColorSucursal',
+      'setEmpresa',
+      'setOperario',
+      'setLevel',
+    ]),
     closeForm(){
       router.push('/')
     },
@@ -1423,7 +1455,8 @@ export default {
       return this.editadoArt.total
     },
     nuevo(que) {
-
+      debugger
+      
       // SI "que" VIENE CON DATOS, ES PORQUE ESTOY HACIENDO UN COMPROBANTE BASADO EN OTRO
 
       this.dialog = true;
@@ -1476,15 +1509,15 @@ export default {
       this.editadoArt = Object.assign({}, this.defaultItemArt);
       this.editado = Object.assign({}, this.defaultItem);
       if (que === 'fac') {
-        this.formTitle = 'Nueva Factura Sucursal ('+this.sucursal+')'+ ' Caja ('+this.caja+')';
+        this.formTitle = 'Nueva Factura - Sucursal ('+this.sucursal+')'+ ' - Caja ('+this.caja+')';
         this.editado.cpr = 'FAC';
         this.coef = 1;
       } else if (que === 'ndc') {
-        this.formTitle = 'Nueva Nota de Crédito Sucursal ('+this.sucursal+')'+ ' Caja ('+this.caja+')';
+        this.formTitle = 'Nueva Nota de Crédito Sucursal - ('+this.sucursal+')'+ ' - Caja ('+this.caja+')';
         this.editado.cpr = 'NDC';
         this.coef = -1;
       } else if (que === 'ndd') {
-        this.formTitle = 'Nueva Nota de Débito Sucursal ('+this.sucursal+')'+ ' Caja ('+this.caja+')';
+        this.formTitle = 'Nueva Nota de Débito - Sucursal ('+this.sucursal+')'+ ' - Caja ('+this.caja+')';
         this.editado.cpr = 'NDD';
         this.coef = 1;
       } else if (que === 'rem') {
@@ -1514,6 +1547,7 @@ export default {
       } else if (que === 'nddfac') {
         this.formTitle = 'Aplicar Nota de Débito a Factura'
       } else if (que.cpr.substring(0,3)=='PED') {
+
         this.formTitle = 'Facturar el Pedido '+que.cpr+' - ('+que.tercero.nombre+')'
         this.searchTerceros = ''
         this.isLoadingTerceros = true // PARA QUE NO BUSQUE EL TERCERO, YA LO TENGO
@@ -1596,6 +1630,7 @@ export default {
       if (this.editedIndex > -1) { // esta modificando
         // var doc = new jsPDF('p', 'pt', 'letter');
 
+        debugger
         var doc = new jsPDF();
 
         doc.setFontStyle("bold");
@@ -1655,13 +1690,13 @@ export default {
         doc.text ( this.items[this.editedIndex].tercero.nombre, 141, 83 )
         doc.text ( this.items[this.editedIndex].tercero.responsable.nombre, 43, 89 )
         doc.text ( 'CONTADO', 46, 95 )
-
-        doc.text ( this.items[this.editedIndex].direccion.calle0.nombre+' '+
-                   this.items[this.editedIndex].direccion.numero+ ' (' +
-                   this.items[this.editedIndex].direccion.postal.codigo+ '-' +
-                   this.items[this.editedIndex].direccion.postal.nombre+ ')-' +
-                   this.items[this.editedIndex].direccion.postal.provincia.nombre+ '-' +
-                   this.items[this.editedIndex].direccion.postal.provincia.pais.nombre, 106, 89 )
+        debugger
+        doc.text ( this.items[this.editedIndex].tercero.direcciones[0].calle0.nombre+' '+
+                   this.items[this.editedIndex].tercero.direcciones[0].numero+ ' (' +
+                   this.items[this.editedIndex].tercero.direcciones[0].postal.codigo+ '-' +
+                   this.items[this.editedIndex].tercero.direcciones[0].postal.nombre+ ')-' +
+                   this.items[this.editedIndex].tercero.direcciones[0].postal.provincia.nombre+ '-' +
+                   this.items[this.editedIndex].tercero.direcciones[0].postal.provincia.pais.nombre, 106, 89 )
 
         doc.rect(  10,  10, 190,  10);     // segundo rectangulo
         doc.rect(  10,  20, 190,  45);     // primer rectangulo
@@ -1774,7 +1809,7 @@ export default {
             this.artPed[i].nuevostock = this.artPed[i].stock - this.artPed[i].cttent
         })
       }
-      debugger
+      //debugger
       this.dialogPed = true;
 
     },
@@ -1833,7 +1868,7 @@ export default {
       });
     },
     altaHTTP:function() {
-      debugger
+      //debugger
       let pf = moment().format('YYYYMM');
       let s = this.sucursalFiscal
 
@@ -1917,7 +1952,7 @@ export default {
       this.mensaje('¡Alta Exitosa!', 'blue', 1500) 
 
       // Si es efectivo debo agregar el pago en 'valores' para que grabe en efectivo
-      debugger
+      //debugger
       for (let i=0; i<=this.articulos.length-1; i++) {
         this.articulos[i].stock*=(this.coef*-1)
       }
@@ -1941,7 +1976,7 @@ export default {
       } 
       if (Number(this.valCtaCte) !== 0) {
         // Si es ctacte agrego en 'pendientes' para que grabe la cuenta corriente
-        debugger
+        //debugger
         this.pendientes.push({ 
           comprobante_id: null,
           vencimiento: moment(new Date).add(30, 'd').format('YYYY-MM-DD'),
@@ -2015,6 +2050,7 @@ export default {
     },
 
     calculos() {
+      debugger
       let gra = 0
       let exe = 0
       let iva = 0
@@ -2053,7 +2089,7 @@ export default {
       this.valEfectivo = (this.editado.total-(this.valCtaCte+this.valValores))
     },
     calculosValores(cual) {
-      debugger
+      //debugger
       if (cual=='E') {
         if (this.ctacte) {
           this.valCtaCte = this.roundTo((Number(this.editado.total) - (Number(this.valEfectivo)+Number(this.valValores))),2)

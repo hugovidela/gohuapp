@@ -11,13 +11,6 @@
         :footer-props="footerProps"
         class="elevation-1">
         <template v-slot:top>
-          <!--
-          <v-system-bar color="indigo darken-2" dark>
-            <v-btn icon @click="closeForm">
-              <v-icon color="white" dark>mdi-close-circle</v-icon>
-            </v-btn>
-          </v-system-bar>
-          -->
           <v-toolbar flat :color="colorSucursal">
             <v-btn icon @click="closeForm">
               <v-icon color="white" dark>mdi-close-circle</v-icon>
@@ -40,8 +33,7 @@
               </v-btn>
             </template>
 
-            <v-toolbar-title class="white--text">Mis Artículos</v-toolbar-title>
-            <!--<v-divider class="mx-4" inset vertical></v-divider>-->
+            <v-toolbar-title class="body-1 white--text">Mis Artículos</v-toolbar-title>
             <v-spacer></v-spacer>
 
             <!--  Modal del diálogo para Alta y Edicion    -->
@@ -49,43 +41,18 @@
               <template v-slot:activator="{ on }"></template>
               <v-card>
                 <!-- para el EDICION-->
-
                 <v-toolbar flat dark :color="colorSucursal">
                   <v-btn icon @click="cancelar">
                     <v-icon color="white" dark>mdi-close-circle</v-icon>
                   </v-btn>
                   <span class="headdline">{{ formTitle }}</span>
                   <v-spacer></v-spacer>
-                  <!--<div v-if="icono!='mdi-glasses' || editedIndex===-1">-->
                   <div v-if="elArticuloEsMio || editedIndex===-1">
                     <v-btn
                       color="teal accent-4" class="ma-2 white--text" @click="guardar">Guardar
                     </v-btn>
                   </div>
                 </v-toolbar>
-                <!--
-                <v-card-title  class="cyan white--text">
-                  <span class="headline">{{ formTitle }}</span>
-                  <v-spacer></v-spacer>
-                  <span class="text--right">
-                    <div v-if="icono!='mdi-glasses'">
-                      <v-btn
-                        color="blue-grey" class="ma-2 white--text" @click="cancelar">Cancelar
-                      </v-btn>
-                    </div>
-                    <div v-else>
-                      <v-btn
-                        color="blue-grey" class="ma-2 white--text" @click="cancelar">Cerrar
-                      </v-btn>
-                    </div>
-                    <div v-if="icono!='mdi-glasses'">
-                      <v-btn
-                        color="teal accent-4" class="ma-2 white--text" @click="guardar">Guardar
-                      </v-btn>
-                    </div>
-                  </span>
-                </v-card-title>
-                -->
                 <v-form ref="form">
                   <v-card-text>
                     <v-container>
@@ -159,7 +126,6 @@
                                 </v-row>
                                 <v-row>
                                   <v-col cols="12" sx="12" mx="12">
-
                                     <v-autocomplete
                                       class="body-2"
                                       v-model="editado.marca_id"
@@ -172,17 +138,6 @@
                                       placeholder="Escriba para buscar"
                                       prepend-icon="mdi-database-search">
                                     </v-autocomplete>
-<!--
-                                    <v-select
-                                      label="Marca"
-                                      dense
-                                      v-model="editado.marca_id"
-                                      :items="marItems" item-value="id"
-                                      item-text="nombre"
-                                      autocomplete
-                                      return-object>
-                                    </v-select>
--->
                                   </v-col>
                                 </v-row>
                                 <v-row align="center">
@@ -395,11 +350,8 @@
                                 hide-default-footer>
                               </v-data-table>
                             </v-col>
-
                           </v-row>
-
                         </v-tab-item>
-
                         <v-tab href="#precios">
                           Precios
                         </v-tab>
@@ -486,19 +438,6 @@
                             <template v-slot:item.editadoLis.costo="{ item }">
                               <span disable dark>{{ formatoImporte(item.editadoLis.costo) }}</span>
                             </template>
-                            <!--
-                            <template v-slot:item.editadoLis.preciofinal="{ item }">
-                              <span disable dark>{{ precioFinal(item.editadoLis.precio) }}</span>
-                            </template>
-                            -->
-                            <!--
-                            <template v-slot:item.porrem="{ item }">
-                              <span disable dark>{{ formatoImporte(item.porrem) }}</span>
-                            </template>
-                            <template v-slot:item.precio="{ item }">
-                              <span disable dark>{{ formatoImporte(item.precio) }}</span>
-                            </template>
-                            -->
                             <template v-slot:item.accion="{item}">
                               <v-btn
                                 class="mr-2" fab dark x-small color="cyan"
@@ -507,9 +446,7 @@
                               </v-btn>
                             </template>
                           </v-data-table>
-
                         </v-tab-item>
-
                         <v-tab href="#caracteristicas">
                           Caracteristicas
                         </v-tab>
@@ -533,55 +470,6 @@
                               ></v-select>
                             </v-col>
                           </v-row>
-                          <!--
-                          <v-row>
-                            <v-col cols="6" sm="6" md="6">
-                              <p>Tags disponibles</p>
-                              <v-card>
-                                <v-card-text>
-                                  <v-row>
-                                    <v-col cols="3" sm="3" md="3"
-                                      v-for="item in categories" :key="item.nombre">
-                                      <v-chip
-                                        v-if="!selected.includes(item)"
-                                        :key="item.nombre"
-                                        :disabled="loading"
-                                        @click="selected.push(item)"
-                                        class="caption">
-                                        {{item.nombre}}
-                                      </v-chip>
-                                    </v-col>
-                                  </v-row>
-                                </v-card-text>
-                              </v-card>
-                            </v-col>
-
-                            <v-col cols="6" sm="6" md="6">
-                              <p>Tags asignados al artículo</p>
-                              <v-card>
-                                <v-card-text>
-                                  <v-container class="py-0">
-                                    <v-row>
-                                      <v-col cols="3" sm="3" md="3"
-                                        v-for="(selection, i) in selections"
-                                        :key="selection.text"
-                                        class="shrink">
-                                        <v-chip
-                                          :disabled="loading"
-                                          close
-                                          class="caption"
-                                          @click:close="selected.splice(i, 1)">
-                                          {{ selection.nombre }}
-                                        </v-chip>
-                                      </v-col>
-                                    </v-row>
-                                  </v-container>
-                                </v-card-text>
-                              </v-card>
-                            </v-col>
-                          </v-row>
-                          -->
-
                         </v-tab-item>
 
                         <v-tab href="#fotos">
@@ -1009,58 +897,14 @@ export default {
         return Object.assign({}, entry, { nombre })
       })
     },
-
-    // MANEJO DE CHIPS //
-    /*
-    allSelected () {
-      return this.selected.length === this.tagsDisp.length
-    },
-    categories () {
-      const search = this.searchTag.toLowerCase()
-      if (!search) return this.tagsDisp
-      return this.tagsDisp.filter(item => {
-        const text = item.nombre.toLowerCase()
-        return text.indexOf(search) > -1
-      })
-    },
-    selections () {
-      const selections = []
-      for (const selection of this.selected) {
-        selections.push(selection)
-      }
-      return selections
-    },
-    */
-    // MANEJO DE CHIPS //
-
   },
   watch: {
     /*
     selected () {
       this.search = ''
     },
-    */
-    /*
     dialog (val) {
       val || this.cancelar();
-    },
-    */
-   /*
-    searchRubros (val) {
-      // Items have already been loaded
-      // if (this.items.length > 0) return
-      // Items have already been requested
-      if (this.isLoadingRubros) return
-      this.isLoadingRubros = true
-      // Lazily load input items
-      return HTTP().get('/rubros')
-        .then(({ data }) => {
-          this.entriesRubros = data;
-        })
-        .catch(err => {
-          console.log(err)
-        })
-        .finally(() => (this.isLoadingRubros = false))
     },
     */
     searchGrupos (val) {
@@ -1202,7 +1046,6 @@ export default {
     if (!this.isLoggedIn) {
       return router.push('/login');
     } else {
-
       return HTTP().get('/tags')
         .then(({ data }) => {
           this.tagItems = [];
@@ -1221,36 +1064,7 @@ export default {
               })
             });
           });
-        };
-
-      //cargo los tags disponibles
-      /*
-      const a = HTTP().get('/tags')
-        .then(({ data }) => {
-          this.tagItems = [];
-          this.tagObj = [];
-          data.forEach(element => {
-            this.tagItems.push(element.nombre)
-            this.tagObj.push(element)
-          })
-        });
-      const b = HTTP().get('/usersrubros')
-        .then(({ data }) => {
-          this.rubItems = [];
-          this.rubObj = [];
-          data.forEach(element => {
-            this.rubItems.push(element.rubro.nombre)
-            this.rubObj.push(element.rubro)
-          })
-        });
-      const c = HTTP().get('/articulosvinculos')
-        .then(({ data }) => {
-          this.vintems = [];
-          data.forEach(element => {
-            this.vinItems.push(element.user_id_hasta)
-          })
-        });
-      */
+    };
   },
   created () {
     this.listarHTTP();
@@ -1312,12 +1126,6 @@ export default {
         this.editado.precios[i].precio = this.roundTo(this.costo * (1+(this.editado.precios[i].porrem/100)),2)
         this.editado.precios[i].precioFinal = this.roundTo(this.editado.precios[i].precio * (1+(this.editado.iva.tasa/100)),2)
       }
-      /*
-      for (let i=0; i<= this.lisItems.length-1; i++) {
-        this.lisItems[i].costo = Number(this.costo)
-        this.lisItems[i].precio = this.roundTo(this.costo * (1+(this.lisItems[i].porrem/100)),2)
-      }
-      */
     },
     porrem() {
       this.editadoLis.precio = this.roundTo(this.editadoLis.costo * (1+(this.editadoLis.porrem/100)),2)
@@ -1327,13 +1135,6 @@ export default {
       this.editadoLis.porrem = this.roundTo(((this.editadoLis.precio / this.editadoLis.costo )-1)*100,2)
       return this.editadoLis.precio
     },
-    /*
-    precioFinal(){
-      this.editadoLis.precioFinal = this.roundTo(((this.editadoLis.precio * this.editado.tasaiva )-1)*100,2)
-      return this.editadoLis.precioFinal
-    },
-    */
-
     nuevoArticulo() {
       this.editedIndex = -1;
       this.dialog = true;
@@ -1419,24 +1220,6 @@ export default {
           }
       });
     },    
-    // Procedimiento Listar, levanta desde el controlador User metodo articulos path userarticulos
-    // Se filtran los articulos cuyo rubros esten dentro de los rubros asignados al usuario.
-    // Luego para todas las otras tareas del crud se utiliza el controlador de Articulos.
-    // Por lo tanto this.modelo es = a 'articulos'
-
-    /*
-    listarHTTP:function() {
-      return HTTP().get('/userarticulos')
-        .then(({ data }) => {
-          this.items = []
-          for(let i=0; i<data.data.length; i++) {
-            this.items.push(data.data[i].articulo)
-//          this.items.push(data[i].articulo)
-          }
-        });
-    },
-    */
-
     listarHTTP () {
       let localThis = this
       this.loading = true
@@ -1471,7 +1254,6 @@ export default {
     editarHTTP:function(data) {
       return HTTP().patch(`${this.modelo}/${data.id}`, data)
         .then(() => {
-
           this.listarHTTP()
           .then(data => {
             this.items = []
@@ -1480,7 +1262,6 @@ export default {
             }
             this.totalItems = data.total
           })
-
 //        this.listarHTTP();
         });
     },
@@ -1534,13 +1315,6 @@ export default {
           this.dialog = true;
 
           // CARGO RUBROS, TAGS Y PRECIOS DEL ARTICULO
-          /*
-          for (let i=0; i<=this.marItems.length-1; i++) {
-            if (this.marItems[i].id == this.editado.marca_id) {
-              break
-            }
-          }
-          */
           this.rubValue = []
           this.tagValue = []
           this.stocks = []
@@ -1727,14 +1501,7 @@ export default {
         }
       }
       this.editado.tags = aux;
-
-      //this.tags = this.selected;
-      //this.rubros = this.rubValue;
-      //this.tags = this.tagValue;
-      //this.editado.tags = this.tagValue;
-      //this.editado.rubros = this.rubValue;
       this.fotos = this.editado.fotos;
-
       if (this.editedIndex > -1) { // esta modificando
         this.id = this.editado.id;
         this.mensaje('¡Actualización Exitosa!', 'black', 1500) 

@@ -5,9 +5,110 @@
     <p>@2020</p>
     <p> y las notificaciones son:{{ notificaciones }}</p>
     -->
-    <v-layout align-start>
+    <v-layout align-right>
       <v-flex>
+        <div v-show="sayAviso">
+          <v-container fluid>
+            <v-card height="550" width="1270" class="mx-auto">
+              <v-list-item>
+                <v-list-item-avatar color="grey">
+                  <img src="https://cdn.vuetifyjs.com/images/john.jpg" alt="John">
+                </v-list-item-avatar>
+                <v-list-item-content>
+                  <v-list-item-title class="caption">
+                    Gohu
+                  </v-list-item-title>
+                  <v-list-item-subtitle></v-list-item-subtitle>
+                </v-list-item-content>
+              </v-list-item>
+              <v-card-subtitle class="pb-0">
+                Un sistema ERP (por sus siglas en inglés, Enterprise Resource Planning)
+                es un conjunto de sistemas de información que ayudan a gestionar y controlar
+                de mejor manera las operaciones de una empresa.
+              </v-card-subtitle>
+              <v-card-text class="text--primary">
+                <div>
+                  <br>
+                  <b>gohu</b> es un ERP fácil de utilizar en el cual todo esta integrado<br><br>
+                  Comparta clientes, proveedores, artículos y muchos mas datos con el resto de
+                  usuarios gohu. Genere vinculos con sus clientes y proveedores y podra disfrutar
+                  de un sistema que lo comparte todo...<br>si ud quiere.<br>
+                  Podra enviar pedidos a sus proveedores, este recibirlos, procesarlos y
+                  facturarlos. En ese instante le aparecera el comprobante en su tablero,
+                  lo confirma y... va a tener tiempo para tomarse un café.<br>
+                  porque ya esta todo listo. El comprobante ingresara como una compra y actualizara
+                  todo como si Ud la hubiese cargado...,si le hace mal el cafe la opción puede ser
+                  un te. Y asi con todos los comprobantes, facturas, recibos, presupuestos
+                  remitos, pagos, etc etc etc...Le gustan las limonadas? Es la otra opción<br><br>
+                  Hay un monton de opciones de integracion en gohu, este es solo un ejemplo.
+                  <br>
+                  En gohu aprendimos a compartir, el mundo web es un mundo principalemte
+                  colaborativo. Mas alla de eso necesitamos cobrar el uso del sistema, si,
+                  tenemos gastos que cubrir, programadores, asistentes, servidores, y un lagro etc.
+                  <br>
+                  <br>
+                  No obstante, los costos de utilizacion de gohu son muy accesibles:
+                  <br>Plan <b>base</b> a 20 dolares por mes.
+                  <br>Plan <b>gohu</b> a 40 dolares por mes.
+                  <br>
+                  Para saber si gohu puede servirle o no, revise la documentacion <b>aqui</b>
+                  y los videos <b>aqui</b>, que le ayudaran a comprender que puede hacer con esta
+                  herramienta.
+                  <br>
+                  Para comenzar a utilizar gohu debera realizar un pago inicial de 10 dolares que
+                  cubriran el pimer mes de uso del sistema. Luego este valor pasara el valor segun
+                  el plan seleccioando.
+                  <br>
+                </div>
+                <div v-show="!yaEstaNotificado">
+                  <br>
+                    Envia una
+                    <v-btn @click="notificar">
+                      notifiacion
+                    </v-btn>
+                    a gohu y comienza a utilizar el sistema.
+                </div>
+                <div v-show="yaEstaNotificado">
+                  <br>
+                  <b>Gohu ya esta notificado de su pedido. En breve sera contactado para avanzar
+                  con el registro y configuracion del sistema. Dede ya, muchas gracias por
+                  apoyarnos.</b>
+                </div>
+                <div v-show="!$store.state.sucursal">
+                  <br>
+                  <b>No hay ninguna sucursal definida. Para poder trabajar en gohu necesita
+                  definir al menos una sucursal.</b>
+                </div>
 
+              </v-card-text>
+            </v-card>
+          </v-container>
+        </div>
+        <div>
+          <v-card v-show="!sayAviso && !$store.state.sucursal && userId!=1"
+            max-width="800" class="mx-auto">
+            <v-card-subtitle class="pb-0">
+              <b>gohu</b> necesita de cierta información para poder trabajar.
+            </v-card-subtitle>
+            <v-card-text class="text--primary">
+              <div>
+                <br>
+                Ingrese por favor a su perfil para definir los siguientes datos<br><br>
+                - El rubro o rubros a los cuales va a trabajar<br>
+                - Un 'tercero' con sus datos detallados para luego ligarlo al perfil.<br>
+                - El tipo de usuario con el cual se identifica.<br>
+                - Una sucursal o sucursales con las que quiere trabajar<br>
+                - Un depósito como minimo por cada sucursal definida<br>
+                - Una (sola) lista de precios, luego podra hacer promociones<br>
+                - Si tiene empleados, puede definirlos en 'Usuarios del sistema'<br>
+                - Y por ultimo los vinculos con los otros usuarios de gohu'<br>
+                <br>
+              </div>
+            </v-card-text>
+          </v-card>
+        </div>
+
+        <!-- NOTIFICACIONES DE USUARIOS -->
         <v-container fluid>
           <v-row justify="space-around">
             <v-col v-for="(nota, idx) in $store.state.notificaciones" v-bind:key="idx">
@@ -87,6 +188,39 @@
           </v-row>
         </v-container>
 
+        <!-- NOTIFICACIONES GOHU-->
+        <v-container fluid>
+          <v-row justify="space-around">
+            <v-col v-for="(nota, idx) in $store.state.notificacionesgohu" v-bind:key="idx">
+              <v-card max-width="230" class="mx-auto">
+                <v-list-item>
+                  <v-list-item-content>
+                    <v-list-item-title class="caption">
+                      {{nota.detalles}}
+                    </v-list-item-title>
+                    <v-list-item-subtitle></v-list-item-subtitle>
+                  </v-list-item-content>
+                </v-list-item>
+                <v-card-subtitle class="pb-0">{{nota.detalles}}</v-card-subtitle>
+                <v-card-text class="text--primary">
+                  <div>Envia: {{nota.userdesde.username}}</div>
+                  <div>{{nota.userdesde.email}}</div>
+                </v-card-text>
+                <v-card-actions>
+                  <v-btn v-show="nota.paraprocesar==true"
+                    text color="deep-purple accent-4"
+                    @click="activarRechazarUsuario(nota, true)">Activar
+                  </v-btn>
+                  <v-btn v-show="nota.paraprocesar==true"
+                    text color="deep-purple accent-4"
+                    @click="activarRechazarUsuario(nota, false)">Rechazar
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-col>
+          </v-row>
+        </v-container>
+
         <!--
         <v-data-table
           :headers="headers"
@@ -132,6 +266,8 @@ import jsPDF from 'jspdf'
 export default {
   data: () => ({
     noti: [],
+    sayAviso: false,
+    yaEstaNotificado: false,
     /*
     item: [],
     headers: [
@@ -146,6 +282,31 @@ export default {
   }),
   created() {
     moment.locale('es');
+    if (this.isLoggedIn) {
+      this.sayAviso = !this.$store.state.activo
+      const a = HTTP().get('/gohuestanotificado')
+        .then(({ data }) => {
+          this.yaEstaNotificado = data;
+        })
+    } else {
+      debugger
+      this.$store.commit('setSucursal', null, { root: true });
+      this.$store.commit('setSucursales', null , { root: true })
+      this.$store.commit('setSucursalFiscal', null , { root: true })
+      this.$store.commit('setColorSucursal', 'black' , { root: true })
+      this.$store.commit('setCaja', null , { root: true })
+      this.$store.commit('setEmpresa', null, { root: true })
+      this.$store.commit('setOperario', null, { root: true })
+      this.$store.commit('setLevel', null, { root: true })
+      this.$store.commit('setResponsable', null, { root: true })
+      this.$store.commit('setCuit', null, { root: true })
+      this.$store.commit('setActivo', null, { root: true })
+      this.$store.commit('setNotificaciones', null, { root: true })
+      this.$store.commit('setNotificacionesgohu', null, { root: true })
+      this.$store.commit('setArticulosVinculados', null, { root: true });
+      this.$store.commit('setTipo', null , { root: true })
+    }
+
     //let a = this.userId;
     //let b = this.sucursal;
     //let c = this.sucursales;
@@ -176,6 +337,7 @@ export default {
         'empresa',
         'operario',
         'level',
+        'activo',
       ]),
 
   },
@@ -425,6 +587,15 @@ export default {
         doc.output ('dataurlnewwindow');
 
     },
+    notificar() {
+      debugger
+      return HTTP().patch('notificaragohu', {})
+        .then(({ data }) => {
+          this.yaEstaNotificado = true
+        })
+        .catch((e) => {
+        });
+    },
     aceptarVinculo(nota) {
 
       this.$store.commit('actNotificacion', nota.id, { root: true });
@@ -439,6 +610,14 @@ export default {
         })
         .catch((e) => {});
       */
+    },
+    activarRechazarUsuario(nota, sino) {
+      debugger
+      return HTTP().patch('activarrechazarusuario/'+nota.user_id_desde, {activo: sino})
+      .then(({ data }) => {
+        debugger
+        })
+      .catch((e) => {});
     },
     rechazarVinculo(nota) {
       let a = this.notificaciones[1].estado='R'

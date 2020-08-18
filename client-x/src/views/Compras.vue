@@ -8,13 +8,12 @@
         dense
         class="elevation-3"
         :footer-props="footerProps">
+
         <template v-slot:top>
-          <v-system-bar color="indigo darken-2" dark>
+          <v-toolbar flat :color="colorSucursal">
             <v-btn icon @click="closeForm">
               <v-icon color="white" dark>mdi-close-circle</v-icon>
             </v-btn>
-          </v-system-bar>
-          <v-toolbar flat color="indigo">
             <template v-slot:extension>
               <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
@@ -65,18 +64,17 @@
             <v-dialog v-model="dialogCab" max-width="550px" :fullscreen="true">
               <template v-slot:activator="{}"></template>
               <v-card>
-                <v-card-title  class="cyan white--text">
-                  <span class="headline">{{ formTitle }}</span>
+
+                <v-toolbar flat dark :color="colorSucursal">
+                  <v-btn icon @click="cancelar">
+                    <v-icon color="white" dark>mdi-close-circle</v-icon>
+                  </v-btn>
+                  <span class="headdline">{{ formTitle }}</span>
                   <v-spacer></v-spacer>
-                  <span class="text--right">
-                    <v-btn
-                      color="blue-grey" class="ma-2 white--text" @click="cancelar">Cancelar
-                    </v-btn>
-                    <v-btn
-                      color="teal accent-4" class="ma-2 white--text" @click="guardar">Guardar
-                    </v-btn>
-                  </span>
-                </v-card-title>
+                  <v-btn
+                    color="teal accent-4" class="ma-2 white--text" @click="guardar">Guardar
+                  </v-btn>
+                </v-toolbar>
 
                 <!--// CABECERA DE LA COMPRA // -->
                 <v-form ref="form">
@@ -1034,9 +1032,22 @@ export default {
     search: null,
   }),
   computed: {
-    ...mapGetters('authentication', ['isLoggedIn', 'userName', 'userId', 'sucursal', 'sucursalFiscal', 'caja']),
+    ...mapGetters('authentication', ['isLoggedIn', 'userName', 'userId']),
     ...mapMutations(['alert','closeAlert']),
-    ...mapState(['sucursal','sucursalFiscal']),
+    ...mapState([
+      'sucursal',
+      'sucursales',
+      'sucursalFiscal',
+      'notificaciones',
+      'caja',
+      'articulosViculados',
+      'colorSucursal',
+      'empresa',
+      'responsable',
+      'cuit',
+      'operario',
+      'level',
+    ]),    
 
     computedDateFormatted () {
       return this.formatDate(this.date)

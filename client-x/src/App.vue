@@ -6,7 +6,6 @@
       app
       v-if="isLoggedIn">
       <v-list dense>
-
         <v-list-group no-action prepend-icon="shopping_cart">
           <template v-slot:activator>
             <v-list-item-title>Ventas</v-list-item-title>
@@ -47,13 +46,14 @@
               Proveedores
             </v-list-item-title>
           </v-list-item>
-          <v-list-item link :to="{name:'compras'}">
+          <v-list-item
+            link :to="{name:'compras'}">
             <v-list-item-title>
               <v-icon>mdi-face</v-icon>
               Central de Compras
             </v-list-item-title>
           </v-list-item>
-          <v-list-item
+          <v-list-item  v-show="activo"
             link :to="{name: 'resumenesproveedores'}">
             <v-list-item-title>
               <v-icon>mdi-sale</v-icon>
@@ -66,13 +66,13 @@
           <template v-slot:activator>
               <v-list-item-title>Tesoreria</v-list-item-title>
           </template>
-          <v-list-item link :to="{name: 'tesoreriacaja'}">
+          <v-list-item  v-show="activo" link :to="{name: 'tesoreriacaja'}">
               <v-list-item-title>
                 <v-icon>shopping_cart</v-icon>
                 Cerrar Caja
               </v-list-item-title>
           </v-list-item>
-          <v-list-item link :to="{name: 'tesoreriainformes'}">
+          <v-list-item  v-show="activo" link :to="{name: 'tesoreriainformes'}">
               <v-list-item-title>
                 <v-icon>verified_user</v-icon>
                 Informes
@@ -158,25 +158,6 @@
               </v-list-item-title>
           </v-list-item>
         </v-list-group>
-
-        <v-list-group no-action prepend-icon="shopping_cart">
-          <template v-slot:activator>
-            <v-list-item-title>Tablas</v-list-item-title>
-          </template>
-          <v-list-item link :to="{name:'afipiva'}">
-            <v-list-item-title>
-              <v-icon>mdi-city</v-icon>
-              Ciudades
-            </v-list-item-title>
-          </v-list-item>
-          <v-list-item link :to="{name:'afipdocumentos'}">
-            <v-list-item-title>
-              <v-icon>mdi-clipboard-flow</v-icon>
-              Calles
-            </v-list-item-title>
-          </v-list-item>
-        </v-list-group>
-
         <v-list-group no-action prepend-icon="shopping_cart">
           <template v-slot:activator>
             <v-list-item-title>AFIP</v-list-item-title>
@@ -285,29 +266,32 @@
       app
       v-bind:style="{'background-color': colorSucursal ? colorSucursal:'blue darken-3'}"
       dark>
-      <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
+      <v-app-bar-nav-icon v-show="activo" @click.stop="drawer = !drawer" />
       <v-toolbar-title style="width: 300px" class="ml-0 pl-4">
-        <span class="hidden-sm-and-down">Gohu/{{empresa}}/{{operario}}</span>
+        <span class="body-2 hidden-sm-and-down">Gohu/{{empresa}}/{{operario}}</span>
       </v-toolbar-title>
-      <v-icon v-show="mostrarNotificaciones" dense class="mr-2">mdi-bell-ring</v-icon>
       <v-spacer />
+      <v-icon v-show="mostrarNotificaciones && activo" dense class="mr-2">mdi-bell-ring</v-icon>
       <v-toolbar-items class="hidden-sm-and-down">
-        <v-select v-if="isLoggedIn"
+        <v-select v-if="isLoggedIn" v-show="activo && userId!==1"
           class="mt-3 caption"
           v-bind:style="{'background-color': colorSucursal ? colorSucursal:'blue darken-3'}"
           :value="$store.state.sucursal"
           dense
+          label="Sucursal"
           outlined
           @change="cambioSucursal"
           :items="sucursales" item-value="id" item-text="nombre" return-object>
         </v-select>
-        <v-btn class="text-capitalize" text link to="/profile" v-if="isLoggedIn">
+        <v-btn class="text-capitalize" text link to="/profile" v-if="isLoggedIn" v-show="activo">
           <v-icon class="mr-2">account_box</v-icon>
+          <!--
           c:{{ contador-1 }}
+          cg:{{ contadorGohu-1 }}
           s:{{ sucursal }}
           u:{{ userId }}
-          n:{{ userName }}
           v:{{ level }}
+          -->
         </v-btn>
         <v-btn class="text-capitalize" text to="/register" v-if="!isLoggedIn">
           <v-icon class="mr-2">account_box</v-icon>
@@ -348,28 +332,44 @@
       sucursalNombre: '',
       sucItems: [],
       contador: 0,
+      contadorGohu: 0,
       mostrarNotificaciones: false,
+      mostrarNotificacionesGohu: false,
       }),
     mounted() {
-      this.cambioSucursal(this.sucursales[0])
+      debugger
+      if (this.isLoggedIn) {
+        this.cambioSucursal(this.sucursales[0])
+      }
     },
     created() {
-      let vinItems = []
-      vinItems.push(this.userId)
-      const a = HTTP().get('/articulosvinculos')
-        .then(({ data }) => {
-          data.forEach(element => {
-            vinItems.push(element.user_id_hasta)
-          })
-        this.$store.commit('setArticulosVinculados', vinItems, { root: true });
-      })
+      debugger
+      if (this.isLoggedIn) {
+        let vinItems = []
+        vinItems.push(this.userId)
+        const a = HTTP().get('/articulosvinculos')
+          .then(({ data }) => {
+            data.forEach(element => {
+              vinItems.push(element.user_id_hasta)
+            })
+          this.$store.commit('setArticulosVinculados', vinItems, { root: true });
+        })
 
-      this.mostrarNotificaciones = false;
-      var self=this;
-      this.contador = 1;
-      setInterval(function(){
-        self.actualizarContador()
-      },1000)
+        this.mostrarNotificaciones = false;
+        var self=this;
+        this.contador = 1;
+        setInterval(function(){
+          self.actualizarContador()
+        },1000)
+
+        this.mostrarNotificacionesGohu = false;
+        var self=this;
+        this.contadorGohu = 1;
+        setInterval(function(){
+          self.actualizarContadorGohu()
+        },1000)
+      }
+
     },
     computed: {
       ...mapGetters('authentication', ['isLoggedIn', 'userName', 'userId']),
@@ -378,12 +378,14 @@
         'sucursales',
         'sucursalFiscal',
         'notificaciones',
+        'notificacionesgohu',
         'caja',
         'articulosViculados',
         'colorSucursal',
         'empresa',
         'operario',
         'level',
+        'activo',
       ]),    
     },
     methods: {
@@ -393,12 +395,14 @@
         'setSucursales',
         'setSucursalFiscal',
         'setNotificaciones',
+        'setNotificacionesgohu',
         'setCaja',
         'setArticulosVinculados',
         'setColorSucursal',
         'setEmpresa',
         'setOperario',
         'setLevel',
+        'setActivo',
       ]),
       actualizarContador() {
         this.contador --
@@ -406,17 +410,11 @@
           this.contador = 60;
           let n = []
           //alert(this.userId)
-          if (this.isLoggedIn) {
-            /*
-            SELECT users.id, users.username, users.tipo, rubros.id, rubros.nombre,
-            (select id from vinculos where user_id_hasta=users.id) as id
-            from users
-            left join users_rubros on users_rubros.user_id = users.id
-            left join rubros on rubros.id = users_rubros.rubro_id
-            where users.tipo = 'MI' and users.id <> 2 and rubros.id = rubro_id
-            */
+          //debugger
+          if (this.isLoggedIn && this.activo && this.userId!=1) {
             return HTTP().get('/notificaciones/'+this.userId)
               .then(({ data }) => {
+                //debugger
                 if (data.length>0) {
                   for (let i=0; i<=data.length-1; i++) {
                     let p = -1
@@ -468,6 +466,68 @@
         }
       },
 
+      actualizarContadorGohu() {
+        this.contadorGohu --
+        if (this.contadorGohu == 0) {
+          this.contadorGohu = 60;
+          let n = []
+          //alert(this.userId)
+          debugger
+          if (this.isLoggedIn && this.userId==1) {
+            return HTTP().get('/notificacionesgohu')
+              .then(({ data }) => {
+                debugger
+                if (data.length>0) {
+                  for (let i=0; i<=data.length-1; i++) {
+                    let p = -1
+                    for (let j=0; j<=n.length-1; j++) {
+                      if (data[i].comprobante_id == n[j].comprobante_id && n[j].tipo!='V') {
+                        p = j
+                        break
+                      }
+                    }
+                    if (p>=0) {
+                      n[p].notas.push( { nota: data[i].detalles, tipo: data[i].tipo } )
+                    } else {
+                      n.push( { 
+                        comprobante: data[i].comprobante,
+                        comprobante_id: data[i].comprobante_id,
+                        created_at: data[i].created_at,
+                        detalles: data[i].detalles,
+                        estado: data[i].estado,
+                        id: data[i].id,
+                        tipo: data[i].tipo,
+                        updated_at: data[i].updated_at,
+                        user_id_desde: data[i].user_id_desde,
+                        user_id_hasta: data[i].user_id_hasta,
+                        userdesde: data[i].userdesde,
+                        notas: [ { nota: data[i].detalles, tipo: data[i].tipo } ],
+                        paraprocesar: false
+                      })
+                    }
+                  }
+                  // reviso cuales notifiaciones estan listas para procesar asi Home.vue 
+                  // puede prender los botones de ver e importar.
+                  for (let i=0; i<=n.length-1; i++) {
+                    for (let j=0; j<=n[i].notas.length-1; j++) {
+                      if (n[i].notas[j].tipo == 'K' || n[i].notas[j].tipo == 'A' || n[i].notas[j].tipo == 'F' || n[i].notas[j].tipo == 'V' ) {
+                        n[i].paraprocesar = true;
+                      }
+                    }
+                  }
+                  this.$store.commit('setNotificacionesgohu', n, { root: true });
+                  this.mostrarNotificacionesGohu = true;
+                } else  {
+                  this.$store.commit('setNotificacionesgohu', [], { root: true });
+                  this.mostrarNotificacionesGohu = false;
+                }
+              })
+          } else {
+            this.$store.commit('setNotificacionesgohu', [], { root: true });
+          }
+        }
+      },
+
       setTercero(cual) {
         this.$store.commit('setTerceros', cual, { root: true });
       },
@@ -485,8 +545,6 @@
         console.log(this.notificaciones)
         for (let i=0; i<=this.sucursales.length-1; i++) {
           if (this.sucursales[i].id == cual.id) {
-//            this.$store.commit('setSucursalFiscal', this.sucursales[i].fiscal);
-//            this.$store.commit('setColorSucursal', this.sucursales[i].color);
             this.$store.commit('setSucursalFiscal',this.sucursales[i].fiscal, { root: true })
             this.$store.commit('setColorSucursal',this.sucursales[i].color, { root: true })
             break

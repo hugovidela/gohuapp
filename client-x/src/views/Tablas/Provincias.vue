@@ -10,13 +10,10 @@
         class="elevation-3"
         :footer-props="footerProps">
         <template v-slot:top>
-          <v-system-bar color="indigo darken-2" dark>
+          <v-toolbar flat :color="colorSucursal">
             <v-btn icon @click="closeForm">
               <v-icon color="white" dark>mdi-close-circle</v-icon>
             </v-btn>
-          </v-system-bar>
-          <v-toolbar flat color="indigo">
-
             <template v-slot:extension>
               <v-btn
                 fab color="cyan accent-3"
@@ -34,16 +31,25 @@
                 <v-icon>mdi-file-pdf</v-icon>
               </v-btn>
             </template>
-            <v-toolbar-title class="white--text">Provincias</v-toolbar-title>
+            <v-toolbar-title class="body-1 white--text">Provincias</v-toolbar-title>
             <v-divider class="mx-4" inset vertical></v-divider>
             <v-spacer></v-spacer>
             <!-- Modal del diálogo para Alta y Edicion -->
             <v-dialog v-model="dialog" max-width="400px">
               <template v-slot:activator="{ on }"></template>
               <v-card>
-                <v-card-title  class="cyan white--text">
-                  <span class="headline">{{ formTitle }}</span>
-                </v-card-title>
+
+                <v-toolbar flat dark :color="colorSucursal">
+                  <v-btn icon @click="cancelar">
+                    <v-icon color="white" dark>mdi-close-circle</v-icon>
+                  </v-btn>
+                  <span class="headdline">{{ formTitle }}</span>
+                  <v-spacer></v-spacer>
+                  <v-btn
+                    color="teal accent-4" class="ma-2 white--text" @click="guardar">Guardar
+                  </v-btn>
+                </v-toolbar>
+
                 <v-form ref="form">
                   <v-card-text>
                     <v-container>
@@ -99,25 +105,11 @@
                             v-model="editado.activo">
                           </v-switch>
                         </v-col>
-                    </v-row>
+                      </v-row>
                     </v-container>
                   </v-card-text>
-                  <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn
-                      color="blue-grey"
-                      class="ma-2 white--text"
-                      @click="cancelar">
-                      Cancelar
-                    </v-btn>
-                    <v-btn
-                      color="teal accent-4"
-                      class="ma-2 white--text"
-                      @click="guardar">
-                      Guardar
-                    </v-btn>
-                  </v-card-actions>
                 </v-form>
+
               </v-card>
             </v-dialog>
           </v-toolbar>
@@ -169,7 +161,7 @@
 
 /* eslint-disable */
 import HTTP from '../../http';
-import { mapGetters, mapMutations } from 'vuex';
+import { mapGetters, mapMutations, mapState } from 'vuex';
 import router from '../../router';
 import SBar from './../Forms/snackbar.vue';
 import Confirmacion from "./../Forms/confirmacion.vue"
@@ -239,7 +231,7 @@ export default {
   }),
   computed: {
     ...mapGetters('authentication', ['isLoggedIn']),
-    ...mapMutations(['alert','closeAlert']),
+    ...mapState(['colorSucursal']),
     formTitle () {
       return this.editedIndex === -1 ? 'Nueva Provincia' : 'Editar Provincia';
     },
@@ -286,9 +278,10 @@ export default {
     this.listarHTTP();
   },
   */
-  methods: {
-    closeForm(){
-      router.push('/')
+ methods: {
+   ...mapMutations(['alert','closeAlert']),
+   closeForm(){
+     router.push('/')
     },
     activarDesactivar(item) {
       const valor = item.activo ? 0 : 1;

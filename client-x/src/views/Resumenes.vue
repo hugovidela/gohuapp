@@ -10,19 +10,12 @@
         class="elevation-3"
         :footer-props="footerProps">
         <template v-slot:top>
-          <v-system-bar color="indigo darken-2" dark>
+
+          <v-toolbar flat :color="colorSucursal">
             <v-btn icon @click="closeForm">
               <v-icon color="white" dark>mdi-close-circle</v-icon>
             </v-btn>
-          </v-system-bar>
-          <v-toolbar flat color="indigo">
-
             <template v-slot:extension>
-              <v-btn
-                fab color="cyan accent-3"
-                @click="dialog = !dialog">
-                <v-icon>mdi-plus</v-icon>
-              </v-btn>
               <v-btn
                 fab color="green accent-3"
                 @click='exportarAXLS'>
@@ -34,6 +27,7 @@
                 <v-icon>mdi-file-pdf</v-icon>
               </v-btn>
             </template>
+
             <v-toolbar-title class="white--text">{{tituloResumen}}</v-toolbar-title>
             <v-divider class="mx-4" inset vertical></v-divider>
             <v-spacer></v-spacer>
@@ -131,7 +125,7 @@
 
 /* eslint-disable */
 import HTTP from '../http';
-import { mapGetters, mapMutations } from 'vuex';
+import { mapGetters, mapMutations, mapState } from 'vuex';
 import router from '../router';
 import SBar from './Forms/snackbar.vue';
 import Confirmacion from "./Forms/confirmacion.vue"
@@ -185,6 +179,7 @@ export default {
   computed: {
     ...mapGetters('authentication', ['isLoggedIn']),
     ...mapMutations(['alert','closeAlert']),
+    ...mapState(['colorSucursal']),
     formTitle () {
       return this.editedIndex === -1 ? 'Nueva Marca' : 'Editar Marca';
     },

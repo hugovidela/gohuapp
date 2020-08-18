@@ -14,7 +14,7 @@
             <span class="headdline">Mi Perfil</span>
             <v-spacer></v-spacer>
             <v-btn
-              color="grey accent-4" class="ma-2 white--text" @click="guardar">Guardar
+              color="teal accent-4" class="ma-2 white--text" @click="guardar">Guardar
             </v-btn>
           </v-toolbar>
 
@@ -32,11 +32,10 @@
                       <v-col cols="6" sm="6" md="6">
                         <v-text-field
                           ref="username"
-                          autofocus
+                          disabled
                           v-model="editado.username"
                           label="Razón Social"
                           required
-                          :rules="usernameRules"
                           :counter="80"
                           :maxlength="80">
                         </v-text-field>
@@ -45,8 +44,7 @@
                         <v-text-field
                           v-model="editado.email"
                           label="Correo Electrónico"
-                          required
-                          :rules="emailRules"
+                          disabled
                           :counter="80"
                           :maxlength="80">
                         </v-text-field>
@@ -58,6 +56,7 @@
                         <v-select
                           v-model="rubValue"
                           :items="rubItems"
+                          autofocus
                           chips
                           label="Rubros a los cuales pertenece el usuario"
                           multiple
@@ -543,7 +542,6 @@
                       </template>
                       <template v-slot:item.accion="{item}">
                         <v-btn
-                          v-show="vinhab(item)"
                           class="mr-2" fab x-small color="white"
                           @click="activarDesactivarVinArt(item)">
                           <v-icon dark>mdi-shopping</v-icon>
@@ -888,7 +886,6 @@ export default {
       })
   },
   methods: {
-
     ...mapActions('authentication', ['logout']),
     ...mapMutations([
       'setSucursal',
@@ -958,7 +955,6 @@ export default {
         }
       }
       this.editado.rubros = aux;
-
       //this.mensaje('¡Actualización Exitosa!', 'black', 1500) 
       this.editarHTTP(this.editado);
       this.dialog = false;
@@ -968,12 +964,13 @@ export default {
     editarHTTP:function(data) {
       for (let i=0; i<=data.suc.length-1; i++) {
         if (data.suc[i].id == this.sucursal) {
-          this.$store.commit('setColorSucursal', data.suc[i].color);    
+          this.$store.commit('setColorSucursal', data.suc[i].color , { root: true });    
           break
         }
       }
       return HTTP().patch(`${this.modelo}/${data.id}`, data)
         .then(() => {
+          this.$store.commit('setSucursales', data.suc, { root: true })
           this.dialog = false;
       });
     },

@@ -10,13 +10,11 @@
         class="elevation-3"
         :footer-props="footerProps">
         <template v-slot:top>
-          <v-system-bar color="indigo darken-2" dark>
+
+          <v-toolbar flat :color="colorSucursal">
             <v-btn icon @click="closeForm">
               <v-icon color="white" dark>mdi-close-circle</v-icon>
             </v-btn>
-          </v-system-bar>
-          <v-toolbar flat color="indigo">
-
             <template v-slot:extension>
               <v-btn
                 fab color="cyan accent-3"
@@ -35,7 +33,7 @@
               </v-btn>
             </template>
 
-            <v-toolbar-title class="white--text">
+            <v-toolbar-title class="body-1 white--text">
               Mis {{ $store.state.formTercerosTitulo }}
             </v-toolbar-title>
             <v-divider class="mx-4" inset vertical></v-divider>
@@ -45,40 +43,30 @@
             <v-dialog v-model="dialog" max-width="800px" :fullscreen="true">
               <template v-slot:activator="{ on }"></template>
               <v-card>
-                <!-- para el EDICION-->
-                <v-card-title  class="cyan white--text">
-                  <span class="headline">{{ formTitle }}</span>
+
+                <v-toolbar flat dark :color="colorSucursal">
+                  <v-btn icon @click="cancelar">
+                    <v-icon color="white" dark>mdi-close-circle</v-icon>
+                  </v-btn>
+                  <span class="headdline">{{ formTitle }}</span>
                   <v-spacer></v-spacer>
-                  <span class="text--right">
-                    <v-btn
-                      color="blue-grey" class="ma-2 white--text" @click="cancelar">Cancelar
-                    </v-btn>
-                    <v-btn
-                      color="teal accent-4" class="ma-2 white--text" @click="guardar">Guardar
-                    </v-btn>
-                  </span>
-                </v-card-title>
+                  <v-btn
+                    color="teal accent-4" class="ma-2 white--text" @click="guardar">Guardar
+                  </v-btn>
+                </v-toolbar>
+                <!-- para el EDICION-->
                 <v-form ref="form">
                   <v-card-text>
                     <v-container>
                       <v-row>
-                        <!--
-                        <v-col cols="2" sx="2" mx="2">
-                          <v-text-field
-                            disabled
-                            v-model="editado.id"
-                            label="Codigo">
-                          </v-text-field>
-                        </v-col>
-                        -->
                         <v-col cols="3" sx="3" mx="3">
                           <v-select
                             label="Tipo de Documento"
                             v-model="editado.documento_id"
-                            :items="itemsDocumentos" item-value="id"
+                            :items="itemsDocumentos"
+                            item-value="id"
                             item-text="nombre"
-                            autocomplete
-                            return-object>
+                            autocomplete>
                           </v-select>
                         </v-col>
                         <v-col cols="2" sm="2" md="2">
@@ -105,14 +93,6 @@
                             @keyup="escribiendoNombre">
                           </v-text-field>
                         </v-col>
-                        <!--
-                        <v-col cols="2" sx="2" mx="2">
-                          <v-switch
-                            label="Activo"
-                            v-model="editado.activo">
-                          </v-switch>
-                        </v-col>
-                        -->
                       </v-row>
 
                       <v-tabs key="pri" background-color="white" color="cyan" v-model="tabInicial">
@@ -140,8 +120,7 @@
                                 :items="itemsResponsables"
                                 item-value="id"
                                 item-text="nombre"
-                                autocomplete
-                                return-object>
+                                autocomplete>
                               </v-select>
                             </v-col>
                           </v-row>
@@ -383,20 +362,12 @@
                                 </v-dialog>
                               </v-toolbar>
                             </template>
-<!--
-                            //// PARA VER COMO VIENE ITEM ////
-                            <template v-slot:item.contactoTipo.icono="{ item }">
-                              <p>{{item}}</p>
-                            </template>
--->
-<!--                            <template v-slot:item.contactoTipo.icono="{ item }">-->
                             <template v-slot:item.icono="{ item }">
                               <v-btn
                                 class="mr-2" fab dark x-small color="grey-2">
                                 <v-icon dark>{{item.icono}}</v-icon>
                               </v-btn>
                             </template>
-
                             <template v-slot:item.accion="{item}">
                               <v-btn
                                 class="mr-2" fab dark x-small color="cyan"
@@ -620,13 +591,6 @@
                                 @click="activarDesactivarLis(item)">
                                 <v-icon dark>mdi-checkbox-marked-outline</v-icon>
                               </v-btn>
-                              <!--
-                              <v-btn
-                                class="mr-2" fab dark x-small color="error"
-                                @click="preguntoBorrarLis(item)">
-                                <v-icon dark>mdi-delete</v-icon>
-                              </v-btn>
-                              -->
                             </template>
                           </v-data-table>
 
@@ -697,7 +661,7 @@
 
 /* eslint-disable */
 import HTTP from '../http';
-import { mapGetters, mapMutations } from 'vuex';
+import { mapGetters, mapMutations, mapState } from 'vuex';
 import router from '../router';
 import SBar from './Forms/snackbar.vue';
 import Confirmacion from "./Forms/confirmacion.vue"
@@ -948,6 +912,8 @@ export default {
   computed: {
     ...mapGetters('authentication', ['isLoggedIn', 'userName', 'userId' ]),
     ...mapMutations(['alert','closeAlert','setTerceros']),
+    ...mapState(['colorSucursal']),
+
     formTitle () {
       return this.editedIndex === -1 ? 'Nuevo '+this.tipo : 'Editar '+this.tipo;
     },
@@ -1003,39 +969,12 @@ export default {
         return Object.assign({}, entry, { icono })
         })
       },
-
-    // MANEJO DE CHIPS //
-    /*
-    allSelected () {
-      return this.selected.length === this.tagsDisp.length
-    },
-    categories () {
-      const search = this.searchTag.toLowerCase()
-      if (!search) return this.tagsDisp
-      return this.tagsDisp.filter(item => {
-        const text = item.nombre.toLowerCase()
-        return text.indexOf(search) > -1
-      })
-    },
-    selections () {
-      const selections = []
-      for (const selection of this.selected) {
-        selections.push(selection)
-      }
-      return selections
-    },
-    */
-    // MANEJO DE CHIPS //
-
   },
   watch: {
     // ESTE WATCH ES PARA RE-INICIALIZAR EL MISMO FORMULARIO YA CARGADO
     '$route.path': function(val, oldVal){
       this.init_component();
     },
-//  dialog (val) {
-//    val || this.cancelar();
-//  },
     dialogDir (val) {
       val || this.cancelarDir();
     },
@@ -1158,7 +1097,6 @@ export default {
         .then(({ data }) => {
           this.itemsDocumentos = data;
         })
-      debugger
       const g = HTTP().get('/user/'+this.userId)
         .then(({ data }) => {
           this.itemsListas = data[0].listas;
@@ -1173,14 +1111,12 @@ export default {
       router.push('/')
     },
     init_component() {
-      //debugger
       let a = this.$store.state.route.fullPath.substring(1,this.$store.state.route.fullPath.length)
       if (a==='usersclientes') {
         this.tipo='Cliente'
       } else if (a==='usersproveedores') {
         this.tipo='Proveedor'
       }
-      // debugger
       this.modelo = a;
       this.listarHTTP();
     },
@@ -1216,10 +1152,8 @@ export default {
     activarDesactivar(item) {
       const valor = item.activo ? 0 : 1;
       item.activo = valor
-      debugger
       HTTP().patch(`usertercero/${item.id}`,{activo: valor})
         .then ((res) => {
-          debugger
           console.log(res);
         }).catch((err)=>{
           console.log(err);
@@ -1306,10 +1240,8 @@ export default {
       });
     },
     listarHTTP:function() {
-      debugger
       const a = HTTP().get('/'+this.modelo+'/true')
         .then(({ data }) => {
-          debugger
           this.items = data;
       });
     },
@@ -1322,8 +1254,8 @@ export default {
       return HTTP().post('/'+this.modelo, {
         nombre: this.editado.nombre,
         razon_social: this.editado.razon_social,
-        responsable_id: this.editado.responsable.id,
-        documento_id: this.editado.documento.id,
+        responsable_id: this.editado.responsable_id,
+        documento_id: this.editado.documento_id,
         cuit: this.editado.cuit,
         observaciones: this.editado.observaciones,
         activo: true,
@@ -1354,7 +1286,6 @@ export default {
       this.dialog = true;
       this.selected = item.terceroTipos;
 
-      //debugger
       this.lis = item.terceroListas;
       const a = HTTP().get('/direcciones/'+this.editado.id)
         .then(({ data }) => {
@@ -1393,13 +1324,11 @@ export default {
       this.dialogCon = true;
     },
     editarLis (item) {
-      // debugger
       this.editadoLis = Object.assign({}, item);
       this.editedIndexLis = this.lis.indexOf(item); // si this.editIndex es = -1 es una alta.
       this.dialogLis = true;
     },
     editarMedio (item) {
-      //debugger
       this.editadoMedio = Object.assign({}, item);
       this.editedIndexMedio = this.medios.indexOf(item); // si this.editIndex es = -1 es una alta.
       this.dialogMedio = true;
@@ -1489,21 +1418,19 @@ export default {
         this.mensaje('¡Debe completar todos los datos!', 'red', 1500) 
         return this.dialog = true;
       }
-      debugger
-      this.nombre = this.editado.nombre;
-      this.razon_social = this.editado.razon_social;
-      this.responsable_id = this.editado.responsable_id.id;
-      this.documento_id = this.editado.documento_id.id;
-      this.cuit = this.editado.cuit;
-      this.observaciones = this.editado.observaciones;
-      this.activo = this.editado.activo;
-      this.editado.responsable_id = this.editado.responsable_id.id;
-      this.editado.documento_id = this.editado.documento_id.id;
+      //this.nombre = this.editado.nombre;
+      //this.razon_social = this.editado.razon_social;
+      //this.responsable_id = this.editado.responsable_id.id;
+      //this.documento_id = this.editado.documento_id.id;
+      //this.cuit = this.editado.cuit;
+      //this.observaciones = this.editado.observaciones;
+      //this.activo = this.editado.activo;
+      this.editado.responsable_id = this.editado.responsable_id;
+      this.editado.documento_id = this.editado.documento_id;
       this.editado.tipos = this.selected;
       this.editado.direcciones = this.dir;
       this.editado.contactos = this.con;
       this.editado.medios = this.medios;
-      debugger
       this.editado.listas = this.lis;
       if (this.editedIndex > -1) { // esta modificando
         this.id = this.editado.id;
@@ -1617,7 +1544,10 @@ export default {
     },
     guardarLis(item) {
       debugger
-      let mUserTerceroId = this.items[this.editedIndex].id;
+      let mUserTerceroId = 0
+      if (this.editedIndex>=0) {
+        mUserTerceroId = this.items[this.editedIndex].id;  
+      }
       if (this.editedIndexLis > -1) { // esta modificando
         this.lis[this.editedIndexLis].nombre = this.editadoLis.user_lista_id;
         this.lis[this.editedIndexLis].porrem = this.editadoLis.porrem;
@@ -1639,7 +1569,11 @@ export default {
       if (this.editadoMedio.dias_vencimiento !== null && this.editadoMedio.dias_vencimiento !== undefined) {
         mDiasVenc = Number(this.editadoMedio.dias_vencimiento)
       }
-      let mUserTerceroId = this.items[this.editedIndex].id;
+      let mUserTerceroId = 0
+      if (this.editedIndex>=0) {
+        mUserTerceroId = this.items[this.editedIndex].id;
+      }
+
       let mBanco = null;
       let mBancoId = null;
       let mBancoCuenta = null;
@@ -1698,7 +1632,7 @@ export default {
     buscoDocumento (event) {
       if (this.editedIndex===-1) {  // SOLO SI ES UNA ALTA, VER QUE PASA SI CAMBIO EL DOCUMENTO
         const doc = event.target.value;
-        return HTTP().get(`/terceros/documento/${doc}`)
+        const a = HTTP().get(`/tercerodocumento/${doc}`)
           .then(({ data }) => {
             if(data) {
               this.terceroAIncorporar = data.id
