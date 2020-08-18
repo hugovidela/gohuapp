@@ -73,7 +73,7 @@ class UserController {
     return this.login(...arguments)
   }
 
-  // CONSULTA PRINCIPAL DE ARTICULOS
+  // CONSULTA PRINCIPAL DE ARTICULOS - PARA EL BROWSE DE ARTICULOS
   // FILTRA POR LOS RUBROS ASIGNADOS AL USUARIO QUE CORRESPONDAN A LOS ARTICULOS
   async articulos ( {auth, params } ) {
 
@@ -119,6 +119,69 @@ class UserController {
 
     return await articulosRubros
   }
+
+
+  // CONSULTA DE ARTICULOS EN EL FACTURADOR
+  // FILTRA POR LOS RUBROS ASIGNADOS AL USUARIO QUE CORRESPONDAN A LOS ARTICULOS
+  async articulosfac ( {auth, request } ) {
+
+    let search = request.input('search')
+    let vinculos  = request.input('vinculos')
+
+    //let { search, vinculos } = params
+    let bus = search == '' ? '' : search
+    console.log('search es:',search)
+    console.log('vinculos es:',vinculos)
+    
+    bus = decodeURIComponent(bus)
+    console.log(bus)
+    const user = auth.current.user
+    const userRubros = await user.rubros().ids()
+    
+    //const nums = vinculos.split(',').map(x => parseInt(x, 10));
+
+    const articulosRubros = await ArticuloRubro
+    .query()
+      .from('articulos_rubros as ar')
+      .leftJoin('articulos as a', 'a.id' , '=' , 'ar.articulo_id')
+      .leftJoin('afip_iva as i', 'i.id' , '=' , 'a.iva_id')
+      .leftJoin('afip_monedas as mo', 'mo.id' , '=' , 'a.moneda_id')
+      .leftJoin('unidades as um', 'um.id' , '=' , 'a.um_venta_id')
+      .leftJoin('users as u', 'a.creador_id' , '=' , 'u.id')
+      .leftJoin('marcas as m', 'm.id' , '=' , 'a.marca_id')
+      .leftJoin('grupos as g', 'g.id' , '=' , 'a.grupo_id')
+      .leftOuterJoin('users_articulos_inactivos as uai', function() {
+        this.on('uai.user_id', '=', user.id).andOn('uai.articulo_id', '=', 'a.id')
+      })
+      .select('a.codigo', 
+              'a.nombre',
+              'concat(a.codigo,a.nombre) as codnom',
+              'a.creador_id as userid',
+              'a.iva_id as ivaid',
+              'a.moneda_id as monedaid',
+              'a.um_venta_id as unimedid',
+              'uai.id as activo', 
+              'm.nombre as nommar', 
+              'g.nombre as nomgru', 
+              'u.username as creador', 
+              'i.tasa as tasa',
+              'mo.simbolo as simbolo',
+              'um.nombre as unimed',
+              'a.id')
+      .whereIn('rubro_id', userRubros)
+      .whereIn('a.creador_id', vinculos )
+      .where(function () { 
+        this.where('a.codigo', 'like', '%'+bus+'%')
+        this.orWhere('a.nombre', 'like', '%'+bus+'%') })
+      .limit(25)
+      .fetch()
+
+      console.log('articulosRubros es= a: ',articulosRubros.rows.length)
+
+    return await articulosRubros
+  }
+
+
   /*
   select a.codigo, a.nombre, a.activo, m.nombre as nommar, g.nombre as nomgru, a.id,
   (select id from users_articulos_inactivos where(user_id=1 and articulo_id=a.id)) as uai
@@ -185,10 +248,9 @@ class UserController {
   }
 
   async userarticulosmisprecios ( {auth, params } ) {
-    let { rub, lis } = params
+    let { lis } = params
     const user = auth.current.user
     const userRubros = await user.rubros().ids()
-    //console.log(userRubros)
     const precios = Precio.query()
       .from('precios as p')
       .leftJoin('articulos as a', 'a.id' , '=' , 'p.articulo_id')
@@ -597,6 +659,8 @@ class UserController {
       tipoABuscar = ['MD']
     } else if ( user.tipo=='MD') {
       tipoABuscar = ['IP','MI']
+    } else {
+      tipoABuscar = ['SU']
     }
     
     // BUSCO LOS RUBROS A LOS CUALES PERTENECE EL USUARIO
@@ -648,7 +712,14 @@ class UserController {
       nv.user_id_hasta = faltantes[i]
       nv.articulos = 0
       nv.operaciones = 0
-      nv.estado = 'P'
+      nv.activo = 0
+      await nv.save()
+
+      nv = new Vinculo()
+      nv.user_id_desde = faltantes[i]
+      nv.user_id_hasta = user.id
+      nv.articulos = 0
+      nv.operaciones = 0
       nv.activo = 0
       await nv.save()
 
@@ -662,6 +733,7 @@ class UserController {
       notif.estado = 'P'
       await notif.save()
     }
+    console.log('4')
 
     const notificaciones = await Notificacion.query()
     .with('comprobante')
@@ -680,7 +752,7 @@ class UserController {
       return []
     }
   }
-
+  
   async articulosvinculos ({ auth, params }) {
     const user = await auth.getUser()
     const aVin = await Vinculo
@@ -823,6 +895,129 @@ class UserController {
     v.activo = activo
     await v.save()
     return not
+  }
+  
+  async notificaragohu ({ auth }) {
+    /*
+      Un usuario nuevo notifica a gohu para ser autorizado
+      para utilizar el sistema.
+    */
+    const user = await auth.getUser()
+    const notif = new Notificacion()
+    notif.user_id_desde = user.id
+    notif.user_id_hasta = 1
+    notif.comprobante_id = null
+    notif.tipo = 'A'
+    notif.detalles = 'Solicitud de Vinculo Comercial'
+    notif.estado = 'P'
+    await notif.save()
+
+    /* 
+      genero los vinculos asi ya los dejo listos. 
+    */
+    let nv = await new Vinculo()
+    nv.user_id_desde = user.id
+    nv.user_id_hasta = 1
+    nv.articulos = 0
+    nv.operaciones = 0
+    nv.activo = 0
+    await nv.save()
+
+    nv = await new Vinculo()
+    nv.user_id_desde = 1
+    nv.user_id_hasta = user.id
+    nv.articulos = 0
+    nv.operaciones = 0
+    nv.activo = 0
+    await nv.save()
+
+  }
+
+  async gohuestanotificado ({ auth }) {
+    /*
+      Un usuario nuevo notifica a gohu para ser autorizado
+      para utilizar el sistema.
+    */
+    const user = await auth.getUser()
+    const notif = await Notificacion.query()
+    .where('user_id_desde', user.id)
+    .where('user_id_hasta', 1)
+    .where('tipo', 'A')
+    .where('estado', 'P')
+    .fetch()
+    console.log(notif)
+    return (await notif.rows.length > 0) ? true : false
+  }
+
+  async notificacionesgohu ({ auth, params }) {
+    const user = await auth.getUser()
+    const { id } = params;
+
+    const notificaciones = await Notificacion.query()
+    .with('comprobante')
+    .with('comprobante.items')
+    .with('comprobante.tercero')
+    .with('userdesde')
+    .where('estado', 'P')
+    .where('user_id_hasta', 1)
+    .orderBy('created_at','desc')
+    .fetch()
+
+    if (notificaciones) {
+      return notificaciones
+    } else {
+      return []
+    }
+  }
+
+  async activarrechazarusuario ({ params, request }) {
+
+    const { id } = params;
+    let venc = new Date().toISOString().substr(0, 10)
+    const activo = request.input('activo')
+    const user = await User.find(id)
+    user.activo = activo
+    user.vencimiento = venc
+    await user.save()
+
+    const notificacion = await Notificacion
+    .query()
+      .where('estado', 'P')
+      .where('user_id_desde', id)
+      .where('user_id_hasta', 1)
+    .fetch()
+    
+    let notid = notificacion.rows[0].id
+    const not = await Notificacion.find(notid)
+    not.estado = 'R'
+    await not.save()
+
+    // activo el vinculo del usuario con gohu
+    let vin = await Vinculo
+    .query()
+      .where('user_id_desde', '=', id)
+      .where('user_id_hasta', '=', 1 )
+    .fetch()
+    let vinid = vin.rows[0].id
+    let vinculo = await Vinculo.find(vinid)
+    vinculo.activo = activo
+    vinculo.articulos = 0
+    vinculo.operaciones = 0
+    await vinculo.save()
+
+    // activo el vinculo de gohu con el usuario
+    vin = await Vinculo
+    .query()
+      .where('user_id_desde', '=', 1)
+      .where('user_id_hasta', '=', id )
+    .fetch()
+    vinid = vin.rows[0].id
+    vinculo = await Vinculo.find(vinid)
+    vinculo.activo = activo
+    vinculo.articulos = 1
+    vinculo.operaciones = 1
+    await vinculo.save()
+
   }
 
 }

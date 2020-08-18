@@ -80,7 +80,7 @@ class TerceroController {
     const user = await auth.getUser()
     const { nombre } = params
     const tercero = await Tercero.findBy('nombre', nombre  )
-    // AuthorizationService.verifyPermission(afipdocumento, user)
+  //AuthorizationService.verifyPermission(afipdocumento, user)
     return await tercero ? true : false
   }
 
@@ -88,7 +88,7 @@ class TerceroController {
     const user = await auth.getUser()
     const { documento } = params
     const tercero = await Tercero.findBy('cuit', documento )
-    AuthorizationService.verifyPermission(tercero, user)
+  //AuthorizationService.verifyPermission(tercero, user)
     return await tercero
   }
 

@@ -15,6 +15,7 @@
 
 /** @type {typeof import('@adonisjs/framework/src/Route/Manager')} */
 const Route = use('Route')
+const Helpers = use('Helpers')
 
 Route.group(() => {
   Route.post('auth/register', 'UserController.register')
@@ -26,9 +27,13 @@ Route.group(() => {
   Route.get('user/:id', 'UserController.user').middleware('auth')
   Route.get('userprecios/:user/:articulo', 'UserController.userprecios').middleware('auth')
   Route.get('userarticulos/:page/:rows/:search/:vinculos', 'UserController.articulos').middleware('auth')
+
+  Route.post('userarticulosfac', 'UserController.articulosfac').middleware('auth')
+//Route.get('userarticulosfac/:search/:vinculos', 'UserController.articulosfac').middleware('auth')
+
   Route.get('userarticulosimp', 'UserController.userarticulosimp').middleware('auth')
   Route.get('userarticulosprecios/:page/:rows/:search/:rub/:lis/:mar/:gru', 'UserController.userarticulosprecios').middleware('auth')
-  Route.get('userarticulosmisprecios/:rub/:lis', 'UserController.userarticulosmisprecios').middleware('auth')
+  Route.get('userarticulosmisprecios/:lis', 'UserController.userarticulosmisprecios').middleware('auth')
   Route.get('tengoelarticulo/:codigo/:grupo/:marca', 'UserController.tengoelarticulo').middleware('auth')
   Route.get('usersrubros', 'UserController.rubros').middleware('auth')
   Route.get('userscaja', 'UserController.caja').middleware('auth')
@@ -36,7 +41,7 @@ Route.group(() => {
 
   Route.get('articulos/:page/:rows/:search','ArticuloController.index').middleware('auth')
   Route.get('articulosvinculos','UserController.articulosvinculos').middleware('auth')
-  Route.post ('import', 'ArticuloController.import')
+  Route.post ('import','ArticuloController.import')
   Route.post ('actualizaprecios', 'ArticuloController.actualizaprecios')
   Route.get('articulo/:id','ArticuloController.articulo').middleware('auth')
   Route.get('precio/:art/:lis','ArticuloController.precio').middleware('auth')
@@ -56,7 +61,7 @@ Route.group(() => {
   Route.post('terceroincorporar','TerceroController.incorporacion').middleware('auth')
   Route.get('terceros','TerceroController.index').middleware('auth')
   Route.get('tercero/:id','UserTerceroController.tercero').middleware('auth')
-  Route.get('terceros/documento/:documento','TerceroController.documento').middleware('auth')
+  Route.get('tercerodocumento/:documento','TerceroController.documento').middleware('auth')
   Route.get('tercerostipos','TerceroController.tipos').middleware('auth')
   Route.get('tercerosmedios','TerceroController.medios').middleware('auth')
   Route.patch('usertercero/:usrter','UserTerceroController.activardesactivar').middleware('auth')
@@ -239,10 +244,16 @@ Route.group(() => {
   Route.get('vinculos','UserController.vinculos').middleware('auth')
   Route.patch('vinculoconfirmarrechazar/:id','UserController.vinculoconfirmarrechazar').middleware('auth')
   Route.get('notificaciones/:id','UserController.notificaciones').middleware('auth')
+  //cuando un nuevo usuario notifica a gohu desde home.vue
+  Route.patch('notificaragohu','UserController.notificaragohu').middleware('auth')
+  //para mostrar al nuevo usuario que gohu esta notificado
+  Route.get('gohuestanotificado','UserController.gohuestanotificado').middleware('auth')
+  //carga las notificaciones para gohu
+  Route.get('notificacionesgohu','UserController.notificacionesgohu').middleware('auth')
+  //carga las notificaciones para gohu
+  Route.patch('activarrechazarusuario/:id','UserController.activarrechazarusuario').middleware('auth')
 
   // RESUMENES DE CUENTAS
   Route.get('resumenesclientes/:id','TerceroController.resumenes').middleware('auth')
   Route.get('resumenesproveedores/:id','TerceroController.resumenes').middleware('auth')
-
-
 }).prefix('api')

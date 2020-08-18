@@ -67,13 +67,13 @@ class ArticuloController {
       .whereIn('c.tipo', ['VE','CO'])
       .where('ci.articulo_id',id)
       .where('ci.deposito_id',dep)
-      .where('c.user_id',user.id)
+      //.where('c.user_id',user.id)
       .groupBy('ci.deposito_id')
     .catch((err) => {
       console.log(err)
     })
-    console.log(stk)
-    return stk ? stk[0].stock : 0
+    console.log(stk.length)
+    return stk.length > 0 ? stk[0].stock : 0
   }
 
   async stocks ({ auth, params }) {
@@ -416,51 +416,47 @@ class ArticuloController {
     }
   }
 
-
   async import({request, response}) {
     let upload  = request.file('upload')
+    console.log(upload)
     let fname   = `${new Date().getTime()}.${upload.extname}`
     let dir     = 'upload/'
     console.log('a')
     //move uploaded file into custom folder
     await upload.move(Helpers.tmpPath(dir), {
-        name: fname
+      name: fname
     })
     console.log('b')
     if (!upload.moved()) {
-        console.log('error')
-        return (upload.error(), 'Error moving files', 500)
+      console.log('error')
+      return (upload.error(), 'Error moving files', 500)
     }
-    console.log('c')
-    let send = await ImportService.ImportClassification('tmp/' + dir + fname)
-    console.log(send)
+    console.log('FINALIZO!!!')
+    //let send = await ImportService.ImportClassification('tmp/' + dir + fname)
+    //console.log(send)
   }
 
   async actualizaprecios({request, response}) {
-
-    const file = request.file('file',{
-      maxSize: '5mb',
-      allowedExtensions: ['xlsx']
-    })
-
-    console.log('a', file)
-    const filename = `${new Date().getTime()}.${file.extension()}`
-    console.log('b', filename)
-
+    let upload = request.file('file')
+    let lista = request.all('lista')
+    let fname = `${new Date().getTime()}.${upload.extname}`
     let dir = 'upload/'
-    
-    await file.move(Helpers.tmpPath(dir), {
-        name: filename
+    //move uploaded file into custom folder
+    await upload.move(Helpers.tmpPath(dir), {
+      name: fname
     })
-
-    if (!file.moved()) {
-        console.log('error')
-        return (file.error(), 'Error moving files', 500)
+    if (!upload.moved()) {
+      console.log('error')
+      return (upload.error(), 'Error moving files', 500)
     }
-
-    console.log('okey')
-    // let send = await ActualizaPrecios.ImportClassification('tmp/' + dir + fname)
-    console.log(send)
+    console.log('antes de entrar!')
+//  let send = await ActualizaPrecios.ImportClassification('tmp/'+dir+fname, lista.lista)
+    let send = await ActualizaPrecios.ImportClassification('tmp/'+dir+fname, lista.lista)
+    console.log('send es:',send)
+//    .then(({send}) => {
+//      console.log('salio', send)
+//      return send
+//    })
   }
 
 }
