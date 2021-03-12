@@ -10,7 +10,7 @@
   "dependencies": {
     "axios": "^0.19.2",
     "core-js": "^2.6.11",
-    "jspdf": "^1.5.3",
+    "jspdf": "^2.3.1",
     "liquor-tree": "^0.2.70",
     "lodash": "^4.17.19",
     "moment": "^2.26.0",
